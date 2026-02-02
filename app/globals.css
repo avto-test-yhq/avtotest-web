@@ -1,0 +1,361 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://unpkg.com/aos@2.3.1/dist/aos.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark Mode (Default) */
+body {
+  background-color: #020617;
+  color: #E2E8F0;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Mode */
+body.light-mode {
+  background-color: #F8FAFC;
+  color: #1E293B;
+}
+
+/* Premium Glass Effect - Dark */
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+/* Light Mode Glass */
+body.light-mode .glass-dark {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+body.light-mode .glass-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Neon Text */
+.text-glow {
+  text-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+}
+
+body.light-mode .text-glow {
+  text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Grid Background */
+.bg-grid {
+  background-size: 50px 50px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  transition: all 0.3s ease;
+}
+
+body.light-mode .bg-grid {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
+
+/* Smooth Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+  transition: background 0.3s ease;
+}
+body.light-mode ::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+
+/* Light mode text colors */
+body.light-mode .text-white {
+  color: #1E293B !important;
+}
+body.light-mode .text-slate-400 {
+  color: #64748B !important;
+}
+body.light-mode .text-slate-500 {
+  color: #475569 !important;
+}
+body.light-mode .text-slate-300 {
+  color: #334155 !important;
+}
+
+/* Light mode backgrounds */
+body.light-mode .bg-night-900 {
+  background-color: #F1F5F9 !important;
+}
+body.light-mode .bg-night-800 {
+  background-color: #E2E8F0 !important;
+}
+body.light-mode .bg-night-950 {
+  background-color: #FFFFFF !important;
+}
+
+/* Light mode borders */
+body.light-mode .border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+body.light-mode .border-white\/10 {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+body.light-mode .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Light mode hover effects */
+body.light-mode .hover\:bg-night-800:hover {
+  background-color: #E2E8F0 !important;
+}
+body.light-mode .hover\:text-white:hover {
+  color: #1E293B !important;
+}
+
+/* Light mode navbar */
+body.light-mode nav {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light mode sections */
+body.light-mode section {
+  background-color: transparent;
+}
+
+/* Light mode buttons */
+body.light-mode .bg-white {
+  background-color: #FFFFFF !important;
+}
+body.light-mode .text-night-950 {
+  color: #1E293B !important;
+}
+
+/* Light mode toggle button */
+body.light-mode #theme-toggle {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  color: #1E293B !important;
+}
+body.light-mode #theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light mode Pro Card (Featured) */
+body.light-mode .dark-pro-card {
+  background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+}
+
+body.light-mode .pro-card-inner {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15) !important;
+}
+
+body.light-mode .pro-price {
+  color: #1E293B !important;
+}
+
+body.light-mode .pro-price span {
+  color: #64748B !important;
+}
+
+body.light-mode .pro-description {
+  color: #475569 !important;
+}
+
+body.light-mode .pro-list {
+  color: #1E293B !important;
+}
+
+body.light-mode .pro-list li {
+  color: #1E293B !important;
+}
+
+/* Light mode Language Switcher */
+body.light-mode .language-switcher {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+body.light-mode .language-switcher .text-slate-500 {
+  color: #475569 !important;
+}
+
+body.light-mode .language-divider {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+body.light-mode .language-option {
+  color: #475569 !important;
+}
+
+body.light-mode .language-option:hover {
+  color: #1E293B !important;
+}
+
+/* Light mode Sinovni Boshlash button */
+body.light-mode .start-test-btn {
+  background-color: #3b82f6 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.4) !important;
+}
+
+body.light-mode .start-test-btn:hover {
+  background-color: #2563eb !important;
+  box-shadow: 0 10px 30px -10px rgba(59, 130, 246, 0.6) !important;
+}
+
+/* Light mode Speedometer */
+body.light-mode .speedometer-container {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+
+body.light-mode .speedometer-number {
+  color: #1E293B !important;
+}
+
+body.light-mode .speedometer-label {
+  color: #64748B !important;
+}
+
+body.light-mode .speedometer-circle {
+  color: #06b6d4 !important;
+}
+
+/* Light mode Question Panel */
+body.light-mode .question-panel {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.light-mode .question-timer {
+  color: #1E293B !important;
+}
+
+body.light-mode .question-title {
+  color: #1E293B !important;
+}
+
+body.light-mode .question-option {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  color: #334155 !important;
+}
+
+body.light-mode .question-option:hover {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: #1E293B !important;
+}
+
+body.light-mode .question-option-correct {
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  background-color: rgba(34, 197, 94, 0.15) !important;
+  color: #1E293B !important;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2) !important;
+}
+
+/* Mobile Menu Animation */
+#mobile-menu {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Navbar Adjustments */
+@media (max-width: 640px) {
+  nav {
+    height: auto;
+    min-height: auto;
+  }
+  
+  .language-switcher {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
+
+/* Login Page Styles */
+.code-digit {
+  transition: all 0.2s ease;
+}
+
+.code-digit:focus {
+  transform: scale(1.05);
+}
+
+.code-digit.border-red-500 {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+#login-step-2 {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input Styles */
+.input-field {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  width: 100%;
+  outline: none;
+  transition: all 0.3s;
+}
+.input-field:focus {
+  border-color: #06b6d4;
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}

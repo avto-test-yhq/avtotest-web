@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="uz" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AvtoMentor Pro - Premium Haydovchilik</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Outfit (Zamonaviy) & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                        heading: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        night: {
+                            950: '#020617', // Eng to'q fon (Deep Midnight)
+                            900: '#0F172A', // Panel foni
+                            800: '#1E293B', // Borderlar
+                        },
+                        brand: {
+                            cyan: '#06b6d4', // Neon Cyan
+                            blue: '#3b82f6', // Electric Blue
+                            purple: '#8b5cf6', // Deep Purple
+                            accent: '#f43f5e', // Red accent for warnings
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #1e293b 0deg, #0f172a 180deg, #1e293b 360deg)',
+                    },
+                    animation: {
+                        'pulse-glow': 'pulse-glow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 8s ease-in-out infinite',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+                            '50%': { opacity: '0.3', transform: 'scale(1.2)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="selection:bg-brand-cyan selection:text-night-950">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
+    <!-- Ambient Light Orbs -->
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/20 rounded-full blur-[128px] animate-pulse-glow pointer-events-none"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-purple/20 rounded-full blur-[128px] animate-pulse-glow pointer-events-none" style="animation-delay: 2s;"></div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-300 glass-dark border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Top Bar - Language Selector (Mobile & Desktop) -->
+            <div class="flex justify-end items-center h-10 border-b border-white/5">
+                <div class="flex items-center space-x-1 text-xs font-bold text-slate-500 bg-night-800/50 px-3 py-1.5 rounded-full border border-white/5 language-switcher">
+                    <span class="text-brand-cyan">UZ</span>
+                    <span class="w-px h-3 bg-slate-700 mx-2 language-divider"></span>
+                    <span class="hover:text-white cursor-pointer transition-colors language-option">RU</span>
+                </div>
+            </div>
+            
+            <!-- Main Navbar -->
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center cursor-pointer group" data-aos="fade-down">
+                    <img src="imgage/avtotest-logo.png" alt="Logo" class="w-10 h-10 mr-3 object-contain group-hover:scale-110 transition-transform duration-300">
+                    <span class="font-heading font-bold text-xl sm:text-2xl text-white tracking-tight">Pravachi<span class="text-brand-cyan">UZ</span></span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="#how-it-works" class="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+                        Qanday ishlaydi
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cyan transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#features" class="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+                        Mentorlar
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cyan transition-all group-hover:w-full"></span>
+                    </a>
+                    <a href="#pricing" class="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+                        Tariflar
+                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cyan transition-all group-hover:w-full"></span>
+                    </a>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Dark/Light Toggle -->
+                    <button id="theme-toggle" class="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-night-800/50 hover:bg-night-800 border border-white/5 text-slate-400 hover:text-white transition-all" title="Tema o'zgartirish">
+                        <svg id="theme-icon-dark" class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        <svg id="theme-icon-light" class="w-4 h-4 sm:w-5 sm:h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                    
+                    <a href="login.html" class="hidden sm:block text-sm font-bold text-white hover:text-brand-cyan transition-colors">Kirish</a>
+                    <a href="login.html" class="bg-white text-night-950 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold hover:bg-brand-cyan transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)]">
+                        <span class="hidden sm:inline">Boshlash</span>
+                        <span class="sm:hidden">Start</span>
+                    </a>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="lg:hidden flex items-center justify-center w-9 h-9 rounded-full bg-night-800/50 hover:bg-night-800 border border-white/5 text-slate-400 hover:text-white transition-all">
+                        <svg id="menu-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="lg:hidden hidden border-t border-white/5 bg-night-900/95 backdrop-blur-xl">
+            <div class="px-4 py-6 space-y-4">
+                <a href="#how-it-works" class="block text-base font-medium text-slate-400 hover:text-white transition-colors py-2 border-b border-white/5">Qanday ishlaydi</a>
+                <a href="#features" class="block text-base font-medium text-slate-400 hover:text-white transition-colors py-2 border-b border-white/5">Mentorlar</a>
+                <a href="#pricing" class="block text-base font-medium text-slate-400 hover:text-white transition-colors py-2 border-b border-white/5">Tariflar</a>
+                <a href="login.html" class="block text-base font-bold text-white hover:text-brand-cyan transition-colors py-2 sm:hidden">Kirish</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="relative pt-32 sm:pt-36 lg:pt-40 pb-20 overflow-hidden z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col items-center text-center">
+                
+                <!-- Badge -->
+                <div class="inline-flex items-center space-x-2 bg-night-800/80 backdrop-blur-md border border-brand-cyan/30 rounded-full px-5 py-2 mb-8 shadow-[0_0_15px_rgba(6,182,212,0.2)] animate-slide-up" style="animation-delay: 0.1s;">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-cyan"></span>
+                    </span>
+                    <span class="text-xs font-heading font-bold text-brand-cyan tracking-wider uppercase">AI Mentor + Jonli Ustozlar</span>
+                </div>
+
+                <!-- Main Headline -->
+                <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] mb-8 text-glow animate-slide-up" style="animation-delay: 0.2s;">
+                    Haydovchilikni <br/>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-cyan via-brand-blue to-brand-purple">Kelajakda</span> O'rganing
+                </h1>
+                
+                <p class="text-lg md:text-xl text-slate-400 max-w-2xl mb-12 leading-relaxed animate-slide-up" style="animation-delay: 0.3s;">
+                    Eski usullarni unuting. Sun'iy intellekt tahlili, <span class="text-white font-semibold">real imtihon simulyatsiyasi</span> va tajribali mentorlar bilan guvohnomani 1-urinishda oling.
+                </p>
+
+                <!-- Buttons -->
+                <div class="flex flex-col sm:flex-row gap-5 mb-20 animate-slide-up" style="animation-delay: 0.4s;">
+                    <a href="login.html" class="group relative px-8 py-4 bg-brand-blue text-white rounded-2xl font-bold text-lg overflow-hidden shadow-[0_10px_30px_-10px_rgba(59,130,246,0.5)] transition-all hover:scale-105 start-test-btn">
+                        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                        <span>Sinovni Boshlash</span>
+                    </a>
+                    
+                    <a href="https://play.google.com/store/apps/details?id=uz.sheronov.avtotest&hl=en" target="_blank" rel="noopener noreferrer" class="px-8 py-4 bg-night-800/50 hover:bg-night-800 text-white border border-white/10 hover:border-white/30 rounded-2xl font-bold text-lg backdrop-blur-sm transition-all flex items-center justify-center">
+                        <svg class="w-6 h-6 mr-2 opacity-70" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.96 1.05-3.09-1.06.04-2.35.69-3.12 1.6-.69.82-1.29 2-1.12 3.14 1.18.09 2.43-.83 3.19-1.65"/></svg>
+                        Ilovani Yuklash
+                    </a>
+                </div>
+
+                <!-- 3D DASHBOARD VISUALIZATION -->
+                <div class="relative w-full max-w-5xl mx-auto perspective-1000 group" data-aos="fade-up" data-aos-delay="200">
+                    
+                    <!-- Glow behind image -->
+                    <div class="absolute -inset-4 bg-gradient-to-r from-brand-cyan/20 to-brand-purple/20 rounded-[40px] blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-700"></div>
+
+                    <!-- Main Interface Container -->
+                    <div class="relative bg-night-900 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl shadow-black/50 aspect-[16/9] md:aspect-[21/9]">
+                        
+                        <!-- Top Bar (Mac style) -->
+                        <div class="absolute top-0 left-0 right-0 h-10 bg-white/5 backdrop-blur-md flex items-center px-4 border-b border-white/5 z-20">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+                            </div>
+                            <div class="mx-auto text-xs font-mono text-slate-500">AVTO_MENTOR_SIMULATOR_V2.4</div>
+                        </div>
+
+                        <!-- Image content -->
+                        <div class="relative w-full h-full">
+                            <img src="imgage/285.webp" 
+                                 class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity duration-700" 
+                                 alt="Driving Simulation">
+                            
+                            <!-- Overlay Gradient -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/20 to-transparent"></div>
+
+                            <!-- HUD Elements (Heads-up Display) -->
+                            
+                            <!-- Speedometer -->
+                            <div class="absolute bottom-8 left-8 md:left-12 flex flex-col items-center">
+                                <div class="relative w-24 h-24 rounded-full border-4 border-slate-700 flex items-center justify-center bg-black/40 backdrop-blur-sm speedometer-container">
+                                    <span class="text-3xl font-heading font-bold text-white speedometer-number">45</span>
+                                    <span class="absolute bottom-4 text-[10px] text-slate-400 uppercase speedometer-label">km/h</span>
+                                    <svg class="absolute inset-0 w-full h-full -rotate-90 text-brand-cyan speedometer-circle" viewBox="0 0 100 100">
+                                        <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="289" stroke-dashoffset="100" class="drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]"></circle>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Questions Panel (Center) -->
+                            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[60%] glass-dark rounded-2xl p-6 border border-brand-blue/30 shadow-[0_0_50px_rgba(0,0,0,0.5)] question-panel" style="background-image: url('imgage/285.webp'); background-size: cover; background-position: center; background-blend-mode: overlay;">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-xs font-bold text-brand-blue uppercase bg-brand-blue/10 px-2 py-1 rounded question-badge">Savol 14/20</span>
+                                    <span class="text-xs font-mono text-white question-timer">00:14:32</span>
+                                </div>
+                                <h3 class="text-lg md:text-xl font-bold text-white mb-6 question-title">Chorrahada qaysi transport vositasi birinchi bo'lib harakatlanadi?</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div class="p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-brand-blue/20 hover:border-brand-blue/50 cursor-pointer transition-all text-sm text-slate-300 question-option">
+                                        A) Ko'k avtomobil
+                                    </div>
+                                    <div class="p-3 rounded-lg border border-brand-green/50 bg-brand-green/10 cursor-pointer transition-all text-sm text-white shadow-[0_0_15px_rgba(74,222,128,0.2)] question-option-correct">
+                                        B) Tramvay <span class="float-right text-brand-green">✓</span>
+                                    </div>
+                                    <div class="p-3 rounded-lg border border-white/10 bg-white/5 hover:bg-brand-blue/20 hover:border-brand-blue/50 cursor-pointer transition-all text-sm text-slate-300 question-option">
+                                        C) Mototsikl
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Feedback (Right Floating) -->
+                            <div class="absolute top-16 right-8 md:right-12 glass-card p-4 rounded-xl max-w-[200px] border-l-4 border-brand-purple animate-float">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div class="w-2 h-2 rounded-full bg-brand-purple animate-pulse"></div>
+                                    <span class="text-[10px] font-bold text-brand-purple uppercase">AI Mentor</span>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-snug">"To'g'ri! Tramvay teng ahamiyatli yo'llarda har doim ustunlikka ega."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KEY METRICS -->
+    <section class="border-y border-white/5 bg-night-900/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto px-4 py-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center group cursor-pointer">
+                    <div class="text-3xl font-heading font-bold text-white mb-1 group-hover:text-brand-cyan transition-colors">15,000+</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wider">O'quvchilar</div>
+                </div>
+                <div class="text-center group cursor-pointer">
+                    <div class="text-3xl font-heading font-bold text-white mb-1 group-hover:text-brand-blue transition-colors">98%</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wider">Muvaffaqiyat</div>
+                </div>
+                <div class="text-center group cursor-pointer">
+                    <div class="text-3xl font-heading font-bold text-white mb-1 group-hover:text-brand-purple transition-colors">24/7</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wider">AI Yordam</div>
+                </div>
+                <div class="text-center group cursor-pointer">
+                    <div class="text-3xl font-heading font-bold text-white mb-1 group-hover:text-brand-accent transition-colors">2026</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wider">Yangi Baza</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-20" data-aos="fade-up">
+                <h2 class="font-heading text-4xl md:text-5xl font-bold text-white mb-6">Ishlash <span class="text-brand-cyan">Tartibi</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Murakkab jarayonni 3 ta oddiy qadamga aylantirdik.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Connecting Line -->
+                <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gradient-to-r from-slate-800 via-brand-blue/50 to-slate-800 z-0"></div>
+
+                <!-- Step 1 -->
+                <div class="glass-card p-8 rounded-3xl relative z-10 hover:border-brand-blue/50 transition-colors group" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-24 h-24 mx-auto bg-night-900 rounded-2xl border border-white/10 flex items-center justify-center text-4xl font-heading font-bold text-white mb-8 shadow-[0_0_30px_rgba(59,130,246,0.15)] group-hover:scale-110 transition-transform duration-300 relative">
+                        1
+                        <div class="absolute inset-0 bg-brand-blue/10 rounded-2xl blur-lg -z-10 group-hover:bg-brand-blue/20 transition-colors"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white text-center mb-3">Bilimni Aniqlash</h3>
+                    <p class="text-slate-400 text-sm text-center leading-relaxed">
+                        Qisqa test orqali darajangizni bilib oling va shaxsiy "Smart" o'quv rejasini qo'lga kiriting.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="glass-card p-8 rounded-3xl relative z-10 hover:border-brand-purple/50 transition-colors group" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-24 h-24 mx-auto bg-night-900 rounded-2xl border border-white/10 flex items-center justify-center text-4xl font-heading font-bold text-white mb-8 shadow-[0_0_30px_rgba(139,92,246,0.15)] group-hover:scale-110 transition-transform duration-300 relative">
+                        2
+                        <div class="absolute inset-0 bg-brand-purple/10 rounded-2xl blur-lg -z-10 group-hover:bg-brand-purple/20 transition-colors"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white text-center mb-3">AI Bilan Mashq</h3>
+                    <p class="text-slate-400 text-sm text-center leading-relaxed">
+                        Xatolar ustida ishlash uchun eng samarali usul. AI sizga qiyin mavzularni sodda tilda tushuntiradi.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="glass-card p-8 rounded-3xl relative z-10 hover:border-brand-cyan/50 transition-colors group" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-24 h-24 mx-auto bg-night-900 rounded-2xl border border-white/10 flex items-center justify-center text-4xl font-heading font-bold text-white mb-8 shadow-[0_0_30px_rgba(6,182,212,0.15)] group-hover:scale-110 transition-transform duration-300 relative">
+                        3
+                        <div class="absolute inset-0 bg-brand-cyan/10 rounded-2xl blur-lg -z-10 group-hover:bg-brand-cyan/20 transition-colors"></div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white text-center mb-3">Imtihon Topshirish</h3>
+                    <p class="text-slate-400 text-sm text-center leading-relaxed">
+                        Tayyorgarlik darajasi 90% ga yetganda, GAI imtihoniga ishonch bilan boring va guvohnoma oling.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing" class="py-24 bg-night-900 border-t border-white/5 relative overflow-hidden">
+        <!-- Background glows -->
+        <div class="absolute top-1/2 left-1/4 w-96 h-96 bg-brand-blue/5 rounded-full blur-[100px] pointer-events-none"></div>
+        <div class="absolute top-1/2 right-1/4 w-96 h-96 bg-brand-purple/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="font-heading text-4xl md:text-5xl font-bold text-white mb-6">Qulay <span class="text-brand-purple">Tariflar</span></h2>
+                <p class="text-slate-400">Yashirin to'lovsiz, shaffof narxlar.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+                
+                <!-- Free -->
+                <div class="glass-card p-8 rounded-3xl border border-white/5 hover:border-white/20 transition-all">
+                    <h3 class="font-bold text-xl text-slate-300">Start</h3>
+                    <div class="text-4xl font-bold text-white mt-4 mb-2">0 so'm</div>
+                    <p class="text-sm text-slate-500 mb-8">Platforma bilan tanishish uchun</p>
+                    
+                    <ul class="space-y-4 mb-8 text-sm text-slate-300">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 100 ta test savoli</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Asosiy qoidalar</li>
+                        <li class="flex items-center opacity-50"><svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg> AI Mentor yo'q</li>
+                    </ul>
+                    
+                    <a href="login.html" class="block w-full py-3 rounded-xl border border-white/10 text-white font-bold text-center hover:bg-white/5 transition-colors">Bepul Boshlash</a>
+                </div>
+
+                <!-- Pro (Featured) -->
+                <div class="relative bg-gradient-to-b from-brand-blue/20 to-brand-purple/20 backdrop-blur-xl p-1 rounded-[26px] dark-pro-card">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-brand-blue to-brand-purple text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">ENG MASHHUR</div>
+                    
+                    <div class="bg-night-950/80 rounded-[22px] p-8 h-full border border-brand-blue/30 pro-card-inner">
+                        <h3 class="font-bold text-xl text-brand-cyan">Pro Avto</h3>
+                        <div class="text-5xl font-bold text-white mt-4 mb-2 pro-price">49k <span class="text-lg text-slate-400 font-normal">/oy</span></div>
+                        <p class="text-sm text-slate-400 mb-8 pro-description">Kafolatlangan natija uchun</p>
+                        
+                        <ul class="space-y-4 mb-8 text-sm text-white pro-list">
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Barcha 2000+ savollar</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> AI Mentor tahlili</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Imtihon Simulyatori</li>
+                            <li class="flex items-center"><svg class="w-5 h-5 text-brand-cyan mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Video Darsliklar</li>
+                        </ul>
+                        
+                        <a href="#" class="block w-full py-4 rounded-xl bg-gradient-to-r from-brand-blue to-brand-purple text-white font-bold text-center hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] transition-all transform hover:scale-[1.02]">A'zo Bo'lish</a>
+                    </div>
+                </div>
+
+                <!-- Premium -->
+                <div class="glass-card p-8 rounded-3xl border border-white/5 hover:border-white/20 transition-all">
+                    <h3 class="font-bold text-xl text-brand-purple">Premium</h3>
+                    <div class="text-4xl font-bold text-white mt-4 mb-2">99k <span class="text-lg text-slate-400 font-normal">/3 oy</span></div>
+                    <p class="text-sm text-slate-500 mb-8">To'liq kurs va ustoz</p>
+                    
+                    <ul class="space-y-4 mb-8 text-sm text-slate-300">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Pro tarifining barchasi</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Jonli Mentor yordami</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-brand-purple mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Sertifikat</li>
+                    </ul>
+                    
+                    <a href="#" class="block w-full py-3 rounded-xl border border-white/10 text-white font-bold text-center hover:bg-white/5 transition-colors">Tanlash</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-night-950 border-t border-white/5 pt-16 pb-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1">
+                    <div class="flex items-center mb-6">
+                        <img src="imgage/avtotest-logo.png" alt="Logo" class="w-10 h-10 mr-3 object-contain">
+                        <span class="font-heading font-bold text-xl text-white">PravachiUZ</span>
+                    </div>
+                    <p class="text-slate-500 text-sm mb-6">Kelajak haydovchilari uchun №1 raqamli platforma.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4">Platforma</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">Biz haqimizda</a></li>
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">Tariflar</a></li>
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">Mentorlar</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4">Yordam</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">Qo'llab-quvvatlash</a></li>
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">FAQ</a></li>
+                        <li><a href="#" class="hover:text-brand-cyan transition-colors">Maxfiylik</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4">Ilovani Yuklang</h4>
+                    <div class="space-y-3">
+                        <a href="#" class="block bg-white/5 border border-white/10 p-3 rounded-xl flex items-center hover:bg-white/10 transition-colors">
+                            <svg class="w-6 h-6 text-white mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.21-1.96 1.05-3.09-1.06.04-2.35.69-3.12 1.6-.69.82-1.29 2-1.12 3.14 1.18.09 2.43-.83 3.19-1.65"/></svg>
+                            <div>
+                                <div class="text-[10px] text-slate-400">Download on the</div>
+                                <div class="text-sm font-bold text-white leading-none">App Store</div>
+                            </div>
+                        </a>
+                        <a href="https://play.google.com/store/apps/details?id=uz.sheronov.avtotest&hl=en" target="_blank" rel="noopener noreferrer" class="block bg-white/5 border border-white/10 p-3 rounded-xl flex items-center hover:bg-white/10 transition-colors">
+                            <svg class="w-6 h-6 text-white mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" /></svg>
+                            <div>
+                                <div class="text-[10px] text-slate-400">GET IT ON</div>
+                                <div class="text-sm font-bold text-white leading-none">Google Play</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/5 pt-8 text-center text-slate-600 text-sm">
+                &copy; 2026 AvtoMentor Pro. Barcha huquqlar himoyalangan.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 50 });
+        
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIconDark = document.getElementById('theme-icon-dark');
+        const themeIconLight = document.getElementById('theme-icon-light');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to dark mode
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        if (currentTheme === 'light') {
+            body.classList.add('light-mode');
+            themeIconDark.classList.add('hidden');
+            themeIconLight.classList.remove('hidden');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                localStorage.setItem('theme', 'light');
+                themeIconDark.classList.add('hidden');
+                themeIconLight.classList.remove('hidden');
+            } else {
+                localStorage.setItem('theme', 'dark');
+                themeIconDark.classList.remove('hidden');
+                themeIconLight.classList.add('hidden');
+            }
+        });
+        
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+        
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!mobileMenuBtn.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.classList.remove('hidden');
+                    closeIcon.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
