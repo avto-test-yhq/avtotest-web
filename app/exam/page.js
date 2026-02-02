@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -27,7 +27,7 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
   </svg>
 )
 
-export default function ExamPage() {
+function ExamContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') || 'real'
@@ -431,5 +431,13 @@ export default function ExamPage() {
         </button>
       </footer>
     </div>
+  )
+}
+
+export default function ExamPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">Yuklanmoqda...</div>}>
+      <ExamContent />
+    </Suspense>
   )
 }
