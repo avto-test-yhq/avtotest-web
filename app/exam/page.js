@@ -59,8 +59,10 @@ function ExamContent() {
 
   const currentIdsRef = useRef([])
   const scrollRef = useRef(null)
-  const startTimeRef = useRef(null) // Taymer boshlangich vaqti (0 dan yoki 25 min countdown uchun)
-  const endTimeRef = useRef(null)   // Tugash vaqti — natijada sarflangan vaqtni muzlatish uchun
+  const startTimeRef = useRef(null)
+  const endTimeRef = useRef(null)
+  const langRef = useRef(lang)
+  const initialFetchDoneRef = useRef(false)
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true })
@@ -99,24 +101,78 @@ function ExamContent() {
     return () => unsubscribe()
   }, [loadSavedIds])
 
-  // API dan testlarni olish funksiyasi
-  const fetchTests = useCallback(async () => {
-    setAnswers({})
-    setCurrentIndex(0)
-    setIsFinished(false)
-    setShowFailModal(false)
-    setShowTimeUp(false)
-    setShowExplanation(false)
-    setQuestions([])
-    // Har yangi imtihonda taymerni va tugash vaqtini reset qilamiz
-    endTimeRef.current = null
-    setTimerTick(0)
-    setFavoritesEmpty(false)
+  const getLangCode = useCallback((l) => {
+    if (l === 'Uzb (kirill)') return 'uzk'
+    if (l === 'Русский') return 'ru'
+    return 'uzl'
+  }, [])
+
+  const transformQuestion = useCallback((item) => {
+    let imageUrl = ''
+    if (item.image && item.image.trim() !== '') {
+      imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+    }
+    return {
+      id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
+      numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
+      question: item.question,
+      image: imageUrl,
+      explanation: item.explanation || "Izoh mavjud emas.",
+      options: item.options.map((opt) => ({
+        option: opt.text || opt.option || opt.answer || "Matn yo'q",
+        is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
+      })),
+    }
+  }, [API_URL])
+
+  // Til o'zgarganda: savollar va javoblar o'zgarmaydi, faqat matn (tarjima) yangilanadi
+  const refreshQuestionsLanguage = useCallback(async (newLang) => {
+    const ids = currentIdsRef.current
+    if (ids.length === 0) return
+    const langCode = getLangCode(newLang)
+    try {
+      const idsString = ids.join(',')
+      const res = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+      if (!res.ok) return
+      const data = await res.json()
+      if (!Array.isArray(data) || data.length === 0) return
+      const transformedData = data.map(transformQuestion)
+      // Tartib va javoblarni saqlab, faqat savol/option/explanation matnlarini yangilaymiz
+      setQuestions((prev) =>
+        prev.map((q) => {
+          const fromApi = transformedData.find((x) => x.id == q.id || x.numeric_id == q.numeric_id)
+          if (!fromApi) return q
+          return {
+            ...q,
+            question: fromApi.question,
+            explanation: fromApi.explanation,
+            options: q.options.map((opt, j) => ({ ...opt, option: fromApi.options[j]?.option ?? opt.option })),
+          }
+        })
+      )
+    } catch (err) {
+      console.error('Til yangilashda xatolik:', err)
+    }
+  }, [API_URL, getLangCode, transformQuestion])
+
+  // API dan testlarni olish funksiyasi (to'liq yuklash - qayta boshlash)
+  const fetchTests = useCallback(async (skipReset = false) => {
+    if (!skipReset) {
+      setAnswers({})
+      setCurrentIndex(0)
+      setIsFinished(false)
+      setShowFailModal(false)
+      setShowTimeUp(false)
+      setShowExplanation(false)
+      setQuestions([])
+      endTimeRef.current = null
+      setTimerTick(0)
+      setFavoritesEmpty(false)
+    }
 
     try {
-      let langCode = 'uzl'
-      if (lang === 'Uzb (kirill)') langCode = 'uzk'
-      if (lang === 'Русский') langCode = 'ru'
+      const currentLang = langRef.current
+      const langCode = getLangCode(currentLang)
 
       let data = []
 
@@ -172,37 +228,40 @@ function ExamContent() {
       }
 
       if (Array.isArray(data) && data.length > 0) {
-        const transformedData = data.map((item) => {
-          let imageUrl = ''
-          if (item.image && item.image.trim() !== '') {
-            imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
-          }
-
-          return {
-            id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
-            numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
-            question: item.question,
-            image: imageUrl,
-            explanation: item.explanation || "Izoh mavjud emas.",
-            options: item.options.map((opt) => ({
-              option: opt.text || opt.option || opt.answer || "Matn yo'q",
-              is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
-            })),
-          }
-        })
-
+        const transformedData = data.map(transformQuestion)
         currentIdsRef.current = transformedData.map((q) => q.numeric_id).filter(Boolean)
         setQuestions(transformedData)
-        startTimeRef.current = Date.now()
+        if (!skipReset) startTimeRef.current = Date.now()
       }
     } catch (err) {
       console.error("Xatolik:", err)
     }
-  }, [API_URL, lang, questionCount, reloadTrigger, mode, currentUser])
+  }, [API_URL, getLangCode, transformQuestion, questionCount, reloadTrigger, mode, currentUser])
 
   useEffect(() => {
-    fetchTests()
-  }, [fetchTests])
+    langRef.current = lang
+  }, [lang])
+
+  // Testga kirganda backendga bir marta murojaat (qayta urinish bosilganda qayta fetch)
+  useEffect(() => {
+    if (mode === 'favorites' || mode === 'mistakes') {
+      if (!currentUser) return
+    }
+    if (initialFetchDoneRef.current) return
+    initialFetchDoneRef.current = true
+    fetchTests(false)
+  }, [fetchTests, mode, currentUser])
+
+  // Til o'zgarganda: savollar o'zgarmaydi, faqat tarjima yangilanadi
+  const prevLangRef = useRef(lang)
+  useEffect(() => {
+    if (prevLangRef.current !== lang && questions.length > 0 && currentIdsRef.current.length > 0) {
+      prevLangRef.current = lang
+      refreshQuestionsLanguage(lang)
+    } else {
+      prevLangRef.current = lang
+    }
+  }, [lang, questions.length, refreshQuestionsLanguage])
 
   // Taymer: Haqiqiy = 25:00 dan orqaga, Standart = 0 dan yuqoriga; vaqt tugasa (real) imtihon yopiladi
   const REAL_EXAM_SECONDS = 25 * 60
@@ -404,8 +463,9 @@ function ExamContent() {
 
   // Qayta boshlash funksiyasi
   const restartExam = () => {
+    initialFetchDoneRef.current = false // Keyingi fetch uchun ruxsat
     currentIdsRef.current = [] // Tarixni tozalaymiz, yangi savollar olish uchun
-    setReloadTrigger(prev => prev + 1) // useEffectni qayta ishga tushirish uchun
+    setReloadTrigger((prev) => prev + 1) // useEffectni qayta ishga tushirish uchun
   }
 
   if (!questions.length) {

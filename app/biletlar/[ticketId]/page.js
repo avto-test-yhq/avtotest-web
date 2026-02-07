@@ -43,9 +43,9 @@ export default function BiletTicketPage() {
   const params = useParams()
   const ticketId = useMemo(() => parseInt(params?.ticketId, 10) || 1, [params?.ticketId])
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
-  console.log(API_URL)
 
   const [questions, setQuestions] = useState([])
+  const [lang, setLang] = useState('uz-lotin')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
@@ -58,39 +58,48 @@ export default function BiletTicketPage() {
   const startTimeRef = useRef(null)
   const endTimeRef = useRef(null)
 
+  const getLangCode = (l) => {
+    if (l === 'Uzb (kirill)') return 'uzk'
+    if (l === 'Русский') return 'ru'
+    return 'uzl'
+  }
+
+  const transformQuestion = (item) => {
+    let imageUrl = ''
+    if (item.image && item.image.trim() !== '') {
+      imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+    }
+    return {
+      id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
+      numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
+      question: item.question,
+      image: imageUrl,
+      explanation: item.explanation || "Izoh mavjud emas.",
+      options: item.options.map((opt) => ({
+        option: opt.text || opt.option || opt.answer || "Matn yo'q",
+        is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
+      })),
+    }
+  }
+
+  // Bilet yuklash (ticketId o'zgaganda)
   useEffect(() => {
     const fetchTests = async () => {
       setAnswers({})
       setResultSaved(false)
       try {
-        // Bilet bo'yicha ID oraliq: 1-bilet 1-10, 2-bilet 11-20, 3-bilet 21-30, ...
         const startId = (ticketId - 1) * QUESTIONS_PER_TICKET + 1
         const endId = ticketId * QUESTIONS_PER_TICKET
         const ids = []
         for (let i = startId; i <= endId; i++) ids.push(i)
         const idsString = ids.join(',')
-        const url = `${API_URL}/api/tests?lang=uzl&ids=${idsString}`
+        const langCode = getLangCode(lang)
+        const url = `${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`
         const res = await fetch(url)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
-          const transformedData = data.map((item) => {
-            let imageUrl = ''
-            if (item.image && item.image.trim() !== '') {
-              imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
-            }
-            return {
-              id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
-              numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
-              question: item.question,
-              image: imageUrl,
-              explanation: item.explanation || "Izoh mavjud emas.",
-              options: item.options.map((opt) => ({
-                option: opt.text || opt.option || opt.answer || "Matn yo'q",
-                is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
-              })),
-            }
-          })
+          const transformedData = data.map(transformQuestion)
           setQuestions(transformedData)
           startTimeRef.current = Date.now()
         }
@@ -100,6 +109,51 @@ export default function BiletTicketPage() {
     }
     fetchTests()
   }, [ticketId, API_URL])
+
+  // Til o'zgarganda: faqat savol matnlarini yangilash (savollar va javoblar o'zgarmaydi)
+  const idsRef = useRef([])
+  useEffect(() => {
+    if (questions.length === 0) return
+    const startId = (ticketId - 1) * QUESTIONS_PER_TICKET + 1
+    const endId = ticketId * QUESTIONS_PER_TICKET
+    const ids = []
+    for (let i = startId; i <= endId; i++) ids.push(i)
+    idsRef.current = ids
+  }, [ticketId, questions.length])
+
+  // Til o'zgarganda: savollar va javoblar o'zgarmaydi, faqat matn (tarjima) yangilanadi
+  const prevLangBiletRef = useRef(lang)
+  useEffect(() => {
+    if (prevLangBiletRef.current === lang || questions.length === 0) {
+      prevLangBiletRef.current = lang
+      return
+    }
+    prevLangBiletRef.current = lang
+    const ids = idsRef.current.length > 0 ? idsRef.current : questions.map((q) => q.numeric_id ?? q.id).filter(Boolean)
+    if (ids.length === 0) return
+    const idsString = ids.join(',')
+    const langCode = getLangCode(lang)
+    fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+      .then((res) => res.ok ? res.json() : [])
+      .then((data) => {
+        if (!Array.isArray(data) || data.length === 0) return
+        const transformed = data.map(transformQuestion)
+        // Tartib va javoblarni saqlab, faqat savol/option/explanation matnlarini yangilaymiz
+        setQuestions((prev) =>
+          prev.map((q) => {
+            const fromApi = transformed.find((x) => x.id == q.id || x.numeric_id == q.numeric_id)
+            if (!fromApi) return q
+            return {
+              ...q,
+              question: fromApi.question,
+              explanation: fromApi.explanation,
+              options: q.options.map((opt, j) => ({ ...opt, option: fromApi.options[j]?.option ?? opt.option })),
+            }
+          })
+        )
+      })
+      .catch((err) => console.error('Til yangilashda xatolik:', err))
+  }, [lang])
 
   const formatTime = (totalSeconds) => {
     const m = Math.floor(totalSeconds / 60)
@@ -323,7 +377,7 @@ export default function BiletTicketPage() {
   return (
     <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans">
       <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <Link href="/biletlar" className="flex items-center space-x-2">
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={36} height={36} className="rounded-lg object-contain" />
             <div className="hidden sm:flex flex-col leading-tight">
@@ -331,6 +385,25 @@ export default function BiletTicketPage() {
               <p className="text-[11px] md:text-xs text-slate-400">Bilet #{ticketId}</p>
             </div>
           </Link>
+          <div className="hidden md:flex bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
+            {[
+              { label: 'Uzb (lotin)', code: 'uzl' },
+              { label: 'Uzb (kirill)', code: 'uzk' },
+              { label: 'Русский', code: 'ru' }
+            ].map((item) => (
+              <button
+                key={item.code}
+                onClick={() => setLang(item.label)}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                  lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
+                    ? 'bg-[#3e4255] text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <div className="hidden sm:flex items-center space-x-3 bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-white/5">
