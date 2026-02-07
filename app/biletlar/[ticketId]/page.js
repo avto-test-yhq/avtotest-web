@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import { auth } from '@/lib/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const QUESTIONS_PER_TICKET = 10
-const STORAGE_KEY = 'biletlar_progress'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -24,22 +25,16 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
   </svg>
 )
 
-function saveBiletResult(ticketId, correct, total) {
+async function saveBiletResultToApi(apiUrl, uid, ticketId, correct, total) {
   try {
-    if (typeof window === 'undefined') return
-    const raw = localStorage.getItem(STORAGE_KEY)
-    const prev = raw ? JSON.parse(raw) : { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
-    const oldCorrect = prev.ticketResults[ticketId]?.correct || 0
-    const newCompleted = prev.completedTickets.includes(ticketId) ? prev.completedTickets : [...prev.completedTickets, ticketId].sort((a, b) => a - b)
-    const percent = total > 0 ? Math.round((correct / total) * 100) : 0
-    const next = {
-      completedTickets: newCompleted,
-      ticketResults: { ...prev.ticketResults, [ticketId]: { correct, total, percent } },
-      totalCorrectAnswers: (prev.totalCorrectAnswers || 0) - oldCorrect + correct
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+    const res = await fetch(`${apiUrl}/api/bilet-progress/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, ticketId, correct, total })
+    })
+    if (!res.ok) throw new Error('API xatolik')
   } catch (e) {
-    console.error(e)
+    console.error('Bilet natijasini saqlashda xatolik:', e)
   }
 }
 
@@ -48,6 +43,7 @@ export default function BiletTicketPage() {
   const params = useParams()
   const ticketId = useMemo(() => parseInt(params?.ticketId, 10) || 1, [params?.ticketId])
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+  console.log(API_URL)
 
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -55,7 +51,12 @@ export default function BiletTicketPage() {
   const [isFinished, setIsFinished] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
   const [resultSaved, setResultSaved] = useState(false)
+  const [timerTick, setTimerTick] = useState(0)
+  const [savedIds, setSavedIds] = useState([])
+  const [currentUser, setCurrentUser] = useState(null)
   const scrollRef = useRef(null)
+  const startTimeRef = useRef(null)
+  const endTimeRef = useRef(null)
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -79,7 +80,8 @@ export default function BiletTicketPage() {
               imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
             }
             return {
-              id: item._id || item.id,
+              id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
+              numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
               question: item.question,
               image: imageUrl,
               explanation: item.explanation || "Izoh mavjud emas.",
@@ -90,6 +92,7 @@ export default function BiletTicketPage() {
             }
           })
           setQuestions(transformedData)
+          startTimeRef.current = Date.now()
         }
       } catch (err) {
         console.error("Xatolik:", err)
@@ -97,6 +100,56 @@ export default function BiletTicketPage() {
     }
     fetchTests()
   }, [ticketId, API_URL])
+
+  const formatTime = (totalSeconds) => {
+    const m = Math.floor(totalSeconds / 60)
+    const s = totalSeconds % 60
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  const resultElapsedSeconds = (endTimeRef.current != null && startTimeRef.current != null)
+    ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000)
+    : 0
+  const resultTimeStr = formatTime(resultElapsedSeconds)
+
+  // User va saqlangan savollar ro'yxati
+  const loadSavedIds = useCallback(
+    async (uid) => {
+      try {
+        const res = await fetch(`${API_URL}/api/favorites/${uid}`)
+        if (!res.ok) throw new Error('API xatolik')
+        const data = await res.json()
+        if (Array.isArray(data)) {
+          const ids = data.map((q) => q._id || q.id).filter(Boolean)
+          setSavedIds(ids)
+        } else {
+          setSavedIds([])
+        }
+      } catch (e) {
+        console.error("Saqlangan savollarni yuklashda xatolik:", e)
+        setSavedIds([])
+      }
+    },
+    [API_URL]
+  )
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user || null)
+      if (user) {
+        loadSavedIds(user.uid)
+      } else {
+        setSavedIds([])
+        router.push('/login')
+      }
+    })
+    return () => unsubscribe()
+  }, [loadSavedIds, router])
+
+  useEffect(() => {
+    if (questions.length === 0 || isFinished) return
+    const id = setInterval(() => setTimerTick((t) => t + 1), 1000)
+    return () => clearInterval(id)
+  }, [questions.length, isFinished])
 
   useEffect(() => {
     if (scrollRef.current?.children[currentIndex]) {
@@ -106,6 +159,42 @@ export default function BiletTicketPage() {
   }, [currentIndex])
 
   const currentQuestion = questions[currentIndex]
+  const isCurrentFavorite = useMemo(() => {
+    if (!currentQuestion || !currentQuestion.id) return false
+    return savedIds.includes(currentQuestion.id)
+  }, [currentQuestion, savedIds])
+
+  const toggleCurrentFavorite = async () => {
+    if (!currentQuestion || !currentQuestion.id) return
+    if (!currentUser) {
+      alert("Avval tizimga kiring!")
+      return
+    }
+    const questionId = currentQuestion.id
+    const alreadySaved = savedIds.includes(questionId)
+
+    // Optimistik UI
+    setSavedIds((prev) =>
+      alreadySaved ? prev.filter((id) => id !== questionId) : [...prev, questionId]
+    )
+
+    try {
+      await fetch(`${API_URL}/api/favorites/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: currentUser.uid,
+          questionId,
+        }),
+      })
+    } catch (e) {
+      console.error("Sevimli saqlashda xatolik:", e)
+      // Xatolik bo'lsa, qaytarib qo'yamiz
+      setSavedIds((prev) =>
+        alreadySaved ? [...prev, questionId] : prev.filter((id) => id !== questionId)
+      )
+    }
+  }
   const stats = useMemo(() => {
     let correct = 0, incorrect = 0
     Object.entries(answers).forEach(([qId, optIdx]) => {
@@ -120,19 +209,82 @@ export default function BiletTicketPage() {
 
   useEffect(() => {
     if (allAnswered && !isFinished) {
+      endTimeRef.current = Date.now()
       setIsFinished(true)
     }
   }, [allAnswered, isFinished])
 
   useEffect(() => {
     if (isFinished && questions.length > 0 && !resultSaved) {
-      saveBiletResult(ticketId, stats.correct, questions.length)
-      setResultSaved(true)
+      const saveResult = async () => {
+        if (currentUser?.uid) {
+          await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length)
+        }
+        setResultSaved(true)
+      }
+      saveResult()
     }
-  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved])
+  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved, currentUser?.uid])
+
+  const getNumericId = (questionId) => {
+    const q = questions.find((item) => item.id == questionId || item.numeric_id == questionId)
+    return q?.numeric_id ?? q?.id ?? questionId
+  }
+
+  const saveMistakeToApi = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mistakes/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Xatoni saqlashda xatolik:', e)
+    }
+  }
+
+  const saveMasteryCorrect = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mastery/correct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Mastery saqlashda xatolik:', e)
+    }
+  }
+
+  const saveMasteryIncorrect = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mastery/incorrect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Mastery yangilashda xatolik:', e)
+    }
+  }
 
   const selectAnswer = (questionId, optionIndex) => {
     if (isFinished || typeof answers[questionId] === 'number') return
+    const isCorrect = questions.find(item => item.id == questionId)?.options[optionIndex]?.is_correct
+    if (isCorrect) {
+      saveMasteryCorrect(questionId)
+    } else {
+      saveMasteryIncorrect(questionId)
+      saveMistakeToApi(questionId)
+    }
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
     if (currentIndex < questions.length - 1) setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
   }
@@ -155,7 +307,8 @@ export default function BiletTicketPage() {
           <p className="text-slate-400 mb-6">Barcha savollar javoblangan.</p>
           <div className="text-4xl font-bold text-white mb-1">{stats.correct}/{questions.length}</div>
           <p className="text-slate-400 mb-2">To&apos;g&apos;ri javob</p>
-          <div className="text-3xl font-bold text-brand-cyan mb-6">{finishPercent}%</div>
+          <div className="text-3xl font-bold text-brand-cyan mb-2">{finishPercent}%</div>
+          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-white font-semibold">{resultTimeStr}</span></p>
           <Link
             href="/biletlar"
             className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium"
@@ -190,6 +343,21 @@ export default function BiletTicketPage() {
               <Icon name="Wrong" className="w-4 h-4" />
               <span>{stats.incorrect}</span>
             </div>
+          </div>
+          <button
+            onClick={toggleCurrentFavorite}
+            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
+              isCurrentFavorite
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+            }`}
+            title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
+          >
+            <Icon name="Bulb" className="w-4 h-4" />
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/5">
+            <span className="text-slate-400 text-xs">Vaqt</span>
+            <span className="font-mono font-bold text-base text-white">{formatTime(timerTick)}</span>
           </div>
           <div className="text-xs text-slate-400">
             Savol: <span className="font-bold text-white text-base">{currentIndex + 1}</span>/{questions.length}

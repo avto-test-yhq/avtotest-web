@@ -18,18 +18,24 @@ const Icons = {
   Ticket: () => <path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
 }
 
-const BILETLAR_STORAGE = 'biletlar_progress'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
-function getBiletlarProgress() {
-  if (typeof window === 'undefined') return { completed: 0, totalCorrect: 0, percent: 0 }
+const fetchBiletlarProgress = async (uid) => {
   try {
-    const raw = localStorage.getItem(BILETLAR_STORAGE)
-    if (!raw) return { completed: 0, totalCorrect: 0, percent: 0 }
-    const p = JSON.parse(raw)
+    const [biletRes, statsRes] = await Promise.all([
+      fetch(`${API_URL}/api/bilet-progress/${uid}`),
+      fetch(`${API_URL}/api/mastery/stats/app`)
+    ])
+    if (!biletRes.ok) return { completed: 0, totalCorrect: 0, percent: 0 }
+    const p = await biletRes.json()
     const completed = (p.completedTickets || []).length
     const totalCorrect = p.totalCorrectAnswers || 0
-    const totalQuestions = 61 * 10
-    const percent = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0
+    let totalBiletQuestions = 610
+    if (statsRes.ok) {
+      const s = await statsRes.json()
+      totalBiletQuestions = s.totalBiletQuestions || 610
+    }
+    const percent = totalBiletQuestions > 0 ? Math.round((totalCorrect / totalBiletQuestions) * 100) : 0
     return { completed, totalCorrect, percent }
   } catch {
     return { completed: 0, totalCorrect: 0, percent: 0 }
@@ -41,11 +47,17 @@ export default function DashboardPage() {
   const pathname = usePathname()
   const [userName, setUserName] = useState('Foydalanuvchi')
   const [examModalOpen, setExamModalOpen] = useState(false)
-  const [biletlarProgress, setBiletlarProgress] = useState(getBiletlarProgress)
-
-  useEffect(() => {
-    setBiletlarProgress(getBiletlarProgress())
-  }, [pathname])
+  const [examModalType, setExamModalType] = useState(null) // 'standard' | 'real'
+  const [biletlarProgress, setBiletlarProgress] = useState({ completed: 0, totalCorrect: 0, percent: 0 })
+  const [favoritesCount, setFavoritesCount] = useState(0)
+  const [mistakesCount, setMistakesCount] = useState(0)
+  const [mastery, setMastery] = useState({
+    masteredCount: 0,
+    totalQuestions: 1228,
+    totalTickets: 61,
+    totalBiletQuestions: 610,
+    percent: 0
+  })
 
   useEffect(() => {
     // Firebase auth state ni tekshiramiz
@@ -82,6 +94,52 @@ export default function DashboardPage() {
           else if (user.email) setUserName(user.email);
           else if (user.phoneNumber) setUserName(user.phoneNumber);
         }
+
+        // Sevimli savollar, bilet progress, xatolar va samaradorlikni API dan olamiz
+        try {
+          const [favRes, biletRes, mistakesRes, masteryRes] = await Promise.all([
+            fetch(`${API_URL}/api/favorites/${user.uid}`),
+            fetch(`${API_URL}/api/bilet-progress/${user.uid}`),
+            fetch(`${API_URL}/api/mistakes/${user.uid}`),
+            fetch(`${API_URL}/api/mastery/${user.uid}`)
+          ])
+          if (favRes.ok) {
+            const favData = await favRes.json()
+            setFavoritesCount(Array.isArray(favData) ? favData.length : 0)
+          } else {
+            setFavoritesCount(0)
+          }
+          if (mistakesRes.ok) {
+            const { questionIds } = await mistakesRes.json()
+            setMistakesCount(Array.isArray(questionIds) ? questionIds.length : 0)
+          } else {
+            setMistakesCount(0)
+          }
+          let masteryData = null
+          if (masteryRes.ok) {
+            masteryData = await masteryRes.json()
+            setMastery({
+              masteredCount: masteryData.masteredCount || 0,
+              totalQuestions: masteryData.totalQuestions || 1228,
+              totalTickets: masteryData.totalTickets || 61,
+              totalBiletQuestions: masteryData.totalBiletQuestions || 610,
+              percent: masteryData.percent || 0
+            })
+          } else {
+            setMastery({ masteredCount: 0, totalQuestions: 1228, totalTickets: 61, totalBiletQuestions: 610, percent: 0 })
+          }
+          if (biletRes.ok) {
+            const biletData = await biletRes.json()
+            const completed = (biletData.completedTickets || []).length
+            const totalCorrect = biletData.totalCorrectAnswers || 0
+            const totalBiletQuestions = masteryData?.totalBiletQuestions || 610
+            const percent = totalBiletQuestions > 0 ? Math.round((totalCorrect / totalBiletQuestions) * 100) : 0
+            setBiletlarProgress({ completed, totalCorrect, percent, totalTickets: masteryData?.totalTickets || 61 })
+          }
+        } catch (e) {
+          console.error("Ma'lumotlarni yuklashda xatolik:", e)
+          setFavoritesCount(0)
+        }
       } catch (error) {
         console.error("Token yangilashda xatolik:", error);
       }
@@ -89,6 +147,37 @@ export default function DashboardPage() {
 
     return () => unsubscribe();
   }, [router])
+
+  useEffect(() => {
+    const refreshData = async () => {
+      const user = auth.currentUser
+      if (user?.uid) {
+        const data = await fetchBiletlarProgress(user.uid)
+        setBiletlarProgress(data)
+        try {
+          const [mistakesRes, masteryRes] = await Promise.all([
+            fetch(`${API_URL}/api/mistakes/${user.uid}`),
+            fetch(`${API_URL}/api/mastery/${user.uid}`)
+          ])
+          if (mistakesRes.ok) {
+            const { questionIds } = await mistakesRes.json()
+            setMistakesCount(Array.isArray(questionIds) ? questionIds.length : 0)
+          }
+          if (masteryRes.ok) {
+            const m = await masteryRes.json()
+            setMastery({
+              masteredCount: m.masteredCount || 0,
+              totalQuestions: m.totalQuestions || 1228,
+              totalTickets: m.totalTickets || 61,
+              totalBiletQuestions: m.totalBiletQuestions || 610,
+              percent: m.percent || 0
+            })
+          }
+        } catch (e) {}
+      }
+    }
+    refreshData()
+  }, [pathname])
 
   const handleLogout = async () => {
     if (confirm('Hisobdan chiqishni xohlaysizmi?')) {
@@ -111,9 +200,16 @@ export default function DashboardPage() {
     }
   }
 
-  const startExam = (count) => {
+  const startStandardExam = (count) => {
     setExamModalOpen(false)
-    router.push(`/exam?mode=real&count=${count}`)
+    setExamModalType(null)
+    router.push(`/exam?mode=standard&count=${count}`)
+  }
+
+  const startRealExam = () => {
+    setExamModalOpen(false)
+    setExamModalType(null)
+    router.push(`/exam?mode=real&count=20`)
   }
 
   // Sidebar item helper
@@ -233,18 +329,18 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-slate-400 text-sm font-medium mb-1">Jami Savollar</p>
-                  <h3 className="text-2xl md:text-3xl font-heading font-bold text-white">1,192</h3>
+                  <h3 className="text-2xl md:text-3xl font-heading font-bold text-white">{mastery.totalQuestions.toLocaleString()}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-brand-blue/20 flex items-center justify-center text-brand-blue">
                   ?
                 </div>
               </div>
               <div className="mt-4 flex items-center text-xs text-emerald-400">
-                <span>+12 ta yangi savol</span>
+                <span>O&apos;zlashtirilgan: {mastery.masteredCount}</span>
               </div>
             </div>
 
-            {/* Karta 2 */}
+            {/* Karta 2 - Samaradorlik (Imtihonga tayyorlik) */}
             <div className="glass-card p-5 rounded-2xl border border-white/5 bg-gradient-to-br from-night-900 to-night-800 relative overflow-hidden group hover:border-green-500/30 transition-all">
                <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                  <span className="text-6xl">⚙️</span>
@@ -252,14 +348,14 @@ export default function DashboardPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-slate-400 text-sm font-medium mb-1">Samaradorlik</p>
-                  <h3 className="text-2xl md:text-3xl font-heading font-bold text-white">66%</h3>
+                  <h3 className="text-2xl md:text-3xl font-heading font-bold text-white">{mastery.percent}%</h3>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
                   %
                 </div>
               </div>
               <div className="mt-4 w-full bg-night-950 rounded-full h-1.5 overflow-hidden">
-                <div className="bg-green-500 h-full rounded-full" style={{ width: '66%' }}></div>
+                <div className="bg-green-500 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, mastery.percent)}%` }}></div>
               </div>
             </div>
 
@@ -298,7 +394,7 @@ export default function DashboardPage() {
                 <Link href="/biletlar" className="glass-card p-6 rounded-2xl border border-white/10 hover:border-brand-blue hover:bg-brand-blue/5 transition-all group text-left relative overflow-hidden block">
                   <div className="absolute right-0 top-0 p-3">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">
-                      61 bilet
+                      {mastery.totalTickets} bilet
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                     </span>
                   </div>
@@ -308,7 +404,7 @@ export default function DashboardPage() {
                   <h3 className="text-lg font-heading font-bold text-white mb-1">Biletlar bo&apos;yicha</h3>
                   <p className="text-sm text-slate-400 leading-relaxed mb-4">Har bir biletni alohida mashq qiling va bilimingizni mustahkamlang.</p>
                   <div className="flex items-center justify-between text-sm text-slate-400 mb-4">
-                    <span>{biletlarProgress.completed}/61 yechilgan</span>
+                    <span>{biletlarProgress.completed}/{mastery.totalTickets} yechilgan</span>
                     <span className="text-white font-semibold">{biletlarProgress.percent}%</span>
                   </div>
                   <div className="w-full h-1.5 bg-night-950 rounded-full overflow-hidden">
@@ -320,9 +416,24 @@ export default function DashboardPage() {
                   </div>
                 </Link>
 
-                {/* Imtihon - Katta Button */}
+                {/* Standart imtihon: 10/20/50, xatoga qaramay tugamasin */}
                 <button 
-                  onClick={() => setExamModalOpen(true)}
+                  onClick={() => { setExamModalType('standard'); setExamModalOpen(true); }}
+                  className="glass-card p-6 rounded-2xl border border-white/10 hover:border-brand-blue hover:bg-brand-blue/5 transition-all group text-left relative overflow-hidden"
+                >
+                  <div className="absolute right-0 bottom-0 opacity-5 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><Icons.Clock /></svg>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-brand-blue/80 shadow-lg shadow-brand-blue/30 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><Icons.Clock /></svg>
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-white mb-1">Standart imtihon</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">10, 20 yoki 50 ta savol. Xato qilsangiz ham barcha savollarni javoblashingiz mumkin.</p>
+                </button>
+
+                {/* Haqiqiy imtihon: faqat 20 ta, 3 xato → to'xtaydi */}
+                <button 
+                  onClick={() => { setExamModalType('real'); setExamModalOpen(true); }}
                   className="glass-card p-6 rounded-2xl border border-white/10 hover:border-orange-500 hover:bg-orange-500/5 transition-all group text-left relative overflow-hidden"
                 >
                   <div className="absolute right-0 bottom-0 opacity-5 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform">
@@ -331,9 +442,47 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg shadow-orange-900/50 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><Icons.Clock /></svg>
                   </div>
-                  <h3 className="text-lg font-heading font-bold text-white mb-1">Haqiqiy Imtihon</h3>
-                  <p className="text-sm text-slate-400 leading-relaxed">20 ta savol, 20 daqiqa va ruxsat etilgan 2 ta xato.</p>
+                  <h3 className="text-lg font-heading font-bold text-white mb-1">Haqiqiy imtihon</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">20 ta savol. 3 ta xato qilsangiz imtihon to&apos;xtaydi — haqiqiy imtihon qoidalari.</p>
                 </button>
+
+                {/* Xatolar rejimi (Mistakes Mode) */}
+                <Link 
+                  href="/mistakes" 
+                  className="glass-card p-6 rounded-2xl border border-white/10 hover:border-rose-500 hover:bg-rose-500/5 transition-all group text-left relative overflow-hidden block"
+                >
+                  <div className="absolute right-0 bottom-0 opacity-5 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-rose-500/80 shadow-lg shadow-rose-500/30 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-white mb-1">Xatolar rejimi</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Noto&apos;g&apos;ri javob bergan savollaringizdan mashq qiling. Taymer, izoh, avtomatik o&apos;tishsiz.</p>
+                  <div className="mt-3 flex items-center justify-between text-sm text-slate-400">
+                    <span>Xatolar: <span className="text-white font-semibold">{mistakesCount}</span></span>
+                    <span className="font-semibold text-rose-300 group-hover:text-rose-200">Mashq qilish →</span>
+                  </div>
+                </Link>
+
+                {/* Sevimli savollar (Favorites Mode) */}
+                <Link 
+                  href="/favorites" 
+                  className="glass-card p-6 rounded-2xl border border-white/10 hover:border-amber-500 hover:bg-amber-500/5 transition-all group text-left relative overflow-hidden block"
+                >
+                  <div className="absolute right-0 bottom-0 opacity-5 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                  </div>
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/80 shadow-lg shadow-amber-500/30 flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-white mb-1">Sevimli savollar</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed">Saqlab qo‘ygan savollaringizdan aralash tarzda mashq qiling.</p>
+                  <div className="mt-3 flex items-center justify-between text-sm text-slate-400">
+                    <span>Saqlangan: <span className="text-white font-semibold">{favoritesCount}</span></span>
+                    <span className="font-semibold text-amber-300 group-hover:text-amber-200">Mashqni boshlash →</span>
+                  </div>
+                </Link>
 
                 {/* Disabled Cards (Kichikroq ko'rinishda) */}
                 <button className="sm:col-span-2 glass-card p-4 rounded-2xl border border-white/5 opacity-50 cursor-not-allowed flex items-center justify-between hover:opacity-60 transition-opacity">
@@ -411,36 +560,56 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      {/* MODAL - Imtihon sozlamalari */}
+      {/* MODAL - Standart yoki Haqiqiy imtihon */}
       {examModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="glass-card rounded-3xl p-8 w-full max-w-md border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="text-center mb-6">
-               <div className="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
-                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock/></svg>
-               </div>
-               <h3 className="text-2xl font-heading font-bold text-white mb-2">Imtihon rejimi</h3>
-               <p className="text-sm text-slate-400">
-                 O'zingizni sinashga tayyormisiz? Kerakli savollar sonini tanlang.
-               </p>
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {[10, 20, 50].map((count) => (
-                <button
-                  key={count}
-                  onClick={() => startExam(count)}
-                  className="flex flex-col items-center justify-center py-4 rounded-2xl bg-night-900 border border-white/10 text-white hover:border-brand-blue hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
-                >
-                  <span className="text-xl font-bold group-hover:text-brand-blue transition-colors">{count}</span>
-                  <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">Savol</span>
-                </button>
-              ))}
-            </div>
-            
+            {examModalType === 'standard' ? (
+              <>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-brand-blue/20 text-brand-cyan flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock/></svg>
+                  </div>
+                  <h3 className="text-2xl font-heading font-bold text-white mb-2">Standart imtihon</h3>
+                  <p className="text-sm text-slate-400">
+                    Savollar sonini tanlang. Xato qilsangiz ham imtihon tugamasin — barcha savollarni javoblang.
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  {[10, 20, 50].map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => startStandardExam(count)}
+                      className="flex flex-col items-center justify-center py-4 rounded-2xl bg-night-900 border border-white/10 text-white hover:border-brand-blue hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
+                    >
+                      <span className="text-xl font-bold group-hover:text-brand-blue transition-colors">{count}</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">Savol</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-6">
+                  <div className="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock/></svg>
+                  </div>
+                  <h3 className="text-2xl font-heading font-bold text-white mb-2">Haqiqiy imtihon</h3>
+                  <p className="text-sm text-slate-400 mb-4">
+                    20 ta savol. 3 ta xato qilsangiz imtihon to&apos;xtaydi va &quot;Imtihon o&apos;tolmading&quot; chiqadi.
+                  </p>
+                  <button
+                    onClick={startRealExam}
+                    className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition-colors"
+                  >
+                    Boshlash
+                  </button>
+                </div>
+              </>
+            )}
             <button
-              onClick={() => setExamModalOpen(false)}
-              className="w-full py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors"
+              onClick={() => { setExamModalOpen(false); setExamModalType(null); }}
+              className="w-full py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors mt-4"
             >
               Bekor qilish
             </button>

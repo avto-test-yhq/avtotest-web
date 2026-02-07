@@ -33,7 +33,7 @@ export default function Home() {
       <div className="min-h-screen bg-slate-50 dark:bg-night-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
         
         {/* Background Elements (Faqat Dark mode da ko'rinadi yoki Light da sal o'zgaradi) */}
-        <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] pointer-events-none z-0 opacity-20 dark:opacity-40"></div>
+        <div className="fixed inset-0 bg-[url('/imgage/grid-pattern.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] pointer-events-none z-0 opacity-20 dark:opacity-40"></div>
         <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/10 dark:bg-brand-blue/20 rounded-full blur-[128px] animate-pulse-glow pointer-events-none"></div>
         <div className="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-purple/10 dark:bg-brand-purple/20 rounded-full blur-[128px] animate-pulse-glow pointer-events-none" style={{animationDelay: '2s'}}></div>
 

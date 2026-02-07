@@ -7,51 +7,76 @@ import Image from 'next/image'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
-const QUESTIONS_PER_TICKET = 10
-const TOTAL_TICKETS = 61
-const TOTAL_QUESTIONS = TOTAL_TICKETS * QUESTIONS_PER_TICKET // 610
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
-const STORAGE_KEY = 'biletlar_progress'
-
-function getProgress() {
-  if (typeof window === 'undefined') return { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
-    return JSON.parse(raw)
-  } catch {
-    return { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
-  }
-}
+const defaultProgress = { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
+const defaultStats = { totalTickets: 61, totalBiletQuestions: 610 }
 
 export default function BiletlarPage() {
   const router = useRouter()
-  const [progress, setProgress] = useState(getProgress())
-  const [mounted, setMounted] = useState(false)
+  const [progress, setProgress] = useState(defaultProgress)
+  const [stats, setStats] = useState(defaultStats)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) router.push('/login')
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push('/login')
+        return
+      }
+      setLoading(true)
+      try {
+        const [biletRes, masteryRes] = await Promise.all([
+          fetch(`${API_URL}/api/bilet-progress/${user.uid}`),
+          fetch(`${API_URL}/api/mastery/${user.uid}`)
+        ])
+        if (biletRes.ok) {
+          const data = await biletRes.json()
+          setProgress({
+            completedTickets: data.completedTickets || [],
+            ticketResults: data.ticketResults || {},
+            totalCorrectAnswers: data.totalCorrectAnswers || 0
+          })
+        } else {
+          setProgress(defaultProgress)
+        }
+        if (masteryRes.ok) {
+          const m = await masteryRes.json()
+          setStats({
+            totalTickets: m.totalTickets || 61,
+            totalBiletQuestions: m.totalBiletQuestions || 610
+          })
+        } else {
+          setStats(defaultStats)
+        }
+      } catch (e) {
+        console.error('Ma\'lumot yuklashda xatolik:', e)
+        setProgress(defaultProgress)
+        setStats(defaultStats)
+      } finally {
+        setLoading(false)
+      }
     })
     return () => unsub()
   }, [router])
 
-  useEffect(() => {
-    if (!mounted) return
-    setProgress(getProgress())
-  }, [mounted])
-
   const completedCount = progress.completedTickets.length
   const totalCorrect = progress.totalCorrectAnswers
-  const ozlashtirishPercent = TOTAL_QUESTIONS > 0 ? Math.round((totalCorrect / TOTAL_QUESTIONS) * 100) : 0
-  const unlockedCount = Math.min(completedCount + 1, TOTAL_TICKETS)
+  const totalTickets = stats.totalTickets
+  const totalBiletQuestions = stats.totalBiletQuestions
+  const ozlashtirishPercent = totalBiletQuestions > 0 ? Math.round((totalCorrect / totalBiletQuestions) * 100) : 0
+  const unlockedCount = Math.min(completedCount + 1, totalTickets)
 
   const isUnlocked = (ticketNum) => ticketNum <= unlockedCount
-  const ticketResult = (ticketNum) => progress.ticketResults[ticketNum] || null
+  const ticketResult = (ticketNum) => progress.ticketResults[ticketNum] || progress.ticketResults[String(ticketNum)] || null
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#161821] text-white flex items-center justify-center">
+        <div className="text-slate-400">Yuklanmoqda...</div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#161821] text-white font-sans">
@@ -74,11 +99,11 @@ export default function BiletlarPage() {
             <p className="text-sm text-slate-400">O&apos;zlashtirish darajasi</p>
           </div>
           <div className="bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{totalCorrect}/{TOTAL_QUESTIONS}</div>
+            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{totalCorrect}/{totalBiletQuestions}</div>
             <p className="text-sm text-slate-400">To&apos;g&apos;ri javob</p>
           </div>
           <div className="bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{completedCount}/{TOTAL_TICKETS}</div>
+            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{completedCount}/{totalTickets}</div>
             <p className="text-sm text-slate-400">Tugallangan bilet</p>
           </div>
         </section>
@@ -89,7 +114,7 @@ export default function BiletlarPage() {
           <p className="text-slate-400 text-sm mb-6">Har bir savolni chuqur o&apos;rganing! Vaqt cheklovi yo&apos;q, har bir javob uchun batafsil tushuntirish beriladi.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: TOTAL_TICKETS }, (_, i) => i + 1).map((num) => {
+            {Array.from({ length: totalTickets }, (_, i) => i + 1).map((num) => {
               const unlocked = isUnlocked(num)
               const result = ticketResult(num)
               return (

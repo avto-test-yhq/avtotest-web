@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
+import { useEffect, useState, useMemo, useRef, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-// 1. AOS ni import qildik
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { auth } from '@/lib/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
-// Ikonkalar (O'zgarishsiz qoldi)
+// Ikonkalar (O'zgarishsiz)
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
   ArrowRight: () => <path d="M5 12h14m-7 7l7-7-7-7" />,
@@ -18,22 +19,22 @@ const Icons = {
   Check: () => <path d="M5 13l4 4L19 7" />,
   Close: () => <path d="M6 18L18 6M6 6l12 12" />,
   Correct: () => <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
-  Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  Refresh: () => <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 }
 
 const Icon = ({ name, className = "w-5 h-5" }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    {Icons[name]()}
+    {Icons[name] ? Icons[name]() : null}
   </svg>
 )
 
 function ExamContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') || 'real'
   const countParam = searchParams.get('count') || '20'
+  const mode = searchParams.get('mode') || 'standard' // 'standard', 'real' yoki 'favorites'
 
-  // Backend manzili
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001';
 
   const questionCount = useMemo(() => {
@@ -47,75 +48,190 @@ function ExamContent() {
   const [isFinished, setIsFinished] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
   const [lang, setLang] = useState('uz-lotin')
+  
+  const [showFailModal, setShowFailModal] = useState(false)
+  const [showTimeUp, setShowTimeUp] = useState(false) // Vaqt tugaganda
+  const [reloadTrigger, setReloadTrigger] = useState(0)
+  const [timerTick, setTimerTick] = useState(0) // Har soniya yangilash uchun
+  const [savedIds, setSavedIds] = useState([]) // API dan kelgan saqlangan savol IDlari
+  const [favoritesEmpty, setFavoritesEmpty] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
 
-  // Til o'zgarganda bir xil savollarni boshqa tilda olish uchun ID lar
   const currentIdsRef = useRef([])
   const scrollRef = useRef(null)
+  const startTimeRef = useRef(null) // Taymer boshlangich vaqti (0 dan yoki 25 min countdown uchun)
+  const endTimeRef = useRef(null)   // Tugash vaqti — natijada sarflangan vaqtni muzlatish uchun
 
-  // 2. AOS ni ishga tushirish (Faqat bir marta)
   useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-    })
+    AOS.init({ duration: 800, once: true })
   }, [])
 
-  // 3. API dan testlarni olish (til va count bo'yicha)
-  useEffect(() => {
-    const fetchTests = async () => {
-      setAnswers({})
-
+  // Userni aniqlash va saqlangan savollar ro'yxatini olish
+  const loadSavedIds = useCallback(
+    async (uid) => {
       try {
-        let langCode = 'uzl'
-        if (lang === 'Uzb (kirill)') langCode = 'uzk'
-        if (lang === 'Русский') langCode = 'ru'
+        const res = await fetch(`${API_URL}/api/favorites/${uid}`)
+        if (!res.ok) throw new Error('API xatolik')
+        const data = await res.json()
+        if (Array.isArray(data)) {
+          const ids = data.map((q) => q._id || q.id).filter(Boolean)
+          setSavedIds(ids)
+        } else {
+          setSavedIds([])
+        }
+      } catch (e) {
+        console.error("Saqlangan savollarni yuklashda xatolik:", e)
+        setSavedIds([])
+      }
+    },
+    [API_URL]
+  )
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user || null)
+      if (user) {
+        loadSavedIds(user.uid)
+      } else {
+        setSavedIds([])
+      }
+    })
+    return () => unsubscribe()
+  }, [loadSavedIds])
+
+  // API dan testlarni olish funksiyasi
+  const fetchTests = useCallback(async () => {
+    setAnswers({})
+    setCurrentIndex(0)
+    setIsFinished(false)
+    setShowFailModal(false)
+    setShowTimeUp(false)
+    setShowExplanation(false)
+    setQuestions([])
+    // Har yangi imtihonda taymerni va tugash vaqtini reset qilamiz
+    endTimeRef.current = null
+    setTimerTick(0)
+    setFavoritesEmpty(false)
+
+    try {
+      let langCode = 'uzl'
+      if (lang === 'Uzb (kirill)') langCode = 'uzk'
+      if (lang === 'Русский') langCode = 'ru'
+
+      let data = []
+
+      if (mode === 'favorites') {
+        // Favorites mode: faqat user saqlagan savollar
+        if (!currentUser) {
+          setFavoritesEmpty(true)
+          return
+        }
+        const res = await fetch(`${API_URL}/api/favorites/${currentUser.uid}`)
+        if (!res.ok) throw new Error('API xatolik')
+        const raw = await res.json()
+        if (!Array.isArray(raw) || raw.length === 0) {
+          setFavoritesEmpty(true)
+          return
+        }
+        // Aralashtiramiz (shuffle)
+        data = [...raw].sort(() => Math.random() - 0.5)
+      } else if (mode === 'mistakes') {
+        // Mistakes mode: faqat xato qilingan savollar
+        if (!currentUser) {
+          setFavoritesEmpty(true)
+          return
+        }
+        const mistakesRes = await fetch(`${API_URL}/api/mistakes/${currentUser.uid}`)
+        if (!mistakesRes.ok) throw new Error('API xatolik')
+        const { questionIds } = await mistakesRes.json()
+        if (!Array.isArray(questionIds) || questionIds.length === 0) {
+          setFavoritesEmpty(true)
+          return
+        }
+        const idsString = questionIds.join(',')
+        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+        if (!testsRes.ok) throw new Error('API xatolik')
+        const rawData = await testsRes.json()
+        if (!Array.isArray(rawData) || rawData.length === 0) {
+          setFavoritesEmpty(true)
+          return
+        }
+        data = [...rawData].sort(() => Math.random() - 0.5)
+      } else {
+        // Oddiy rejimlar: count bo'yicha yoki avvalgi IDlar bo'yicha
         let url = `${API_URL}/api/tests?lang=${langCode}`
-
-        if (currentIdsRef.current.length > 0) {
+        if (reloadTrigger === 0 && currentIdsRef.current.length > 0) {
           const idsString = currentIdsRef.current.join(',')
           url += `&ids=${idsString}`
         } else {
           url += `&count=${questionCount}`
         }
-
         const res = await fetch(url)
-        if (!res.ok) throw new Error('API dan ma\'lumot olishda xatolik')
-        const data = await res.json()
-
-        if (Array.isArray(data) && data.length > 0) {
-          const transformedData = data.map((item) => {
-            let imageUrl = ''
-            if (item.image && item.image.trim() !== '') {
-              imageUrl = item.image.startsWith('http')
-                ? item.image
-                : `${API_URL}/uploads/${item.image}`
-            }
-
-            return {
-              id: item._id || item.id,
-              numeric_id: item.id ?? item._id,
-              question: item.question,
-              image: imageUrl,
-              explanation: item.explanation || "Izoh mavjud emas.",
-              options: item.options.map((opt) => ({
-                option: opt.text || opt.option || opt.answer || "Matn yo'q",
-                is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
-              })),
-            }
-          })
-
-          currentIdsRef.current = transformedData.map((q) => q.numeric_id).filter(Boolean)
-          setQuestions(transformedData)
-        }
-      } catch (err) {
-        console.error("Xatolik:", err)
+        if (!res.ok) throw new Error('API xatolik')
+        data = await res.json()
       }
+
+      if (Array.isArray(data) && data.length > 0) {
+        const transformedData = data.map((item) => {
+          let imageUrl = ''
+          if (item.image && item.image.trim() !== '') {
+            imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+          }
+
+          return {
+            id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
+            numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
+            question: item.question,
+            image: imageUrl,
+            explanation: item.explanation || "Izoh mavjud emas.",
+            options: item.options.map((opt) => ({
+              option: opt.text || opt.option || opt.answer || "Matn yo'q",
+              is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
+            })),
+          }
+        })
+
+        currentIdsRef.current = transformedData.map((q) => q.numeric_id).filter(Boolean)
+        setQuestions(transformedData)
+        startTimeRef.current = Date.now()
+      }
+    } catch (err) {
+      console.error("Xatolik:", err)
     }
+  }, [API_URL, lang, questionCount, reloadTrigger, mode, currentUser])
 
+  useEffect(() => {
     fetchTests()
-  }, [questionCount, API_URL, lang])
+  }, [fetchTests])
 
+  // Taymer: Haqiqiy = 25:00 dan orqaga, Standart = 0 dan yuqoriga; vaqt tugasa (real) imtihon yopiladi
+  const REAL_EXAM_SECONDS = 25 * 60
+  useEffect(() => {
+    if (questions.length === 0 || isFinished || showFailModal) return
+    const id = setInterval(() => {
+      setTimerTick((t) => t + 1)
+      if (mode === 'real' && startTimeRef.current) {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+        if (elapsed >= REAL_EXAM_SECONDS) {
+          setIsFinished(true)
+          setShowTimeUp(true)
+        }
+      }
+    }, 1000)
+    return () => clearInterval(id)
+  }, [questions.length, isFinished, showFailModal, mode])
+
+  const formatTime = (totalSeconds) => {
+    const m = Math.floor(totalSeconds / 60)
+    const s = totalSeconds % 60
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+  }
+  const elapsedSeconds = startTimeRef.current ? Math.floor((Date.now() - startTimeRef.current) / 1000) : 0
+  const displayTime = mode === 'real'
+    ? formatTime(Math.max(0, REAL_EXAM_SECONDS - elapsedSeconds))
+    : formatTime(elapsedSeconds)
+
+  // Scroll logic
   useEffect(() => {
     if (scrollRef.current) {
       const activeBtn = scrollRef.current.children[currentIndex]
@@ -128,6 +244,44 @@ function ExamContent() {
 
   const currentQuestion = questions[currentIndex]
 
+  const isCurrentFavorite = useMemo(() => {
+    if (!currentQuestion || !currentQuestion.id) return false
+    return savedIds.includes(currentQuestion.id)
+  }, [currentQuestion, savedIds])
+
+  const toggleCurrentFavorite = async () => {
+    if (!currentQuestion || !currentQuestion.id) return
+    if (!currentUser) {
+      alert("Avval tizimga kiring!")
+      return
+    }
+    const questionId = currentQuestion.id
+    const alreadySaved = savedIds.includes(questionId)
+
+    // Optimistik UI yangilash
+    setSavedIds((prev) =>
+      alreadySaved ? prev.filter((id) => id !== questionId) : [...prev, questionId]
+    )
+
+    try {
+      await fetch(`${API_URL}/api/favorites/toggle`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: currentUser.uid,
+          questionId,
+        }),
+      })
+    } catch (e) {
+      console.error("Sevimli saqlashda xatolik:", e)
+      // Xatolik bo'lsa, holatni qaytaramiz
+      setSavedIds((prev) =>
+        alreadySaved ? [...prev, questionId] : prev.filter((id) => id !== questionId)
+      )
+    }
+  }
+
+  // Statistikani hisoblash
   const stats = useMemo(() => {
     let correct = 0
     let incorrect = 0
@@ -144,53 +298,175 @@ function ExamContent() {
   const answeredCount = Object.keys(answers).length
   const allAnswered = questions.length > 0 && answeredCount >= questions.length
 
+  // Yakunlash mantiqi
   useEffect(() => {
-    if (allAnswered && !isFinished) {
+    if (allAnswered && !isFinished && !showFailModal) {
+      endTimeRef.current = Date.now()
       setIsFinished(true)
     }
-  }, [allAnswered, isFinished])
+  }, [allAnswered, isFinished, showFailModal])
 
+  const getNumericId = (questionId) => {
+    const q = questions.find((item) => item.id == questionId || item.numeric_id == questionId)
+    return q?.numeric_id ?? q?.id ?? questionId
+  }
+
+  const saveMistakeToApi = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mistakes/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Xatoni saqlashda xatolik:', e)
+    }
+  }
+
+  const saveMasteryCorrect = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mastery/correct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Mastery saqlashda xatolik:', e)
+    }
+  }
+
+  const saveMasteryIncorrect = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mastery/incorrect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Mastery yangilashda xatolik:', e)
+    }
+  }
+
+  // Javobni tanlash va XATOLIKNI TEKSHIRISH
   const selectAnswer = (questionId, optionIndex) => {
-    if (isFinished) return
+    if (isFinished || showFailModal) return
     if (typeof answers[questionId] === 'number') return
 
-    setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
+    // Hozirgi tanlangan javob to'g'rimi?
+    const isCurrentCorrect = questions[currentIndex].options[optionIndex].is_correct
+    
+    // Javobni saqlaymiz
+    const newAnswers = { ...answers, [questionId]: optionIndex }
+    setAnswers(newAnswers)
 
-    if (currentIndex < questions.length - 1) {
+    if (isCurrentCorrect) {
+      saveMasteryCorrect(questionId)
+    } else {
+      saveMasteryIncorrect(questionId)
+      saveMistakeToApi(questionId)
+    }
+
+    // Haqiqiy imtihonda: noto'g'ri bo'lsa limitni tekshiramiz (3 xato → to'xtaydi)
+    // Standart imtihonda: xatoga qaramay davom etadi
+    if (mode === 'real' && !isCurrentCorrect) {
+      let currentIncorrectCount = 0
+      Object.entries(newAnswers).forEach(([qId, optIdx]) => {
+        const q = questions.find(item => item.id == qId)
+        if (q && !q.options[optIdx].is_correct) currentIncorrectCount++
+      })
+      // Haqiqiy imtihon: 20 ta savol, 3 ta xatoda to'xtaydi (limit = 2, ya'ni 3-xatoda)
+      const limit = 2
+      if (currentIncorrectCount > limit) {
+        setTimeout(() => setShowFailModal(true), 800)
+        return
+      }
+    }
+
+    // Keyingi savolga o'tish (favorites va mistakes rejimida avtomatik o'tmaydi)
+    if (mode !== 'favorites' && mode !== 'mistakes' && currentIndex < questions.length - 1) {
       setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
     }
   }
 
   const finishExam = () => {
+    endTimeRef.current = Date.now()
     setIsFinished(true)
   }
 
-  if (!questions.length) return <div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">Yuklanmoqda...</div>
+  // Qayta boshlash funksiyasi
+  const restartExam = () => {
+    currentIdsRef.current = [] // Tarixni tozalaymiz, yangi savollar olish uchun
+    setReloadTrigger(prev => prev + 1) // useEffectni qayta ishga tushirish uchun
+  }
+
+  if (!questions.length) {
+    if (mode === 'favorites' && favoritesEmpty) {
+      return (
+        <div className="min-h-screen bg-[#1e2130] text-slate-300 flex items-center justify-center px-4 text-center">
+          Sevimli savollar topilmadi. Avval testlarda savollarni saqlab oling.
+        </div>
+      )
+    }
+    if (mode === 'mistakes' && favoritesEmpty) {
+      return (
+        <div className="min-h-screen bg-[#1e2130] text-slate-300 flex items-center justify-center px-4 text-center">
+          Xatolar topilmadi. Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savollar shu yerga qo&apos;shiladi.
+        </div>
+      )
+    }
+    return <div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">Yuklanmoqda...</div>
+  }
 
   const finishPercent = questions.length > 0 ? Math.round((stats.correct / questions.length) * 100) : 0
+  const elapsedSecondsForResult = (endTimeRef.current != null && startTimeRef.current != null)
+    ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000)
+    : 0
+  const resultTimeStr = `${String(Math.floor(elapsedSecondsForResult / 60)).padStart(2, '0')}:${String(elapsedSecondsForResult % 60).padStart(2, '0')}`
 
   if (isFinished) {
+    if (showTimeUp) {
+      return (
+        <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6 font-sans">
+          <div className="bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+            <h2 className="text-xl font-bold text-rose-500 mb-2">Vaqtingiz tugadi</h2>
+            <p className="text-slate-400 mb-6">Haqiqiy imtihon vaqti (25 daqiqa) tugadi. Imtihon yopildi.</p>
+            <div className="flex flex-col gap-3">
+              <button onClick={restartExam} className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors flex items-center justify-center gap-2">
+                <Icon name="Refresh" className="w-5 h-5" /> Qayta urinish
+              </button>
+              <Link href="/dashboard" className="w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-white font-medium border border-white/10 transition-colors text-center block">
+                Bosh sahifaga
+              </Link>
+            </div>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6 font-sans">
         <div className="bg-[#1e2130] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
           <h2 className="text-xl font-bold text-white mb-2">Test yakunlandi</h2>
-          <p className="text-slate-400 mb-6">Natijangiz quyida.</p>
+          <p className="text-slate-400 mb-4">Natijangiz quyida.</p>
           <div className="text-4xl font-bold text-white mb-1">{stats.correct}/{questions.length}</div>
-          <p className="text-slate-400 mb-2">To&apos;g&apos;ri javob</p>
-          <div className="text-3xl font-bold text-brand-cyan mb-2">{finishPercent}%</div>
-          <p className="text-slate-500 text-sm mb-6">Noto&apos;g&apos;ri: {stats.incorrect} ta</p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors"
-            >
+          <p className="text-slate-400 mb-1">To&apos;g&apos;ri javob</p>
+          <div className={`text-3xl font-bold mb-4 ${finishPercent >= 85 ? 'text-emerald-400' : 'text-rose-400'}`}>{finishPercent}%</div>
+          <p className="text-slate-500 text-sm mb-1">Noto&apos;g&apos;ri: {stats.incorrect} ta</p>
+          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-white font-semibold">{resultTimeStr}</span></p>
+          <div className="flex flex-col gap-3">
+            <button onClick={restartExam} className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
+              Qayta ishlash
+            </button>
+            <Link href="/dashboard" className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-white font-medium border border-white/10 transition-colors">
               Dashboardga qaytish
-            </Link>
-            <Link
-              href={`/exam?count=${questionCount}`}
-              className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-white font-medium border border-white/10 transition-colors"
-            >
-              Qayta boshlash
             </Link>
           </div>
         </div>
@@ -199,7 +475,49 @@ function ExamContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans">
+    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans relative">
+
+      {/* FAIL MODAL (POPUP) */}
+      {showFailModal && (
+        <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+               <Icon name="Wrong" className="w-8 h-8 text-rose-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-rose-500 mb-2">Imtihon o&apos;tolmading</h2>
+            <p className="text-slate-400 mb-6">
+              3 ta xato qildingiz. Haqiqiy imtihonda ruxsat etilgan xatolar limitidan oshib ketdingiz.
+            </p>
+            
+            <div className="bg-[#161821] rounded-xl p-4 mb-6 border border-white/5">
+                <div className="flex justify-between text-sm mb-2">
+                    <span className="text-slate-400">To'g'ri javoblar:</span>
+                    <span className="text-emerald-400 font-bold">{stats.correct}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                    <span className="text-slate-400">Xatolar:</span>
+                    <span className="text-rose-400 font-bold">{stats.incorrect}</span>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={restartExam}
+                className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all flex items-center justify-center gap-2"
+              >
+                <Icon name="Refresh" className="w-5 h-5" />
+                Qayta urinish
+              </button>
+              <Link
+                href="/dashboard"
+                className="w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-slate-300 font-medium transition-colors"
+              >
+                Bosh sahifaga qaytish
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* HEADER */}
       <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
@@ -220,7 +538,6 @@ function ExamContent() {
             </div>
           </Link>
 
-          {/* Til tugmalari - ishlaydigan qilindi */}
           <div className="hidden md:flex bg-[#2a2d3e] p-1.5 rounded-lg">
             {[
               { label: 'Uzb (lotin)', code: 'uzl' },
@@ -260,11 +577,31 @@ function ExamContent() {
             <span className="font-bold text-white text-base">{currentIndex + 1}<span className="text-slate-500 text-xs font-normal">/{questions.length}</span></span>
           </div>
 
+          {/* Sevimli savol tugmasi */}
+          <button
+            onClick={toggleCurrentFavorite}
+            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
+              isCurrentFavorite
+                ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+                : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+            }`}
+            title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
+          >
+            <Icon name="Save" className="w-4 h-4" />
+          </button>
+
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/5">
+            <span className="text-slate-400 text-xs">{mode === 'real' ? 'Qolgan vaqt' : 'Vaqt'}</span>
+            <span className={`font-mono font-bold text-base ${mode === 'real' && elapsedSeconds >= REAL_EXAM_SECONDS - 60 ? 'text-rose-400' : 'text-white'}`}>
+              {displayTime}
+            </span>
+          </div>
+
           <button
             onClick={finishExam}
             className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
           >
-            {isFinished ? 'Natijalar' : "O'tkazib yuborish"}
+            {isFinished ? 'Natijalar' : "Tugatish"}
           </button>
         </div>
       </header>
@@ -292,7 +629,7 @@ function ExamContent() {
               let labelClass = "w-14 flex items-center justify-center text-base font-bold border-r "
               let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
 
-              if (hasAnswer || isFinished) {
+              if (hasAnswer || isFinished || showFailModal) {
                 if (isCorrect) {
                   containerClass += "bg-emerald-500/10 border-emerald-500/50"
                   labelClass += "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
@@ -318,7 +655,7 @@ function ExamContent() {
                 }
               }
 
-              const isDisabled = hasAnswer || isFinished
+              const isDisabled = hasAnswer || isFinished || showFailModal
 
               return (
                 <button
@@ -341,6 +678,7 @@ function ExamContent() {
           <div className="mt-6 space-y-3 pt-4 border-t border-white/5">
             <button
               onClick={() => setShowExplanation(!showExplanation)}
+              disabled={showFailModal}
               className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all shadow-lg ${showExplanation
                   ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
                   : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-900/20'
@@ -360,7 +698,7 @@ function ExamContent() {
             <Image
               src={
                 currentQuestion.image && currentQuestion.image.trim() !== ''
-                  ? currentQuestion.image // To'liq URL
+                  ? currentQuestion.image
                   : '/imgage/background.jpg'
               }
               alt="Savol rasmi"
@@ -383,7 +721,7 @@ function ExamContent() {
       <footer className="h-20 bg-[#1e2130] border-t border-white/5 shrink-0 flex items-center px-4 relative z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
-          disabled={currentIndex === 0}
+          disabled={currentIndex === 0 || showFailModal}
           className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
         >
           <Icon name="ArrowLeft" className="w-6 h-6" />
@@ -413,7 +751,8 @@ function ExamContent() {
             return (
               <button
                 key={q.id}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={() => !showFailModal && setCurrentIndex(idx)}
+                disabled={showFailModal}
                 className={btnClass}
               >
                 {idx + 1}
@@ -424,7 +763,7 @@ function ExamContent() {
 
         <button
           onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
-          disabled={currentIndex === questions.length - 1}
+          disabled={currentIndex === questions.length - 1 || showFailModal}
           className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
         >
           <Icon name="ArrowRight" className="w-6 h-6" />
