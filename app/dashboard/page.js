@@ -419,51 +419,49 @@ export default function DashboardPage() {
           </div>
           <div className="glass-card dashboard-block p-6 lg:p-8 pb-24 lg:pb-8">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="dashboard-title-sm text-white">Top Foydalanuvchilar</h3>
-              <span className="text-primary text-sm font-bold cursor-pointer">Hammasini ko&apos;rish</span>
+              <h3 className="dashboard-title-sm text-white">Qoidalar</h3>
+              <Link href="/qoidalar" className="text-primary text-sm font-bold hover:underline">Hammasini ko&apos;rish</Link>
             </div>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/10 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <span className="font-bold text-slate-400 w-4 text-center">1</span>
-                  <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white">AS</div>
+            <div className="grid grid-cols-2 gap-4">
+              <Link href="/qoidalar/yol-harakati" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-blue-500/40 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                </div>
+                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l harakati qoidalari</p>
+                <p className="text-xs text-slate-500">30 bob</p>
+              </Link>
+              <Link href="/qoidalar/yol-belgilari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-emerald-500/40 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                </div>
+                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l belgilari</p>
+                <p className="text-xs text-slate-500">7 kategoriya</p>
+              </Link>
+              <Link href="/qoidalar/yol-chiziqlari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-orange-500/40 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </div>
+                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l chiziqlari</p>
+                <p className="text-xs text-slate-500">Yotiq va tik</p>
+              </Link>
+              <Link href="/qoidalar/tezlik-chegaralari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-blue-500/40 transition-all group">
+                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <p className="font-bold text-white text-sm mb-0.5">Tezlik chegaralari</p>
+                <p className="text-xs text-slate-500">Tez ma&apos;lumot</p>
+              </Link>
+              <Link href="/qoidalar/kerakli-hujjatlar" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-slate-400/40 transition-all group sm:col-span-2">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-slate-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </div>
                   <div>
-                    <p className="font-bold text-sm text-white">Asadbek S.</p>
-                    <p className="text-[10px] text-slate-500 uppercase">98% samaradorlik</p>
+                    <p className="font-bold text-white text-sm mb-0.5">Kerakli hujjatlar</p>
+                    <p className="text-xs text-slate-500">Toifalar bo&apos;yicha hujjatlar ro&apos;yxati</p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-1 text-primary">
-                  <Medal className="w-4 h-4" />
-                  <span className="text-xs font-bold">2,450 p</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/10 transition-colors">
-                <div className="flex items-center space-x-3">
-                  <span className="font-bold text-slate-400 w-4 text-center">2</span>
-                  <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold ring-2 ring-white">MK</div>
-                  <div>
-                    <p className="font-bold text-sm text-white">Madina K.</p>
-                    <p className="text-[10px] text-slate-500 uppercase">95% samaradorlik</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-1 text-slate-500">
-                  <Trophy className="w-4 h-4" />
-                  <span className="text-xs font-bold">2,120 p</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-2xl bg-primary/10 border border-primary/20">
-                <div className="flex items-center space-x-3">
-                  <span className="font-bold text-primary w-4 text-center">—</span>
-                  <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-800 dark:text-slate-200 text-xs font-bold ring-2 ring-white">
-                    {userName.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-white">Siz ({userName})</p>
-                    <p className="text-[10px] text-primary uppercase">O&apos;z natijangiz</p>
-                  </div>
-                </div>
-                <span className="text-xs font-bold text-primary">{mastery.masteredCount} p</span>
-              </div>
+              </Link>
             </div>
           </div>
         </section>
@@ -474,8 +472,11 @@ export default function DashboardPage() {
         <Link href="/dashboard" className="p-2 text-primary hover:scale-110">
           <Home className="dashboard-nav-icon !size-10" />
         </Link>
-        <Link href="/biletlar" className="dashboard-nav-link p-2">
+        <Link href="/qoidalar" className="dashboard-nav-link p-2">
           <BookOpen className="dashboard-nav-icon !size-10" />
+        </Link>
+        <Link href="/biletlar" className="dashboard-nav-link p-2">
+          <ClipboardCheck className="dashboard-nav-icon !size-10" />
         </Link>
         <button type="button" className="dashboard-nav-link p-2">
           <Search className="dashboard-nav-icon !size-10" />
