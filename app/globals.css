@@ -85,7 +85,7 @@ body.light-mode .gradient-bg {
 
 /* Dashboard: asosiy layout */
 .dashboard-wrap {
-  max-width: 1400px;
+  max-width: 1500px;
   margin-left: auto;
   margin-right: auto;
   padding-left: var(--dash-space);

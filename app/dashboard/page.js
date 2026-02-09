@@ -6,17 +6,22 @@ import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
-
-// Icon komponentlari (kodni toza saqlash uchun)
-const Icons = {
-  Home: () => <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>,
-  Book: () => <path d="M4 19.5A2.5 2.5 0 016.5 17H20"></path>, // Soddalashtirilgan
-  Search: () => <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>,
-  Settings: () => <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>,
-  Car: () => <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 002 12v4c0 .6.4 1 1 1h2"></path>,
-  Clock: () => <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>,
-  Ticket: () => <path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-}
+import {
+  Car,
+  Home,
+  BookOpen,
+  Search,
+  Settings as SettingsIcon,
+  Timer,
+  ClipboardCheck,
+  AlertCircle,
+  Star,
+  HelpCircle,
+  Zap,
+  Flame,
+  Medal,
+  Trophy,
+} from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -259,7 +264,7 @@ export default function DashboardPage() {
           <header className="flex justify-between items-center mb-8 lg:mb-12">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Car /></svg>
+                <Car className="w-5 h-5 text-white" />
               </div>
               <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">
                 Pravachi<span className="text-primary">UZ</span>
@@ -281,7 +286,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Oxirgi mashq – Biletlar */}
-          <Link href="/biletlar" className="block relative group cursor-pointer mb-10 overflow-hidden rounded-3xl bg-blue-600 p-8 text-white shadow-xl shadow-blue-600/20">
+          <Link href="/biletlar" className="block relative group cursor-pointer mb-10 overflow-hidden rounded-3xl bg-blue-600 p-8 text-white shadow-xl shadow-blue-600/30">
               <div className="relative z-10">
                 <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider !text-white">Oxirgi mashq</span>
                 <h3 className="text-3xl font-bold mt-4 mb-2 !text-white">Biletlar bo'yicha</h3>
@@ -298,7 +303,7 @@ export default function DashboardPage() {
               <img 
                  alt="Driving school car" 
                  className="absolute top-0 right-0 h-full w-1/3 object-cover opacity-20 pointer-events-none" 
-                 src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&q=80&w=300" 
+                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuvFci29edPEcx4oinoYcCGcarH-JEy9ANOiKgLXzplMHJhZ9c-RZaT6unQXF2ReIkfXWyyxxAm6tmLSQ4s9-46wjH4tdiuQr7LQxyqQ8bmvXf4eodT5jHbpMgijzLhSOAUmZ0X6XZJsT44HeR8PGtdUsYF3wvrQXDgYRQePioj3dKq7TNxA3qIgyxf9kWBRuuQw-_wYdsNLCyf8jsv1y3ZszVRvuwEML8J6DNKpBXs5n20zu0udv0tMa6jHt1REEY7yAzQYopOpiR" 
               />
             </Link>
 
@@ -309,7 +314,7 @@ export default function DashboardPage() {
               className="glass-card dashboard-activity-card hover:border-primary/30 group"
             >
               <div className="dashboard-icon-box dashboard-icon-box--primary">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock /></svg>
+                <Timer className="w-6 h-6" />
               </div>
               <h4 className="dashboard-card-title text-white">Standart imtihon</h4>
               <p className="dashboard-card-desc">10, 20 yoki 50 ta savol. Xato qilsangiz ham davom ettiring.</p>
@@ -322,7 +327,7 @@ export default function DashboardPage() {
               className="glass-card dashboard-activity-card hover:border-orange-500/30 group"
             >
               <div className="dashboard-icon-box dashboard-icon-box--orange">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock /></svg>
+                <Timer className="w-6 h-6" />
               </div>
               <h4 className="dashboard-card-title text-white">Haqiqiy imtihon</h4>
               <p className="dashboard-card-desc">20 ta savol. 3 ta xato — imtihon to&apos;xtatiladi. Jiddiy sinov!</p>
@@ -332,7 +337,7 @@ export default function DashboardPage() {
             </button>
             <Link href="/mistakes" className="glass-card dashboard-activity-card hover:border-red-500/30 block group">
               <div className="dashboard-icon-box dashboard-icon-box--red">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <AlertCircle className="w-6 h-6" />
               </div>
               <h4 className="dashboard-card-title text-white">Xatolar rejimi</h4>
               <p className="dashboard-card-desc">Faqat noto&apos;g&apos;ri javob bergan savollaringiz ustida ishlang.</p>
@@ -342,7 +347,7 @@ export default function DashboardPage() {
             </Link>
             <Link href="/favorites" className="glass-card dashboard-activity-card hover:border-amber-500/30 block group">
               <div className="dashboard-icon-box dashboard-icon-box--amber">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>
+                <Star className="w-6 h-6" />
               </div>
               <h4 className="dashboard-card-title text-white">Sevimli savollar</h4>
               <p className="dashboard-card-desc">Siz belgilab qo&apos;ygan murakkab savollar jamlanmasi.</p>
@@ -360,14 +365,14 @@ export default function DashboardPage() {
               <h2 className="dashboard-title text-white font-extrabold mb-1">Statistika</h2>
               <p className="dashboard-subtitle">Sizning haftalik yutuqlaringiz</p>
             </div>
-            <Link href="/tarix" className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/20 px-4 lg:px-6 py-2 rounded-2xl text-sm font-bold hover:bg-white transition-colors text-white">
+            <Link href="/tarix" className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/20 px-4 lg:px-6 py-2 rounded-2xl text-sm font-bold hover:bg-white hover:text-black transition-colors text-white">
               Barcha hisobotlar
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-8 lg:mb-10">
             <div className="glass-card dashboard-stat-card">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-primary text-2xl">?</span>
+                <HelpCircle className="w-6 h-6 text-primary" />
                 <span className="text-xs font-bold text-emerald-500">+{mastery.percent}%</span>
               </div>
               <p className="dashboard-stat-value text-white">{mastery.totalQuestions.toLocaleString()}</p>
@@ -375,7 +380,7 @@ export default function DashboardPage() {
             </div>
             <div className="glass-card dashboard-stat-card">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-orange-500 text-2xl">%</span>
+                <Zap className="w-6 h-6 text-orange-500" />
                 <span className="text-xs font-bold text-emerald-500">+{weeklyStats.changePercent || 0}%</span>
               </div>
               <p className="dashboard-stat-value text-white">{mastery.percent}%</p>
@@ -383,7 +388,7 @@ export default function DashboardPage() {
             </div>
             <Link href="/tashriflar" className="glass-card dashboard-stat-card block">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-yellow-500 text-2xl">🔥</span>
+                <Flame className="w-6 h-6 text-yellow-500" />
                 <span className="text-xs font-bold text-red-400">0</span>
               </div>
               <p className="dashboard-stat-value text-white">{activityDays} kun</p>
@@ -427,7 +432,10 @@ export default function DashboardPage() {
                     <p className="text-[10px] text-slate-500 uppercase">98% samaradorlik</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-primary">2,450 p</span>
+                <div className="flex items-center space-x-1 text-primary">
+                  <Medal className="w-4 h-4" />
+                  <span className="text-xs font-bold">2,450 p</span>
+                </div>
               </div>
               <div className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/10 transition-colors">
                 <div className="flex items-center space-x-3">
@@ -438,7 +446,10 @@ export default function DashboardPage() {
                     <p className="text-[10px] text-slate-500 uppercase">95% samaradorlik</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-slate-500">2,120 p</span>
+                <div className="flex items-center space-x-1 text-slate-500">
+                  <Trophy className="w-4 h-4" />
+                  <span className="text-xs font-bold">2,120 p</span>
+                </div>
               </div>
               <div className="flex items-center justify-between p-3 rounded-2xl bg-primary/10 border border-primary/20">
                 <div className="flex items-center space-x-3">
@@ -461,19 +472,19 @@ export default function DashboardPage() {
       {/* Pastki nav */}
       <nav className="dashboard-nav glass-card fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 lg:gap-8">
         <Link href="/dashboard" className="p-2 text-primary hover:scale-110">
-          <svg className="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Home /></svg>
+          <Home className="dashboard-nav-icon !size-10" />
         </Link>
         <Link href="/biletlar" className="dashboard-nav-link p-2">
-          <svg className="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Book /></svg>
+          <BookOpen className="dashboard-nav-icon !size-10" />
         </Link>
         <button type="button" className="dashboard-nav-link p-2">
-          <svg className="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Search /></svg>
+          <Search className="dashboard-nav-icon !size-10" />
         </button>
         <Link href="/mistakes" className="dashboard-nav-link p-2">
-          <svg className="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+          <Medal className="dashboard-nav-icon !size-10" />
         </Link>
         <Link href="/" className="dashboard-nav-link p-2">
-          <svg className="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Settings /></svg>
+          <SettingsIcon className="dashboard-nav-icon !size-10" />
         </Link>
       </nav>
 
@@ -488,7 +499,7 @@ export default function DashboardPage() {
               <>
                 <div className="text-center mb-6">
                   <div className="w-16 h-16 rounded-full bg-brand-blue/20 text-brand-cyan flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock/></svg>
+                    <Timer className="w-8 h-8" />
                   </div>
                   <h3 className="text-2xl font-heading font-bold text-white mb-2">Standart imtihon</h3>
                   <p className="text-sm text-slate-400">
@@ -512,7 +523,7 @@ export default function DashboardPage() {
               <>
                 <div className="text-center mb-6">
                   <div className="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><Icons.Clock/></svg>
+                    <Timer className="w-8 h-8" />
                   </div>
                   <h3 className="text-2xl font-heading font-bold text-white mb-2">Haqiqiy imtihon</h3>
                   <p className="text-sm text-slate-400 mb-4">
