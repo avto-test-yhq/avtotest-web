@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const QUESTIONS_PER_TICKET = 10
 
@@ -171,10 +172,9 @@ export default function BiletTicketPage() {
       try {
         const res = await fetch(`${API_URL}/api/favorites/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
-        const data = await res.json()
-        if (Array.isArray(data)) {
-          const ids = data.map((q) => q._id || q.id).filter(Boolean)
-          setSavedIds(ids)
+        const { questionIds } = await res.json()
+        if (Array.isArray(questionIds)) {
+          setSavedIds(questionIds)
         } else {
           setSavedIds([])
         }
@@ -214,22 +214,22 @@ export default function BiletTicketPage() {
 
   const currentQuestion = questions[currentIndex]
   const isCurrentFavorite = useMemo(() => {
-    if (!currentQuestion || !currentQuestion.id) return false
-    return savedIds.includes(currentQuestion.id)
+    if (!currentQuestion) return false
+    const qId = currentQuestion.numeric_id ?? currentQuestion.id
+    if (qId == null) return false
+    return savedIds.some((id) => Number(id) === Number(qId))
   }, [currentQuestion, savedIds])
 
   const toggleCurrentFavorite = async () => {
-    if (!currentQuestion || !currentQuestion.id) return
-    if (!currentUser) {
-      alert("Avval tizimga kiring!")
-      return
-    }
-    const questionId = currentQuestion.id
-    const alreadySaved = savedIds.includes(questionId)
+    if (!currentQuestion || !currentUser) return
+    const questionId = currentQuestion.numeric_id ?? currentQuestion.id
+    if (questionId == null) return
+    const numId = Number(questionId)
+    if (isNaN(numId)) return
+    const alreadySaved = savedIds.some((id) => Number(id) === numId)
 
-    // Optimistik UI
     setSavedIds((prev) =>
-      alreadySaved ? prev.filter((id) => id !== questionId) : [...prev, questionId]
+      alreadySaved ? prev.filter((id) => Number(id) !== numId) : [...prev, numId]
     )
 
     try {
@@ -238,14 +238,13 @@ export default function BiletTicketPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: currentUser.uid,
-          questionId,
+          questionId: numId,
         }),
       })
     } catch (e) {
       console.error("Sevimli saqlashda xatolik:", e)
-      // Xatolik bo'lsa, qaytarib qo'yamiz
       setSavedIds((prev) =>
-        alreadySaved ? [...prev, questionId] : prev.filter((id) => id !== questionId)
+        alreadySaved ? [...prev, numId] : prev.filter((id) => Number(id) !== numId)
       )
     }
   }
@@ -273,12 +272,27 @@ export default function BiletTicketPage() {
       const saveResult = async () => {
         if (currentUser?.uid) {
           await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length)
+          const elapsed = (endTimeRef.current && startTimeRef.current)
+            ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
+          fetch(`${API_URL}/api/exam-history/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              uid: currentUser.uid,
+              type: 'bilet',
+              correct: stats.correct,
+              total: questions.length,
+              durationSeconds: elapsed,
+              status: 'tugallangan',
+              ticketId,
+            }),
+          }).catch(() => {})
         }
         setResultSaved(true)
       }
       saveResult()
     }
-  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved, currentUser?.uid])
+  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved, currentUser?.uid, API_URL])
 
   const getNumericId = (questionId) => {
     const q = questions.find((item) => item.id == questionId || item.numeric_id == questionId)
@@ -375,8 +389,8 @@ export default function BiletTicketPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
+    <div className="h-screen flex flex-col bg-[#161821] page-bg text-white overflow-hidden font-sans">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-4 md:gap-6">
           <Link href="/biletlar" className="flex items-center space-x-2">
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={36} height={36} className="rounded-lg object-contain" />
@@ -404,6 +418,7 @@ export default function BiletTicketPage() {
               </button>
             ))}
           </div>
+          <ThemeToggle size="sm" className="hidden md:flex" />
         </div>
         <div className="flex items-center space-x-4">
           <div className="hidden sm:flex items-center space-x-3 bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-white/5">
@@ -438,17 +453,17 @@ export default function BiletTicketPage() {
         </div>
       </header>
 
-      <div className="bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
+      <div className="question-bar bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-8 h-8 rounded-full bg-white/10 items-center justify-center border border-white/20">
           <span className="text-sm font-bold">?</span>
         </div>
-        <h2 className="w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
+        <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
           {currentQuestion.question}
         </h2>
       </div>
 
       <main className="flex-1 flex overflow-hidden relative">
-        <aside className="w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+        <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
               const selected = answers[currentQuestion.id] === idx

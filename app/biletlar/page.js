@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -68,7 +69,16 @@ export default function BiletlarPage() {
   const unlockedCount = Math.min(completedCount + 1, totalTickets)
 
   const isUnlocked = (ticketNum) => ticketNum <= unlockedCount
-  const ticketResult = (ticketNum) => progress.ticketResults[ticketNum] || progress.ticketResults[String(ticketNum)] || null
+
+  // ticketResults: { 5: [ { correct, total, percent }, ... ] } yoki eski format { 5: { correct, total, percent } }
+  const ticketResult = (ticketNum) => {
+    const raw = progress.ticketResults[ticketNum] ?? progress.ticketResults[String(ticketNum)]
+    if (!raw) return null
+    const attempts = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && !Array.isArray(raw) ? [raw] : [])
+    if (attempts.length === 0) return null
+    const last = attempts[attempts.length - 1]
+    return { attempts, last, count: attempts.length }
+  }
 
   if (loading) {
     return (
@@ -79,8 +89,8 @@ export default function BiletlarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#161821] text-white font-sans">
-      <header className="h-16 border-b border-white/5 bg-[#1e2130] flex items-center justify-between px-4 md:px-8 sticky top-0 z-50">
+    <div className="min-h-screen bg-[#161821] page-bg text-white font-sans">
+      <header className="h-16 border-b border-white/5 bg-[#1e2130] header-bg flex items-center justify-between px-4 md:px-8 sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
@@ -88,21 +98,24 @@ export default function BiletlarPage() {
           </Link>
           <h1 className="text-lg font-semibold text-white">Biletlar bo&apos;yicha mashq</h1>
         </div>
-        <Link href="/dashboard" className="text-sm text-slate-400 hover:text-white">Dashboard</Link>
+        <div className="flex items-center gap-3">
+          <ThemeToggle size="sm" />
+          <Link href="/dashboard" className="text-sm text-slate-400 hover:text-white">Dashboard</Link>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
         {/* Stats: O'zlashtirish darajasi, To'g'ri javob, Tugallangan bilet */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
+          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
             <div className="text-3xl md:text-4xl font-bold text-white mb-1">{ozlashtirishPercent}%</div>
             <p className="text-sm text-slate-400">O&apos;zlashtirish darajasi</p>
           </div>
-          <div className="bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
+          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
             <div className="text-3xl md:text-4xl font-bold text-white mb-1">{totalCorrect}/{totalBiletQuestions}</div>
             <p className="text-sm text-slate-400">To&apos;g&apos;ri javob</p>
           </div>
-          <div className="bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
+          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
             <div className="text-3xl md:text-4xl font-bold text-white mb-1">{completedCount}/{totalTickets}</div>
             <p className="text-sm text-slate-400">Tugallangan bilet</p>
           </div>
@@ -120,33 +133,33 @@ export default function BiletlarPage() {
               return (
                 <div
                   key={num}
-                  className={`relative rounded-2xl border overflow-hidden transition-all ${
+                  className={`bilet-card relative rounded-2xl border overflow-hidden transition-all ${
                     unlocked
                       ? 'bg-[#1e2130] border-white/10 hover:border-blue-500/50'
-                      : 'bg-[#1a1d2d] border-white/5 opacity-80'
+                      : 'bilet-card-locked bg-[#1a1d2d] border-white/5 opacity-80'
                   }`}
                 >
                   {!unlocked && (
-                    <div className="absolute top-3 right-3 z-10 w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">
+                    <div className="bilet-lock-icon absolute top-3 right-3 z-10 w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">
                       <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                     </div>
                   )}
                   <div className="p-5">
-                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg mb-4">{num}</div>
+                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center !text-white font-bold text-lg mb-4">{num}</div>
                     <p className="text-slate-400 text-xs mb-1">
-                      {result ? `Oxirgi natija: ${result.percent}%` : 'Boshlanmagan'}
+                      {result ? `Oxirgi natija: ${result.last?.percent ?? 0}%` : 'Boshlanmagan'}
                     </p>
-                    <p className="text-slate-500 text-xs mb-4">{result ? '1 urinish' : '0 urinish'}</p>
+                    <p className="text-slate-500 text-xs mb-4">{result ? `${result.count} urinish` : '0 urinish'}</p>
                     {unlocked ? (
                       <Link
                         href={`/biletlar/${num}`}
-                        className="inline-flex items-center justify-center w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors"
+                        className="inline-flex items-center justify-center w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 !text-white text-sm font-medium transition-colors"
                       >
                         Boshlash
                         <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
                       </Link>
                     ) : (
-                      <button disabled className="w-full py-2.5 rounded-xl bg-slate-700 text-slate-500 text-sm font-medium cursor-not-allowed">
+                      <button disabled className="bilet-lock-btn w-full py-2.5 rounded-xl bg-slate-700 text-slate-500 text-sm font-medium cursor-not-allowed">
                         Qulflangan
                       </button>
                     )}

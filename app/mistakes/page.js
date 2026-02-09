@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -102,8 +103,8 @@ export default function MistakesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#161821] text-white flex flex-col font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0">
+    <div className="min-h-screen bg-[#161821] page-bg text-white flex flex-col font-sans">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0">
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
@@ -122,6 +123,7 @@ export default function MistakesPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <ThemeToggle size="sm" />
           <div className="px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/30 text-xs text-rose-300">
             Jami: <span className="font-bold text-white">{count}</span>
           </div>
@@ -195,12 +197,12 @@ export default function MistakesPage() {
                     <p className="text-sm md:text-[15px] text-slate-100 leading-relaxed line-clamp-3">
                       {q.question}
                     </p>
-                    {q.explanation && (
+                    {/* {q.explanation && (
                       <p className="text-[11px] text-slate-400 flex items-center gap-1.5 line-clamp-2">
                         <Icon name="Bulb" className="w-3.5 h-3.5" />
                         {q.explanation}
                       </p>
-                    )}
+                    )} */}
                     <div className="mt-2 flex items-center justify-end text-[11px] text-slate-500">
                       <span>To&apos;liq ko&apos;rish</span>
                     </div>

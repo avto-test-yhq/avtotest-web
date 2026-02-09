@@ -2,26 +2,11 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [theme, setTheme] = useState('dark')
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'dark'
-    setTheme(savedTheme)
-    if (savedTheme === 'light') {
-      document.body.classList.add('light-mode')
-    }
-  }, [])
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
-    document.body.classList.toggle('light-mode')
-  }
 
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-dark border-b border-white/5">
@@ -69,23 +54,7 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {/* Dark/Light Toggle */}
-            <button 
-              onClick={toggleTheme}
-              className="flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-night-800/50 hover:bg-night-800 border border-white/5 text-slate-400 hover:text-white transition-all" 
-              title="Tema o'zgartirish"
-            >
-              {theme === 'dark' ? (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                </svg>
-              )}
-            </button>
-            
+            <ThemeToggle />
             <Link href="/login" className="hidden sm:block text-sm font-bold text-white hover:text-brand-cyan transition-colors">
               Kirish
             </Link>

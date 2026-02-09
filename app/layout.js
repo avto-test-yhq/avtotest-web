@@ -1,16 +1,23 @@
 import './globals.css'
-import { Inter, Outfit } from 'next/font/google'
+import { Inter, Outfit, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
+import ThemeProviderWrapper from './ThemeProviderWrapper'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 })
 
-const outfit = Outfit({ 
+const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
+  display: 'swap',
+})
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 })
 
@@ -19,11 +26,24 @@ export const metadata = {
   description: 'Haydovchilikni kelajakda o\'rganing',
 }
 
+// Tema flash oldini olish: sahifa yuklanishidan oldin localStorage dan temani o'qib body ga qo'llash
+const themeScript = `
+(function(){
+  try {
+    var t = localStorage.getItem('theme');
+    document.body.classList.toggle('light-mode', t === 'light');
+  } catch (e) {}
+})();
+`
+
 export default function RootLayout({ children }) {
   return (
     <html lang="uz" className="scroll-smooth">
-      <body className={`${inter.variable} ${outfit.variable} selection:bg-brand-cyan selection:text-night-950`}>
-        {children}
+      <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <ThemeProviderWrapper>
+          {children}
+        </ThemeProviderWrapper>
         <Script src="https://unpkg.com/aos@2.3.1/dist/aos.js" strategy="afterInteractive" />
         <Script id="aos-init" strategy="afterInteractive">
           {`AOS.init({ duration: 800, once: true, offset: 50 });`}

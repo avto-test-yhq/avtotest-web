@@ -8,6 +8,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import ThemeToggle from '@/components/ThemeToggle'
 
 // Ikonkalar (O'zgarishsiz)
 const Icons = {
@@ -63,6 +64,7 @@ function ExamContent() {
   const endTimeRef = useRef(null)
   const langRef = useRef(lang)
   const initialFetchDoneRef = useRef(false)
+  const examAttemptSavedRef = useRef(false)
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true })
@@ -74,13 +76,8 @@ function ExamContent() {
       try {
         const res = await fetch(`${API_URL}/api/favorites/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
-        const data = await res.json()
-        if (Array.isArray(data)) {
-          const ids = data.map((q) => q._id || q.id).filter(Boolean)
-          setSavedIds(ids)
-        } else {
-          setSavedIds([])
-        }
+        const { questionIds } = await res.json()
+        setSavedIds(Array.isArray(questionIds) ? questionIds : [])
       } catch (e) {
         console.error("Saqlangan savollarni yuklashda xatolik:", e)
         setSavedIds([])
@@ -177,20 +174,27 @@ function ExamContent() {
       let data = []
 
       if (mode === 'favorites') {
-        // Favorites mode: faqat user saqlagan savollar
+        // Favorites mode: faqat user saqlagan savollar (mistakes kabi)
         if (!currentUser) {
           setFavoritesEmpty(true)
           return
         }
-        const res = await fetch(`${API_URL}/api/favorites/${currentUser.uid}`)
-        if (!res.ok) throw new Error('API xatolik')
-        const raw = await res.json()
-        if (!Array.isArray(raw) || raw.length === 0) {
+        const favRes = await fetch(`${API_URL}/api/favorites/${currentUser.uid}`)
+        if (!favRes.ok) throw new Error('API xatolik')
+        const { questionIds } = await favRes.json()
+        if (!Array.isArray(questionIds) || questionIds.length === 0) {
           setFavoritesEmpty(true)
           return
         }
-        // Aralashtiramiz (shuffle)
-        data = [...raw].sort(() => Math.random() - 0.5)
+        const idsString = questionIds.join(',')
+        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+        if (!testsRes.ok) throw new Error('API xatolik')
+        const rawData = await testsRes.json()
+        if (!Array.isArray(rawData) || rawData.length === 0) {
+          setFavoritesEmpty(true)
+          return
+        }
+        data = [...rawData].sort(() => Math.random() - 0.5)
       } else if (mode === 'mistakes') {
         // Mistakes mode: faqat xato qilingan savollar
         if (!currentUser) {
@@ -304,22 +308,22 @@ function ExamContent() {
   const currentQuestion = questions[currentIndex]
 
   const isCurrentFavorite = useMemo(() => {
-    if (!currentQuestion || !currentQuestion.id) return false
-    return savedIds.includes(currentQuestion.id)
+    if (!currentQuestion) return false
+    const qId = currentQuestion.numeric_id ?? currentQuestion.id
+    if (qId == null) return false
+    return savedIds.some((id) => Number(id) === Number(qId))
   }, [currentQuestion, savedIds])
 
   const toggleCurrentFavorite = async () => {
-    if (!currentQuestion || !currentQuestion.id) return
-    if (!currentUser) {
-      alert("Avval tizimga kiring!")
-      return
-    }
-    const questionId = currentQuestion.id
-    const alreadySaved = savedIds.includes(questionId)
+    if (!currentQuestion || !currentUser) return
+    const questionId = currentQuestion.numeric_id ?? currentQuestion.id
+    if (questionId == null) return
+    const numId = Number(questionId)
+    if (isNaN(numId)) return
+    const alreadySaved = savedIds.some((id) => Number(id) === numId)
 
-    // Optimistik UI yangilash
     setSavedIds((prev) =>
-      alreadySaved ? prev.filter((id) => id !== questionId) : [...prev, questionId]
+      alreadySaved ? prev.filter((id) => Number(id) !== numId) : [...prev, numId]
     )
 
     try {
@@ -328,14 +332,13 @@ function ExamContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: currentUser.uid,
-          questionId,
+          questionId: numId,
         }),
       })
     } catch (e) {
       console.error("Sevimli saqlashda xatolik:", e)
-      // Xatolik bo'lsa, holatni qaytaramiz
       setSavedIds((prev) =>
-        alreadySaved ? [...prev, questionId] : prev.filter((id) => id !== questionId)
+        alreadySaved ? [...prev, numId] : prev.filter((id) => Number(id) !== numId)
       )
     }
   }
@@ -461,12 +464,51 @@ function ExamContent() {
     setIsFinished(true)
   }
 
+  // Imtihon natijasini Tarix uchun saqlash
+  const saveExamAttempt = useCallback(async (status) => {
+    if (!currentUser?.uid || examAttemptSavedRef.current) return
+    const total = questions.length
+    if (total === 0) return
+    const elapsed = (endTimeRef.current && startTimeRef.current)
+      ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
+    const typeMap = { standard: 'standart', real: 'haqiqiy', favorites: 'favorites', mistakes: 'mistakes' }
+    try {
+      await fetch(`${API_URL}/api/exam-history/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uid: currentUser.uid,
+          type: typeMap[mode] || 'standart',
+          correct: stats.correct,
+          total,
+          durationSeconds: elapsed,
+          status,
+        }),
+      })
+      examAttemptSavedRef.current = true
+    } catch (e) {
+      console.error('Tarix saqlashda xatolik:', e)
+    }
+  }, [API_URL, currentUser, mode, questions.length, stats.correct])
+
   // Qayta boshlash funksiyasi
   const restartExam = () => {
-    initialFetchDoneRef.current = false // Keyingi fetch uchun ruxsat
-    currentIdsRef.current = [] // Tarixni tozalaymiz, yangi savollar olish uchun
-    setReloadTrigger((prev) => prev + 1) // useEffectni qayta ishga tushirish uchun
+    examAttemptSavedRef.current = false
+    initialFetchDoneRef.current = false
+    currentIdsRef.current = []
+    setReloadTrigger((prev) => prev + 1)
   }
+
+  useEffect(() => {
+    if (!currentUser?.uid || examAttemptSavedRef.current) return
+    if (showFailModal) {
+      saveExamAttempt('otmadi')
+    } else if (showTimeUp) {
+      saveExamAttempt('bekor')
+    } else if (isFinished && questions.length > 0) {
+      saveExamAttempt('tugallangan')
+    }
+  }, [showFailModal, showTimeUp, isFinished, questions.length, currentUser?.uid, saveExamAttempt])
 
   if (!questions.length) {
     if (mode === 'favorites' && favoritesEmpty) {
@@ -535,7 +577,7 @@ function ExamContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans relative">
+    <div className="h-screen flex flex-col bg-[#161821] page-bg text-white overflow-hidden font-sans relative">
 
       {/* FAIL MODAL (POPUP) */}
       {showFailModal && (
@@ -580,7 +622,7 @@ function ExamContent() {
       )}
 
       {/* HEADER */}
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <Image
@@ -617,6 +659,7 @@ function ExamContent() {
               </button>
             ))}
           </div>
+          <ThemeToggle size="sm" />
         </div>
 
         <div className="flex items-center space-x-4">
@@ -667,18 +710,18 @@ function ExamContent() {
       </header>
 
       {/* QUESTION BAR */}
-      <div className="bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
+      <div className="question-bar bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-8 h-8 rounded-full bg-white/10 items-center justify-center border border-white/20">
           <span className="text-sm font-bold">?</span>
         </div>
-        <h2 className="w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
+        <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
           {currentQuestion.question}
         </h2>
       </div>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex overflow-hidden relative">
-        <aside className="w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+        <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
               const selected = answers[currentQuestion.id] === idx

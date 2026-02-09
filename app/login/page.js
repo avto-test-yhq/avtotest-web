@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
 
 // Firebase importlari
 import { auth, googleProvider } from '@/lib/firebase'
@@ -293,7 +294,10 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="fixed inset-0 bg-night-950 pointer-events-none z-0">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle size="sm" />
+      </div>
+      <div className="fixed inset-0 bg-night-950 pointer-events-none z-0 page-bg">
          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/20 rounded-full blur-[128px] animate-pulse"></div>
          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-purple/20 rounded-full blur-[128px]"></div>

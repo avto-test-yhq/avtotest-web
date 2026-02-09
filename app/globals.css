@@ -37,16 +37,233 @@ body.light-mode .glass-dark {
 }
 
 .glass-card {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
 body.light-mode .glass-card {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.gradient-bg {
+  background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 50%),
+              radial-gradient(circle at 100% 100%, #064e3b 0%, transparent 50%);
+}
+
+body.light-mode .gradient-bg {
+  background: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 50%),
+              radial-gradient(circle at 100% 100%, #dcfce7 0%, transparent 50%);
+}
+
+/* ========== DASHBOARD – bitta joydan boshqarish uchun ========== */
+.dashboard-page {
+  --dash-space: 1.5rem;      /* sm */
+  --dash-space-lg: 2rem;    /* lg */
+  --dash-space-xl: 3rem;    /* xl */
+  --dash-radius: 1.5rem;    /* 24px */
+  --dash-radius-lg: 2rem;   /* 32px */
+  --dash-card-padding: 1.5rem;
+  --dash-card-padding-lg: 2rem;
+}
+@media (min-width: 1024px) {
+  .dashboard-page {
+    --dash-space: 2rem;
+    --dash-space-lg: 2.5rem;
+    --dash-space-xl: 3rem;
+  }
+}
+@media (min-width: 1280px) {
+  .dashboard-page {
+    --dash-card-padding: 2rem;
+    --dash-card-padding-lg: 2.5rem;
+  }
+}
+
+/* Dashboard: asosiy layout */
+.dashboard-wrap {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--dash-space);
+  padding-right: var(--dash-space);
+}
+.dashboard-section {
+  padding-top: var(--dash-space);
+  padding-bottom: var(--dash-space);
+}
+.dashboard-section-pad {
+  padding: var(--dash-space);
+}
+@media (min-width: 640px) {
+  .dashboard-section-pad { padding: 1.5rem; }
+}
+@media (min-width: 1024px) {
+  .dashboard-section-pad { padding: 2rem; }
+}
+@media (min-width: 1280px) {
+  .dashboard-section-pad { padding: 3rem; }
+}
+
+/* Dashboard: sarlavhalar */
+.dashboard-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+@media (min-width: 1024px) {
+  .dashboard-title { font-size: 2.25rem; }
+}
+.dashboard-title-sm {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+@media (min-width: 1024px) {
+  .dashboard-title-sm { font-size: 1.25rem; }
+}
+.dashboard-subtitle {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+body.light-mode .dashboard-subtitle {
+  color: #64748b;
+}
+
+/* Dashboard: hero kartochka (biletlar) */
+.dashboard-hero-card {
+  padding: var(--dash-card-padding);
+  border-radius: var(--dash-radius-lg);
+  box-shadow: 0 20px 25px -5px rgb(37 99 235 / 0.2);
+}
+@media (min-width: 1024px) {
+  .dashboard-hero-card { padding: var(--dash-card-padding-lg); }
+}
+
+/* Dashboard: activity kartochkalar (umumiy) */
+.dashboard-activity-card {
+  padding: var(--dash-card-padding);
+  border-radius: var(--dash-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  text-align: left;
+}
+.dashboard-activity-card:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+.dashboard-icon-box {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.dashboard-icon-box--primary {
+  background: rgba(37, 99, 235, 0.2);
+  color: #2563eb;
+}
+.dashboard-icon-box--orange {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fb923c;
+}
+.dashboard-icon-box--red {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+.dashboard-icon-box--amber {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+.dashboard-card-title {
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin-bottom: 0.25rem;
+}
+.dashboard-card-desc {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+body.light-mode .dashboard-card-desc {
+  color: #64748b;
+}
+.dashboard-card-cta {
+  font-weight: 700;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: gap 0.2s;
+}
+.dashboard-activity-card:hover .dashboard-card-cta {
+  gap: 0.5rem;
+}
+
+/* Dashboard: stat kartochkalar (o'ng ustun) */
+.dashboard-stat-card {
+  padding: 1.25rem;
+  border-radius: var(--dash-radius);
+}
+@media (min-width: 1024px) {
+  .dashboard-stat-card { padding: 1.5rem; }
+}
+.dashboard-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+@media (min-width: 1024px) {
+  .dashboard-stat-value { font-size: 1.875rem; }
+}
+.dashboard-stat-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+body.light-mode .dashboard-stat-label {
+  color: #64748b;
+}
+
+/* Dashboard: yumaloq bloklar (haftalik, top users) */
+.dashboard-block {
+  border-radius: var(--dash-radius);
+}
+
+/* Dashboard: pastki nav */
+.dashboard-nav {
+  padding: 0.75rem 1rem;
+  border-radius: var(--dash-radius);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+@media (min-width: 1024px) {
+  .dashboard-nav { padding: 0.75rem 1.5rem; }
+}
+.dashboard-nav-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0.5rem;
+  transition: transform 0.2s, color 0.2s;
+}
+.dashboard-nav-link {
+  color: #94a3b8;
+  transition: color 0.2s;
+}
+.dashboard-nav-link:hover {
+  color: #2563eb;
+}
+body.light-mode .dashboard-nav-link {
+  color: #64748b;
+}
+body.light-mode .dashboard-nav-link:hover {
+  color: #2563eb;
 }
 
 /* Neon Text */
@@ -155,13 +372,261 @@ body.light-mode .text-night-950 {
 }
 
 /* Light mode toggle button */
-body.light-mode #theme-toggle {
+body.light-mode #theme-toggle,
+body.light-mode .theme-toggle-btn {
   background-color: rgba(0, 0, 0, 0.05) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
   color: #1E293B !important;
 }
-body.light-mode #theme-toggle:hover {
+body.light-mode #theme-toggle:hover,
+body.light-mode .theme-toggle-btn:hover {
   background-color: rgba(0, 0, 0, 0.1) !important;
+  color: #0f172a !important;
+}
+
+/* Light mode: sahifa va header fonlari (barcha sahifalar uchun) */
+body.light-mode .page-bg {
+  background-color: #f1f5f9 !important;
+}
+body.light-mode .header-bg {
+  background-color: #e2e8f0 !important;
+}
+
+/* Light mode: qattiq hex fonlar (biletlar, imtixon, favorites, mistakes) */
+body.light-mode [class*="bg-[#161821]"] {
+  background-color: #f1f5f9 !important;
+}
+body.light-mode [class*="bg-[#1e2130]"] {
+  background-color: #e2e8f0 !important;
+}
+body.light-mode [class*="bg-[#1a1d2d]"] {
+  background-color: #f8fafc !important;
+}
+body.light-mode [class*="bg-[#2a2d3e]"] {
+  background-color: #cbd5e1 !important;
+}
+body.light-mode [class*="bg-[#35394b]"]:hover,
+body.light-mode [class*="bg-[#3e4255]"] {
+  background-color: #94a3b8 !important;
+}
+
+/* Light mode: Dashboard – rasmdagi ranglar */
+body.light-mode .dashboard-page {
+  background-color: #F3F6FD !important;
+}
+body.light-mode .dashboard-main .dashboard-title,
+body.light-mode .dashboard-main .dashboard-card-title {
+  color: #1e293b !important;
+}
+body.light-mode .dashboard-main .glass-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .dashboard-main .glass-card .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .dashboard-main .glass-card .text-slate-400,
+body.light-mode .dashboard-main .glass-card .text-slate-500 {
+  color: #64748b !important;
+}
+body.light-mode .dashboard-main .glass-card .font-semibold.text-white {
+  color: #1e293b !important;
+}
+body.light-mode .dashboard-main .glass-card .text-rose-300,
+body.light-mode .dashboard-main .glass-card .text-amber-300 {
+  color: #b45309 !important;
+}
+body.light-mode .dashboard-main .glass-card .text-amber-200 {
+  color: #d97706 !important;
+}
+body.light-mode .dashboard-main .glass-card .text-rose-200 {
+  color: #be123c !important;
+}
+body.light-mode .dashboard-main .glass-card .bg-night-950 {
+  background-color: #f1f5f9 !important;
+}
+body.light-mode .dashboard-header {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+body.light-mode .dashboard-header .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .sidebar-panel {
+  background: #ffffff !important;
+  border-right-color: #e2e8f0 !important;
+}
+body.light-mode .sidebar-panel .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .dashboard-main .glass-card .border-white\/10 {
+  border-color: #e2e8f0 !important;
+}
+body.light-mode .dashboard-main .glass-card.bg-night-900\/40 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+}
+body.light-mode .dashboard-main .glass-card .text-brand-cyan {
+  color: #2563eb !important;
+}
+body.light-mode .dashboard-main .glass-card .bg-brand-blue\/10,
+body.light-mode .dashboard-main .glass-card .bg-brand-blue\/30 {
+  background-color: #dbeafe !important;
+}
+body.light-mode .dashboard-main .glass-card .border-brand-blue\/30 {
+  border-color: #93c5fd !important;
+}
+body.light-mode .sidebar-panel .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .sidebar-panel .text-slate-500 {
+  color: #475569 !important;
+}
+body.light-mode .sidebar-panel .text-slate-400 {
+  color: #64748b !important;
+}
+body.light-mode .sidebar-panel .border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+body.light-mode .sidebar-panel .hover\:bg-night-800:hover,
+body.light-mode .sidebar-panel .bg-night-800\/50 {
+  background-color: #e2e8f0 !important;
+}
+
+/* Light mode: Headers (dashboard va boshqalar) */
+body.light-mode .dashboard-header,
+body.light-mode .header-bg {
+  background-color: #e2e8f0 !important;
+}
+body.light-mode .dashboard-header .text-white,
+body.light-mode header .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .dashboard-header .text-slate-400,
+body.light-mode header .text-slate-400 {
+  color: #64748b !important;
+}
+
+/* Light mode: Bilet kartalari */
+body.light-mode .bilet-card {
+  background-color: #e2e8f0 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+body.light-mode .bilet-card .text-white {
+  color: #1e293b !important;
+}
+body.light-mode .bilet-card .text-slate-400,
+body.light-mode .bilet-card .text-slate-500 {
+  color: #475569 !important;
+}
+
+/* Light mode: Qulflangan bilet */
+body.light-mode .bilet-card-locked {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  opacity: 1 !important;
+}
+body.light-mode .bilet-lock-icon {
+  background-color: #cbd5e1 !important;
+}
+body.light-mode .bilet-lock-icon .text-slate-400 {
+  color: #64748b !important;
+}
+body.light-mode .bilet-lock-btn {
+  background-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+/* Light mode: Savol matni (test/bilet) – fon ko‘kda matn oq qoladi */
+body.light-mode .question-bar {
+  background-color: #2563eb !important;
+}
+body.light-mode .question-bar-text,
+body.light-mode .question-bar .text-white,
+body.light-mode .question-bar h2 {
+  color: #ffffff !important;
+}
+body.light-mode .question-bar .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+body.light-mode .question-bar .border-white\/20 {
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Light mode: Javoblar paneli (options) */
+body.light-mode .options-panel {
+  background-color: #f8fafc !important;
+  border-right-color: rgba(0, 0, 0, 0.1) !important;
+}
+body.light-mode .options-panel [class*="bg-[#252836]"],
+body.light-mode .options-panel [class*="bg-[#2d3042]"],
+body.light-mode .options-panel [class*="bg-[#2f3345]"] {
+  background-color: #e2e8f0 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+body.light-mode .options-panel [class*="bg-[#34374a]"] {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+body.light-mode .options-panel .text-slate-300,
+body.light-mode .options-panel .text-slate-400,
+body.light-mode .options-panel .text-slate-500 {
+  color: #334155 !important;
+}
+body.light-mode .options-panel .group-hover\:text-white:hover,
+body.light-mode .options-panel .hover\:bg-\[\#2f3345\]:hover {
+  color: #1e293b !important;
+  background-color: #cbd5e1 !important;
+}
+body.light-mode .options-panel .opacity-50 {
+  opacity: 0.7 !important;
+}
+/* Tanlangan javob (ko‘k tugma) – matn oq qoladi */
+body.light-mode .options-panel button[class*="bg-blue-600"] .text-white,
+body.light-mode .options-panel [class*="bg-blue-600"].text-white {
+  color: #ffffff !important;
+}
+
+/* Javob tanlangandan keyin: to‘g‘ri (yashil) va noto‘g‘ri (qizil) – light mode */
+body.light-mode .options-panel .bg-emerald-500\/10,
+body.light-mode .options-panel [class*="bg-emerald-500"] {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+body.light-mode .options-panel .border-emerald-500\/50 {
+  border-color: rgba(16, 185, 129, 0.5) !important;
+}
+body.light-mode .options-panel .bg-emerald-500\/20 {
+  background-color: rgba(16, 185, 129, 0.28) !important;
+}
+body.light-mode .options-panel .border-emerald-500\/30 {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+body.light-mode .options-panel .text-emerald-100 {
+  color: #047857 !important;
+}
+body.light-mode .options-panel .text-emerald-400 {
+  color: #059669 !important;
+}
+
+body.light-mode .options-panel .bg-rose-500\/10,
+body.light-mode .options-panel [class*="bg-rose-500"] {
+  background-color: rgba(244, 63, 94, 0.2) !important;
+}
+body.light-mode .options-panel .border-rose-500\/50 {
+  border-color: rgba(244, 63, 94, 0.5) !important;
+}
+body.light-mode .options-panel .bg-rose-500\/20 {
+  background-color: rgba(244, 63, 94, 0.28) !important;
+}
+body.light-mode .options-panel .border-rose-500\/30 {
+  border-color: rgba(244, 63, 94, 0.4) !important;
+}
+body.light-mode .options-panel .text-rose-100 {
+  color: #be123c !important;
+}
+body.light-mode .options-panel .text-rose-400 {
+  color: #e11d48 !important;
 }
 
 /* Light mode Pro Card (Featured) */

@@ -9,25 +9,50 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: '1rem',
+        sm: '1.5rem',
+        lg: '2rem',
+        xl: '2.5rem',
+        '2xl': '3rem',
+      },
+      screens: {
+        sm: '640px',
+        md: '768px',
+        lg: '1024px',
+        xl: '1200px',
+        '2xl': '1400px',
+      },
+    },
     extend: {
       fontFamily: {
-        // Agar Next.js fontlarini (next/font) ishlatsangiz, bu yerga 'var(--font-inter)' deb yozish kerak bo'ladi
         sans: ['Inter', 'sans-serif'],
         heading: ['Outfit', 'sans-serif'],
+        display: ['var(--font-display)', 'Plus Jakarta Sans', 'sans-serif'],
       },
       colors: {
+        primary: '#2563eb',
+        'background-light': '#f8fafc',
+        'background-dark': '#0f172a',
         night: {
-          950: '#020617', // Eng to'q fon
-          900: '#0F172A', // Panel foni
-          800: '#1E293B', // Borderlar
+          950: '#020617',
+          900: '#0F172A',
+          800: '#1E293B',
         },
         brand: {
           cyan: '#06b6d4',
           blue: '#3b82f6',
           purple: '#8b5cf6',
           accent: '#f43f5e',
-          green: '#22c55e', // 2. QO'SHILDI: Kodda ishlatilgan yashil rang (to'g'ri javoblar uchun)
+          green: '#22c55e',
         }
+      },
+      borderRadius: {
+        DEFAULT: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

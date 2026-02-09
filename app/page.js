@@ -1,34 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-// Agar lucide-react o'rnatilmagan bo'lsa: npm install lucide-react
-import { Sun, Moon, Menu, X, Check, Download, ChevronRight, Apple, Play } from 'lucide-react'
+import { useTheme } from '@/context/ThemeContext'
+import ThemeToggle from '@/components/ThemeToggle'
+import { Menu, X, Check, Download, ChevronRight, Apple, Play } from 'lucide-react'
 
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(true)
+  const { theme } = useTheme()
+  const darkMode = theme === 'dark'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Tizim mavzusini o'qish yoki localStorage dan olish
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme')
-    if (savedTheme === 'light') {
-      setDarkMode(false)
-    } else {
-      setDarkMode(true)
-    }
-  }, [])
-
-  // Mavzuni o'zgartirish funksiyasi
-  const toggleTheme = () => {
-    const newMode = !darkMode
-    setDarkMode(newMode)
-    localStorage.setItem('theme', newMode ? 'dark' : 'light')
-  }
-
   return (
-    // "dark" klassi qo'shilsa tun, olib tashlansa kun rejimi ishlaydi
     <div className={`${darkMode ? 'dark' : ''} font-sans transition-colors duration-300`}>
       <div className="min-h-screen bg-slate-50 dark:bg-night-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
         
@@ -64,14 +48,7 @@ export default function Home() {
 
               {/* Actions */}
               <div className="flex items-center space-x-2 sm:space-x-4">
-                {/* Theme Toggle */}
-                <button 
-                  onClick={toggleTheme} 
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 dark:bg-night-800 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-brand-blue dark:hover:text-white transition-all"
-                >
-                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                </button>
-                
+                <ThemeToggle className="bg-slate-100 dark:bg-night-800 border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 hover:text-brand-blue dark:hover:text-white" />
                 <Link href="/login" className="hidden sm:block text-sm font-bold text-slate-700 dark:text-white hover:text-brand-cyan transition-colors">
                   Kirish
                 </Link>
