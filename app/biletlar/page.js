@@ -82,88 +82,166 @@ export default function BiletlarPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#161821] text-white flex items-center justify-center">
-        <div className="text-slate-400">Yuklanmoqda...</div>
+      <div className="biletlar-page min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 flex items-center justify-center">
+        <div className="text-slate-500 dark:text-slate-400">Yuklanmoqda...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#161821] page-bg text-white font-sans">
-      <header className="h-16 border-b border-white/5 bg-[#1e2130] header-bg flex items-center justify-between px-4 md:px-8 sticky top-0 z-50">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center space-x-2">
-            <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
-            <span className="font-bold text-white hidden sm:inline">Pravachi<span className="text-brand-cyan">UZ</span></span>
-          </Link>
-          <h1 className="text-lg font-semibold text-white">Biletlar bo&apos;yicha mashq</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle size="sm" />
-          <Link href="/dashboard" className="text-sm text-slate-400 hover:text-white">Dashboard</Link>
+    <div className="biletlar-page min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/70 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              <svg className="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7-7-7 7-7" />
+              </svg>
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-cyan-500/10 rounded-xl flex items-center justify-center">
+                <span className="text-sm font-bold text-cyan-500">BT</span>
+              </div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Biletlar bo&apos;yicha mashq
+              </h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle size="sm" />
+            <Link
+              href="/dashboard"
+              className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-white dark:!text-black  !text-white dark:text-slate-900 text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition-opacity"
+            >
+              <span>Dashboard</span>
+            </Link>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
-        {/* Stats: O'zlashtirish darajasi, To'g'ri javob, Tugallangan bilet */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{ozlashtirishPercent}%</div>
-            <p className="text-sm text-slate-400">O&apos;zlashtirish darajasi</p>
+      <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-10 pb-20">
+        {/* Stats */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-cyan-500/5">
+            <div className="text-3xl md:text-4xl font-extrabold text-cyan-500 mb-1">{ozlashtirishPercent}%</div>
+            <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
+              O&apos;zlashtirish
+            </div>
           </div>
-          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{totalCorrect}/{totalBiletQuestions}</div>
-            <p className="text-sm text-slate-400">To&apos;g&apos;ri javob</p>
+          <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-emerald-500/5">
+            <div className="text-3xl md:text-4xl font-extrabold mb-1">
+              <span className="text-emerald-500">{totalCorrect}</span>
+              <span className="text-slate-300 dark:text-slate-600 text-base md:text-xl font-semibold">
+                /{totalBiletQuestions}
+              </span>
+            </div>
+            <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
+              To&apos;g&apos;ri javob
+            </div>
           </div>
-          <div className="bilet-card bg-[#1e2130] border border-white/5 rounded-2xl p-6 text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-1">{completedCount}/{totalTickets}</div>
-            <p className="text-sm text-slate-400">Tugallangan bilet</p>
+          <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-blue-500/5">
+            <div className="text-3xl md:text-4xl font-extrabold mb-1">
+              <span className="text-blue-500">{completedCount}</span>
+              <span className="text-slate-300 dark:text-slate-600 text-base md:text-xl font-semibold">
+                /{totalTickets}
+              </span>
+            </div>
+            <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
+              Tugallangan
+            </div>
           </div>
         </section>
 
-        {/* Har bir bilet bo'yicha tayyorlanish */}
+        {/* Biletlar ro'yxati */}
         <section>
-          <h2 className="text-xl font-bold text-white mb-2">Har bir bilet bo&apos;yicha tayyorlanish</h2>
-          <p className="text-slate-400 text-sm mb-6">Har bir savolni chuqur o&apos;rganing! Vaqt cheklovi yo&apos;q, har bir javob uchun batafsil tushuntirish beriladi.</p>
+          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
+            Har bir bilet bo&apos;yicha tayyorlanish
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
+            Vaqt cheklovi yo&apos;q. Har bir javob uchun batafsil tushuntirish beriladi.
+          </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {Array.from({ length: totalTickets }, (_, i) => i + 1).map((num) => {
               const unlocked = isUnlocked(num)
               const result = ticketResult(num)
+              const percent = result?.last?.percent ?? 0
+
+              if (!unlocked) {
+                return (
+                  <div
+                    key={num}
+                    className="ticket-card glass-card p-5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/30 opacity-60 relative overflow-hidden grayscale-[0.5]"
+                  >
+                    <div className="absolute top-3 right-3">
+                      <svg
+                        className="w-4 h-4 text-slate-300 dark:text-slate-700"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex items-start mb-6 opacity-60">
+                      <span className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-lg text-slate-500 dark:text-slate-400">
+                        {num}
+                      </span>
+                    </div>
+                    <button
+                      disabled
+                      className="w-full py-3 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-bold text-sm cursor-not-allowed"
+                    >
+                      Qulflangan
+                    </button>
+                  </div>
+                )
+              }
+
               return (
                 <div
                   key={num}
-                  className={`bilet-card relative rounded-2xl border overflow-hidden transition-all ${
-                    unlocked
-                      ? 'bg-[#1e2130] border-white/10 hover:border-blue-500/50'
-                      : 'bilet-card-locked bg-[#1a1d2d] border-white/5 opacity-80'
-                  }`}
+                  className="ticket-card glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 shadow-sm hover:shadow-md relative overflow-hidden"
                 >
-                  {!unlocked && (
-                    <div className="bilet-lock-icon absolute top-3 right-3 z-10 w-8 h-8 rounded-lg bg-slate-700 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                    </div>
-                  )}
-                  <div className="p-5">
-                    <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center !text-white font-bold text-lg mb-4">{num}</div>
-                    <p className="text-slate-400 text-xs mb-1">
-                      {result ? `Oxirgi natija: ${result.last?.percent ?? 0}%` : 'Boshlanmagan'}
-                    </p>
-                    <p className="text-slate-500 text-xs mb-4">{result ? `${result.count} urinish` : '0 urinish'}</p>
-                    {unlocked ? (
-                      <Link
-                        href={`/biletlar/${num}`}
-                        className="inline-flex items-center justify-center w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 !text-white text-sm font-medium transition-colors"
-                      >
-                        Boshlash
-                        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-                      </Link>
-                    ) : (
-                      <button disabled className="bilet-lock-btn w-full py-2.5 rounded-xl bg-slate-700 text-slate-500 text-sm font-medium cursor-not-allowed">
-                        Qulflangan
-                      </button>
+                  <div className="flex items-start justify-between mb-6">
+                    <span className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center">
+                      <span className="text-lg font-bold text-cyan-500">{num}</span>
+                    </span>
+                    {result && (
+                      <div className="flex-1 ml-4 text-right">
+                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-1">
+                          <div
+                            className="h-full bg-cyan-500 rounded-full"
+                            style={{ width: `${Math.max(5, Math.min(100, percent))}%` }}
+                          />
+                        </div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                          {percent}% • {result.count} urinish
+                        </div>
+                      </div>
                     )}
                   </div>
+                  <Link
+                    href={`/biletlar/${num}`}
+                    className={`w-full py-3 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                      result
+                        ? 'bg-cyan-500 !text-white hover:opacity-90'
+                        : 'bg-cyan-500 !text-white hover:opacity-90'
+                    }`}
+                  >
+                    {result ? 'Davom etish' : 'Boshlash'}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 </div>
               )
             })}

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
-const ThemeContext = createContext({ theme: 'dark', setTheme: () => {}, toggleTheme: () => {} })
+const ThemeContext = createContext({ theme: 'dark', setTheme: () => {}, toggleTheme: () => {}, mounted: false })
 
 const STORAGE_KEY = 'theme'
 
@@ -12,10 +12,13 @@ export function ThemeProvider({ children }) {
 
   const applyTheme = useCallback((value) => {
     if (typeof document === 'undefined') return
+    const html = document.documentElement
     if (value === 'light') {
       document.body.classList.add('light-mode')
+      html.classList.remove('dark')
     } else {
       document.body.classList.remove('light-mode')
+      html.classList.add('dark')
     }
   }, [])
 

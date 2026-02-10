@@ -59,15 +59,66 @@ body.light-mode .gradient-bg {
               radial-gradient(circle at 100% 100%, #dcfce7 0%, transparent 50%);
 }
 
-/* ========== DASHBOARD – bitta joydan boshqarish uchun ========== */
+/* ========== DASHBOARD – Restructured (sidebar + main) ========== */
 .dashboard-page {
-  --dash-space: 1.5rem;      /* sm */
-  --dash-space-lg: 2rem;    /* lg */
-  --dash-space-xl: 3rem;    /* xl */
-  --dash-radius: 1.5rem;    /* 24px */
-  --dash-radius-lg: 2rem;   /* 32px */
+  --dash-space: 1.5rem;
+  --dash-space-lg: 2rem;
+  --dash-space-xl: 3rem;
+  --dash-radius: 1rem;
+  --dash-radius-lg: 1.5rem;
+  --dash-radius-xl: 2rem;
   --dash-card-padding: 1.5rem;
   --dash-card-padding-lg: 2rem;
+}
+.dashboard-page .dashboard-bg {
+  background-image: radial-gradient(circle at 0% 0%, #e2e8f0 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, #dbeafe 0%, transparent 50%);
+}
+body:not(.light-mode) .dashboard-page .dashboard-bg {
+  background-image: radial-gradient(circle at 0% 0%, #1e293b 0%, transparent 50%),
+                    radial-gradient(circle at 100% 100%, #0f172a 0%, transparent 50%);
+}
+.dashboard-sidebar {
+  width: 16rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+body.light-mode .dashboard-sidebar {
+  background: rgba(255, 255, 255, 0.4);
+  border-right-color: rgba(0, 0, 0, 0.08);
+}
+body:not(.light-mode) .dashboard-sidebar {
+  background: rgba(15, 23, 42, 0.4);
+}
+.sidebar-item-active {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0) 100%);
+  border-left: 4px solid #3B82F6;
+  color: #3B82F6;
+  font-weight: 600;
+}
+body.light-mode .sidebar-item-active {
+  color: #2563eb;
+}
+.dashboard-main-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+}
+.dashboard-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.light-mode .dashboard-sticky-header {
+  background: rgba(255, 255, 255, 0.3);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+body:not(.light-mode) .dashboard-sticky-header {
+  background: rgba(15, 23, 42, 0.3);
 }
 @media (min-width: 1024px) {
   .dashboard-page {
@@ -509,24 +560,39 @@ body.light-mode header .text-slate-400 {
   color: #64748b !important;
 }
 
+/* Light mode: Biletlar sahifasi (yengil palitra) */
+body.light-mode .biletlar-page {
+  background-color: #f3f6fd !important;
+  color: #1e293b;
+}
+
 /* Light mode: Bilet kartalari */
 body.light-mode .bilet-card {
-  background-color: #e2e8f0 !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
 }
 body.light-mode .bilet-card .text-white {
   color: #1e293b !important;
 }
 body.light-mode .bilet-card .text-slate-400,
 body.light-mode .bilet-card .text-slate-500 {
-  color: #475569 !important;
+  color: #64748b !important;
 }
 
 /* Light mode: Qulflangan bilet */
 body.light-mode .bilet-card-locked {
-  background-color: #f1f5f9 !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  background-color: #f9fafb !important;
+  border-color: #e2e8f0 !important;
   opacity: 1 !important;
+}
+
+/* Ticket card hover effekti (biletlar sahifasi) */
+.ticket-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ticket-card:hover {
+  transform: translateY(-4px);
 }
 body.light-mode .bilet-lock-icon {
   background-color: #cbd5e1 !important;

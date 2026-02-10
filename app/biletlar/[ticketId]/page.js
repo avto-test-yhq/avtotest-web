@@ -359,8 +359,11 @@ export default function BiletTicketPage() {
 
   if (!questions.length) {
     return (
-      <div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">
-        Yuklanmoqda...
+      <div className="min-h-screen bg-[#161821] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 rounded-full border-2 border-brand-cyan/30 border-t-brand-cyan animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Yuklanmoqda...</p>
+        </div>
       </div>
     )
   }
@@ -370,18 +373,34 @@ export default function BiletTicketPage() {
   if (isFinished) {
     return (
       <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6">
-        <div className="bg-[#1e2130] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center">
-          <h2 className="text-xl font-bold text-white mb-2">Bilet #{ticketId} yakunlandi</h2>
-          <p className="text-slate-400 mb-6">Barcha savollar javoblangan.</p>
-          <div className="text-4xl font-bold text-white mb-1">{stats.correct}/{questions.length}</div>
-          <p className="text-slate-400 mb-2">To&apos;g&apos;ri javob</p>
-          <div className="text-3xl font-bold text-brand-cyan mb-2">{finishPercent}%</div>
-          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-white font-semibold">{resultTimeStr}</span></p>
+        <div className="rounded-2xl bg-[#1e2130] border border-white/5 p-8 max-w-md w-full text-center shadow-xl">
+          <div className="w-16 h-16 rounded-full bg-brand-cyan/20 flex items-center justify-center mx-auto mb-6">
+            <svg className="w-8 h-8 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+          </div>
+          <h2 className="text-xl font-bold text-white mb-1">Bilet #{ticketId} yakunlandi</h2>
+          <p className="text-slate-500 text-sm mb-6">Barcha savollar javoblangan</p>
+          <div className="flex items-center justify-center gap-6 mb-6">
+            <div>
+              <div className="text-3xl font-bold text-brand-cyan">{finishPercent}%</div>
+              <p className="text-xs text-slate-500">Natija</p>
+            </div>
+            <div className="w-px h-12 bg-white/10" />
+            <div>
+              <div className="text-2xl font-bold text-white">{stats.correct}<span className="text-slate-500 font-normal">/{questions.length}</span></div>
+              <p className="text-xs text-slate-500">To&apos;g&apos;ri javob</p>
+            </div>
+            <div className="w-px h-12 bg-white/10" />
+            <div>
+              <div className="text-2xl font-bold text-white font-mono">{resultTimeStr}</div>
+              <p className="text-xs text-slate-500">Vaqt</p>
+            </div>
+          </div>
           <Link
             href="/biletlar"
-            className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium"
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan font-semibold transition-colors"
           >
             Biletlar ro&apos;yxatiga qaytish
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
           </Link>
         </div>
       </div>
@@ -389,16 +408,19 @@ export default function BiletTicketPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] page-bg text-white overflow-hidden font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0 z-50">
+    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/biletlar" className="flex items-center space-x-2">
-            <Image src="/imgage/avtotest-logo.png" alt="Logo" width={36} height={36} className="rounded-lg object-contain" />
-            <div className="hidden sm:flex flex-col leading-tight">
-              <h1 className="text-base md:text-lg font-bold text-white">Pravachi<span className="text-brand-cyan">UZ</span></h1>
-              <p className="text-[11px] md:text-xs text-slate-400">Bilet #{ticketId}</p>
-            </div>
+          <Link href="/biletlar" className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300 shrink-0">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
           </Link>
+          <div className="flex items-center gap-2">
+            <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
+            <div>
+              <h1 className="text-base font-bold text-white">Bilet #{ticketId}</h1>
+              <p className="text-[11px] text-slate-500">Savol {currentIndex + 1}/{questions.length}</p>
+            </div>
+          </div>
           <div className="hidden md:flex bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
             {[
               { label: 'Uzb (lotin)', code: 'uzl' },
@@ -447,23 +469,23 @@ export default function BiletTicketPage() {
             <span className="text-slate-400 text-xs">Vaqt</span>
             <span className="font-mono font-bold text-base text-white">{formatTime(timerTick)}</span>
           </div>
-          <div className="text-xs text-slate-400">
-            Savol: <span className="font-bold text-white text-base">{currentIndex + 1}</span>/{questions.length}
+          <div className="hidden sm:block text-xs text-slate-400">
+            <span className="font-bold text-white">{currentIndex + 1}</span>/{questions.length}
           </div>
         </div>
       </header>
 
-      <div className="question-bar bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-8 h-8 rounded-full bg-white/10 items-center justify-center border border-white/20">
-          <span className="text-sm font-bold">?</span>
+      <div className="bg-[#1e2130] border-b border-white/5 px-6 py-5 shrink-0 z-40 relative flex items-center min-h-[80px]">
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/20 items-center justify-center">
+          <span className="text-brand-cyan font-bold">?</span>
         </div>
-        <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
+        <h2 className="w-full text-center text-base md:text-lg font-medium text-white leading-relaxed max-w-5xl mx-auto">
           {currentQuestion.question}
         </h2>
       </div>
 
       <main className="flex-1 flex overflow-hidden relative">
-        <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+        <aside className="w-full md:w-[400px] lg:w-[450px] bg-[#1e2130] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
               const selected = answers[currentQuestion.id] === idx
@@ -474,26 +496,26 @@ export default function BiletTicketPage() {
               let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
               if (hasAnswer || isFinished) {
                 if (isCorrect) {
-                  containerClass += "bg-emerald-500/10 border-emerald-500/50"
+                  containerClass += "bg-emerald-500/10 border-emerald-500/40"
                   labelClass += "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
                   textClass += "text-emerald-100"
                 } else if (selected && !isCorrect) {
-                  containerClass += "bg-rose-500/10 border-rose-500/50"
+                  containerClass += "bg-rose-500/10 border-rose-500/40"
                   labelClass += "bg-rose-500/20 text-rose-400 border-rose-500/30"
                   textClass += "text-rose-100"
                 } else {
-                  containerClass += "bg-[#252836] border-white/5 opacity-50"
-                  labelClass += "bg-[#2d3042] text-slate-500 border-white/5"
+                  containerClass += "bg-[#2a2d3e] border-white/5 opacity-60"
+                  labelClass += "bg-[#35394b] text-slate-500 border-white/5"
                   textClass += "text-slate-400"
                 }
               } else {
                 if (selected) {
-                  containerClass += "bg-blue-600/20 border-blue-500"
-                  labelClass += "bg-blue-600 text-white border-blue-500"
+                  containerClass += "bg-brand-cyan/20 border-brand-cyan/50"
+                  labelClass += "bg-brand-cyan/30 text-brand-cyan border-brand-cyan/40"
                   textClass += "text-white"
                 } else {
-                  containerClass += "bg-[#252836] border-[#34374a] hover:border-slate-500 hover:bg-[#2f3345]"
-                  labelClass += "bg-[#2d3042] text-slate-400 border-[#34374a] group-hover:text-white group-hover:bg-[#3e4255]"
+                  containerClass += "bg-[#2a2d3e] border-white/5 hover:border-brand-cyan/30 hover:bg-[#35394b]"
+                  labelClass += "bg-[#35394b] text-slate-400 border-white/5 group-hover:text-brand-cyan"
                   textClass += "text-slate-300 group-hover:text-white"
                 }
               }
@@ -518,7 +540,7 @@ export default function BiletTicketPage() {
           <div className="mt-6 space-y-3 pt-4 border-t border-white/5">
             <button
               onClick={() => setShowExplanation(!showExplanation)}
-              className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all shadow-lg ${showExplanation ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50' : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-900/20'}`}
+              className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all ${showExplanation ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40'}`}
             >
               <span className="flex items-center">
                 <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
@@ -561,8 +583,8 @@ export default function BiletTicketPage() {
             const isAnswered = typeof answerIdx === 'number'
             const isCurrent = idx === currentIndex
             const isCorrect = isAnswered && q.options[answerIdx]?.is_correct
-            let btnClass = "min-w-[44px] h-11 rounded-lg text-base font-bold flex items-center justify-center border transition-all duration-300 "
-            if (isCurrent) btnClass += "bg-blue-600 border-blue-400 text-white shadow-[0_0_15px_rgba(37,99,235,0.6)] scale-110 z-10 ring-2 ring-blue-400/50"
+            let btnClass = "min-w-[44px] h-11 rounded-xl text-base font-bold flex items-center justify-center border transition-all duration-300 "
+            if (isCurrent) btnClass += "bg-brand-cyan border-brand-cyan text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] scale-110 z-10 ring-2 ring-brand-cyan/50"
             else if (isAnswered) {
               if (isCorrect) btnClass += "bg-emerald-600 border-emerald-500 text-white"
               else btnClass += "bg-rose-600 border-rose-500 text-white"

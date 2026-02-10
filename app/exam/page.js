@@ -388,6 +388,21 @@ function ExamContent() {
     }
   }
 
+  const removeMistakeFromApi = async (questionId) => {
+    if (!currentUser?.uid) return
+    const numericId = getNumericId(questionId)
+    if (numericId == null) return
+    try {
+      await fetch(`${API_URL}/api/mistakes/remove`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+      })
+    } catch (e) {
+      console.error('Xatolardan olib tashlashda xatolik:', e)
+    }
+  }
+
   const saveMasteryCorrect = async (questionId) => {
     if (!currentUser?.uid) return
     const numericId = getNumericId(questionId)
@@ -432,6 +447,7 @@ function ExamContent() {
 
     if (isCurrentCorrect) {
       saveMasteryCorrect(questionId)
+      if (mode === 'mistakes') removeMistakeFromApi(questionId)
     } else {
       saveMasteryIncorrect(questionId)
       saveMistakeToApi(questionId)

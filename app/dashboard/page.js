@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import WeeklyChart from '@/components/WeeklyChart'
 import {
   Car,
   Home,
@@ -21,6 +23,9 @@ import {
   Flame,
   Medal,
   Trophy,
+  LogOut,
+  ChevronRight,
+  Play,
 } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
@@ -254,221 +259,283 @@ export default function DashboardPage() {
     }
   }, []);
 
-  const weekLabels = (weeklyStats.daily?.length ? weeklyStats.daily : [{ label: 'DUSH', percent: 0 }, { label: 'SESH', percent: 0 }, { label: 'CHOR', percent: 0 }, { label: 'PAY', percent: 0 }, { label: 'JUM', percent: 0 }, { label: 'SHA', percent: 0 }, { label: 'YAK', percent: 0 }]);
-
   return (
-    <div className="dashboard-page min-h-screen page-bg flex font-display text-slate-900 overflow-x-hidden">
-      <div className="dashboard-wrap flex flex-col lg:flex-row w-full min-h-screen">
-        {/* CHAP USTUN */}
-        <section className="dashboard-main w-full lg:w-1/2 h-full overflow-y-auto dashboard-section-pad">
-          <header className="flex justify-between items-center mb-8 lg:mb-12">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shrink-0">
-                <Car className="w-5 h-5 text-white" />
-              </div>
-              <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">
-                Pravachi<span className="text-primary">UZ</span>
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <ThemeToggle size="sm" />
-              <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-800 ring-2 ring-white/20 shrink-0">
-                {userName.charAt(0).toUpperCase()}
-              </div>
-            </div>
-          </header>
-
-          <div className="mb-8 lg:mb-10">
-            <h2 className="dashboard-title text-white">
-              Xush kelibsiz, <span className="text-primary">{userName}</span> 👋
-            </h2>
-            <p className="dashboard-subtitle">Bugungi mashg&apos;ulotlarni davom ettirishga tayyormisiz?</p>
-          </div>
-
-          {/* Oxirgi mashq – Biletlar */}
-          <Link href="/biletlar" className="block relative group cursor-pointer mb-10 overflow-hidden rounded-3xl bg-blue-600 p-8 text-white shadow-xl shadow-blue-600/30">
-              <div className="relative z-10">
-                <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider !text-white">Oxirgi mashq</span>
-                <h3 className="text-3xl font-bold mt-4 mb-2 !text-white">Biletlar bo'yicha</h3>
-                <p className="opacity-80 mb-6 text-sm max-w-sm !text-white">Har bir biletni alohida mashq qiling va bilimingizni mustahkamlang.</p>
-                <div className="flex items-center justify-between bg-white/10 p-4 rounded-2xl backdrop-blur-sm">
-                  <div className="flex flex-col">
-                    <span className="text-xs opacity-70 !text-white">Progress</span>
-                    <span className="text-xl font-bold !text-white">{biletlarProgress.completed}/{mastery.totalTickets} yechilgan ({biletlarProgress.percent}%)</span>
-                  </div>
-                  <button className="bg-white text-blue-600 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition-colors">Davom etish</button>
-                </div>
-              </div>
-              {/* Rasm placeholder (Dizayn buzilmasligi uchun) */}
-              <img 
-                 alt="Driving school car" 
-                 className="absolute top-0 right-0 h-full w-1/3 object-cover opacity-20 pointer-events-none" 
-                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuvFci29edPEcx4oinoYcCGcarH-JEy9ANOiKgLXzplMHJhZ9c-RZaT6unQXF2ReIkfXWyyxxAm6tmLSQ4s9-46wjH4tdiuQr7LQxyqQ8bmvXf4eodT5jHbpMgijzLhSOAUmZ0X6XZJsT44HeR8PGtdUsYF3wvrQXDgYRQePioj3dKq7TNxA3qIgyxf9kWBRuuQw-_wYdsNLCyf8jsv1y3ZszVRvuwEML8J6DNKpBXs5n20zu0udv0tMa6jHt1REEY7yAzQYopOpiR" 
+    <div className="dashboard-page dashboard-bg min-h-screen flex font-display text-slate-800 dark:text-slate-100 overflow-hidden">
+      {/* SIDEBAR – desktop */}
+      <aside className="dashboard-sidebar hidden md:flex flex-col flex-shrink-0 z-20">
+        <div className="p-6 flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-white/30 dark:border-slate-800 shadow-lg shadow-primary/20 overflow-hidden flex items-center justify-center">
+              <Image
+                src="/imgage/avtotest-logo.png"
+                alt="PravachiUZ"
+                width={32}
+                height={32}
+                className="object-contain"
+                priority
               />
-            </Link>
+            </div>
+            <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
+              Pravachi<span className="text-primary font-extrabold text-2xl leading-none">UZ</span>
+            </span>
+          </Link>
+        </div>
+        <nav className="flex-1 mt-4 px-4 space-y-2">
+          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">Menyu</p>
+          <Link href="/dashboard" className="flex items-center gap-3 p-3 rounded-xl sidebar-item-active">
+            <Home className="w-5 h-5" />
+            <span>Bosh sahifa</span>
+          </Link>
+          <Link href="/qoidalar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
+            <BookOpen className="w-5 h-5" />
+            <span>Qoidalar</span>
+          </Link>
+          <Link href="/biletlar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
+            <ClipboardCheck className="w-5 h-5" />
+            <span>Biletlar</span>
+          </Link>
+          <button type="button" className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400 text-left">
+            <Search className="w-5 h-5" />
+            <span>Qidirish</span>
+          </button>
+          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-8 mb-2">Tizim</p>
+          <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
+            <SettingsIcon className="w-5 h-5" />
+            <span>Sozlamalar</span>
+          </Link>
+        </nav>
+        <div className="p-4 mt-auto">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-all font-medium">
+            <LogOut className="w-5 h-5" />
+            <span>Chiqish</span>
+          </button>
+        </div>
+      </aside>
 
-          {/* 4 ta activity card */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 pb-24 lg:pb-12">
-            <button
-              onClick={() => { setExamModalType('standard'); setExamModalOpen(true); }}
-              className="glass-card dashboard-activity-card hover:border-primary/30 group"
-            >
-              <div className="dashboard-icon-box dashboard-icon-box--primary">
-                <Timer className="w-6 h-6" />
-              </div>
-              <h4 className="dashboard-card-title text-white">Standart imtihon</h4>
-              <p className="dashboard-card-desc">10, 20 yoki 50 ta savol. Xato qilsangiz ham davom ettiring.</p>
-              <span className="dashboard-card-cta text-primary">
-                Boshlash <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-              </span>
-            </button>
-            <button
-              onClick={() => { setExamModalType('real'); setExamModalOpen(true); }}
-              className="glass-card dashboard-activity-card hover:border-orange-500/30 group"
-            >
-              <div className="dashboard-icon-box dashboard-icon-box--orange">
-                <Timer className="w-6 h-6" />
-              </div>
-              <h4 className="dashboard-card-title text-white">Haqiqiy imtihon</h4>
-              <p className="dashboard-card-desc">20 ta savol. 3 ta xato — imtihon to&apos;xtatiladi. Jiddiy sinov!</p>
-              <span className="dashboard-card-cta text-orange-500">
-                Boshlash <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-              </span>
-            </button>
-            <Link href="/mistakes" className="glass-card dashboard-activity-card hover:border-red-500/30 block group">
-              <div className="dashboard-icon-box dashboard-icon-box--red">
-                <AlertCircle className="w-6 h-6" />
-              </div>
-              <h4 className="dashboard-card-title text-white">Xatolar rejimi</h4>
-              <p className="dashboard-card-desc">Faqat noto&apos;g&apos;ri javob bergan savollaringiz ustida ishlang.</p>
-              <span className="dashboard-card-cta text-red-400">
-                O&apos;tish <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-              </span>
-            </Link>
-            <Link href="/favorites" className="glass-card dashboard-activity-card hover:border-amber-500/30 block group">
-              <div className="dashboard-icon-box dashboard-icon-box--amber">
-                <Star className="w-6 h-6" />
-              </div>
-              <h4 className="dashboard-card-title text-white">Sevimli savollar</h4>
-              <p className="dashboard-card-desc">Siz belgilab qo&apos;ygan murakkab savollar jamlanmasi.</p>
-              <span className="dashboard-card-cta text-amber-400">
-                Ko&apos;rish <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
-              </span>
-            </Link>
+      <main className="dashboard-main-content">
+        <header className="dashboard-sticky-header p-6 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-white">Xush kelibsiz, {userName} 👋</h1>
+          <div className="flex items-center gap-4">
+            <ThemeToggle size="sm" />
+            <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-sm font-semibold border border-blue-100 dark:border-blue-800">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span>Premium A&apos;zo</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border-2 border-white dark:border-slate-800">
+              {userName.charAt(0).toUpperCase()}
+            </div>
           </div>
-        </section>
+        </header>
 
-        {/* O'NG USTUN – Statistika + gradient-bg */}
-        <section className="w-full lg:w-1/2 h-full gradient-bg dashboard-section-pad overflow-y-auto">
-          <div className="flex justify-between items-end mb-8 lg:mb-12">
-            <div>
-              <h2 className="dashboard-title text-white font-extrabold mb-1">Statistika</h2>
-              <p className="dashboard-subtitle">Sizning haftalik yutuqlaringiz</p>
+        <div className="p-6 md:p-8 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8">
+          <div className="flex-1 space-y-8">
+            {/* 3 ta stat karta + Barcha hisobotlar */}
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Statistika</h2>
+              <Link href="/tarix" className="text-primary text-sm font-semibold hover:underline">Barcha hisobotlar</Link>
             </div>
-            <Link href="/tarix" className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/20 px-4 lg:px-6 py-2 rounded-2xl text-sm font-bold hover:bg-white hover:text-black transition-colors text-white">
-              Barcha hisobotlar
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mb-8 lg:mb-10">
-            <div className="glass-card dashboard-stat-card">
-              <div className="flex justify-between items-start mb-4">
-                <HelpCircle className="w-6 h-6 text-primary" />
-                <span className="text-xs font-bold text-emerald-500">+{mastery.percent}%</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50">
+                <div className="relative z-10">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Jami Savollar</p>
+                  <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.totalQuestions.toLocaleString()}</h2>
+                  <p className="text-xs text-green-500 mt-2 font-medium">O&apos;zlashtirilgan: {mastery.masteredCount}</p>
+                </div>
+                <HelpCircle className="absolute -right-2 -bottom-2 w-12 h-12 text-primary/10 group-hover:scale-110 transition-transform" />
               </div>
-              <p className="dashboard-stat-value text-white">{mastery.totalQuestions.toLocaleString()}</p>
-              <p className="dashboard-stat-label">Jami Savollar</p>
+              <div className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50">
+                <div className="relative z-10">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Samaradorlik</p>
+                  <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.percent}%</h2>
+                  <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-4 overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${Math.min(100, mastery.percent)}%` }} />
+                  </div>
+                </div>
+                <Zap className="absolute -right-2 -bottom-2 w-12 h-12 text-green-500/10 group-hover:scale-110 transition-transform" />
+              </div>
+              <Link href="/tarix" className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50 block">
+                <div className="relative z-10">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Davomiylik</p>
+                  <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{activityDays} kun</h2>
+                  <span className="text-xs text-primary mt-3 font-medium flex items-center hover:underline">
+                    Tashriflar tarixi <ChevronRight className="w-3 h-3 ml-1" />
+                  </span>
+                </div>
+                <Flame className="absolute -right-2 -bottom-2 w-12 h-12 text-orange-500/10 group-hover:scale-110 transition-transform" />
+              </Link>
             </div>
-            <div className="glass-card dashboard-stat-card">
-              <div className="flex justify-between items-start mb-4">
-                <Zap className="w-6 h-6 text-orange-500" />
-                <span className="text-xs font-bold text-emerald-500">+{weeklyStats.changePercent || 0}%</span>
+
+            {/* Mashq qilish – Biletlar (to'liq kenglik) */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Mashq qilish</h3>
+                <Link href="/biletlar" className="text-primary text-sm font-semibold hover:underline">Barchasini ko&apos;rish</Link>
               </div>
-              <p className="dashboard-stat-value text-white">{mastery.percent}%</p>
-              <p className="dashboard-stat-label">Samaradorlik</p>
-            </div>
-            <Link href="/tashriflar" className="glass-card dashboard-stat-card block">
-              <div className="flex justify-between items-start mb-4">
-                <Flame className="w-6 h-6 text-yellow-500" />
-                <span className="text-xs font-bold text-red-400">0</span>
-              </div>
-              <p className="dashboard-stat-value text-white">{activityDays} kun</p>
-              <p className="dashboard-stat-label">Davomiylik</p>
-            </Link>
-          </div>
-          <div className="glass-card dashboard-block p-6 lg:p-8 mb-8 lg:mb-10 relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6 lg:mb-8">
-                <h3 className="dashboard-title-sm text-white">Haftalik faollik</h3>
-                <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold">BU HAFTA</span>
-              </div>
-              <div className="flex items-end justify-between gap-2 lg:gap-3 h-36 lg:h-40">
-                {weekLabels.map((d, idx) => {
-                  const pct = Math.min(100, (d.percent || 0) * 2)
-                  const barH = pct ? `${Math.max(pct, 8)}%` : '8%'
-                  return (
-                    <div key={d.label} className="flex flex-col items-center flex-1">
-                      <div className="w-full bg-primary/20 rounded-xl relative overflow-hidden flex items-end" style={{ minHeight: 150 }}>
-                        <div className="absolute bottom-0 w-full bg-primary rounded-xl transition-all duration-500" style={{ height: barH }} />
-                      </div>
-                      <span className="text-[10px] mt-2 font-bold opacity-60 text-white">{d.label}</span>
+              <Link href="/biletlar" className="block relative group cursor-pointer overflow-hidden rounded-3xl bg-primary p-6 md:p-8 text-white shadow-xl shadow-primary/30">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                      <BookOpen className="w-8 h-8 md:w-10 md:h-10 !text-white" />
                     </div>
-                  )
-                })}
-              </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h4 className="text-2xl font-bold !text-white">Biletlar bo&apos;yicha</h4>
+                        <span className="bg-white/20 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider !text-white">{mastery.totalTickets} bilet</span>
+                      </div>
+                      <p className="text-white/80 max-w-md text-sm">Har bir biletni alohida mashq qiling va bilimingizni tizimli ravishda mustahkamlang.</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 max-w-xs space-y-3">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-white/80 uppercase tracking-tighter">{biletlarProgress.completed}/{mastery.totalTickets} yechilgan</span>
+                      <span className="!text-white">{biletlarProgress.percent}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="h-full bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, biletlarProgress.percent)}%` }} />
+                    </div>
+                    <span className="inline-flex items-center justify-center gap-2 w-full mt-2 bg-white text-primary py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-slate-50 transition-colors">
+                      <span>Davom ettirish</span>
+                      <Play className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+                <img alt="Mashina" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuvFci29edPEcx4oinoYcCGcarH-JEy9ANOiKgLXzplMHJhZ9c-RZaT6unQXF2ReIkfXWyyxxAm6tmLSQ4s9-46wjH4tdiuQr7LQxyqQ8bmvXf4eodT5jHbpMgijzLhSOAUmZ0X6XZJsT44HeR8PGtdUsYF3wvrQXDgYRQePioj3dKq7TNxA3qIgyxf9kWBRuuQw-_wYdsNLCyf8jsv1y3ZszVRvuwEML8J6DNKpBXs5n20zu0udv0tMa6jHt1REEY7yAzQYopOpiR" className="absolute top-0 right-0 h-full w-1/3 object-cover opacity-20 pointer-events-none hidden md:block" />
+              </Link>
+            </div>
+
+            {/* 4 ta activity card – pastdan kartalar */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-24 md:pb-8">
+              <button
+                onClick={() => { setExamModalType('standard'); setExamModalOpen(true); }}
+                className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 text-left"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center text-primary">
+                    <Timer className="w-6 h-6" />
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progress</p>
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Standart imtihon</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-10 line-clamp-2">10, 20 yoki 50 ta savol. Xato qilsangiz ham davom ettiring.</p>
+                <span className="flex items-center justify-center gap-2 text-primary font-bold text-sm group-hover:translate-x-1 transition-transform">
+                  Boshlash <ChevronRight className="w-4 h-4" />
+                </span>
+              </button>
+              <button
+                onClick={() => { setExamModalType('real'); setExamModalOpen(true); }}
+                className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 text-left"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-500">
+                    <Timer className="w-6 h-6" />
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Haqiqiy</p>
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Haqiqiy imtihon</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">20 ta savol. 3 ta xato — imtihon to&apos;xtatiladi. Jiddiy sinov!</p>
+                <span className="flex items-center justify-center gap-2 text-orange-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
+                  Boshlash <Zap className="w-4 h-4" />
+                </span>
+              </button>
+              <Link href="/mistakes" className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 block">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-500">
+                    <AlertCircle className="w-6 h-6" />
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xatolar</p>
+                  <p className="text-sm font-bold text-rose-500">{mistakesCount} ta</p>
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Xatolar bilan ishlash</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Oldin xato qilgan savollaringizni qayta ko&apos;rib chiqing va o&apos;zlashtiring.</p>
+                <span className="flex items-center justify-center gap-2 text-rose-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
+                  Xatolarni tozalash <ChevronRight className="w-4 h-4" />
+                </span>
+              </Link>
+              <Link href="/favorites" className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 block">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500">
+                    <Star className="w-6 h-6" />
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sevimli</p>
+                  <p className="text-sm font-bold text-amber-500">{favoritesCount} ta</p>
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Sevimli savollar</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Siz belgilab qo&apos;ygan murakkab savollar jamlanmasi.</p>
+                <span className="flex items-center justify-center gap-2 text-amber-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
+                  Ko&apos;rish <ChevronRight className="w-4 h-4" />
+                </span>
+              </Link>
             </div>
           </div>
-          <div className="glass-card dashboard-block p-6 lg:p-8 pb-24 lg:pb-8">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="dashboard-title-sm text-white">Qoidalar</h3>
-              <Link href="/qoidalar" className="text-primary text-sm font-bold hover:underline">Hammasini ko&apos;rish</Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <Link href="/qoidalar/yol-harakati" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-blue-500/40 transition-all group">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                </div>
-                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l harakati qoidalari</p>
-                <p className="text-xs text-slate-500">30 bob</p>
-              </Link>
-              <Link href="/qoidalar/yol-belgilari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-emerald-500/40 transition-all group">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
-                </div>
-                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l belgilari</p>
-                <p className="text-xs text-slate-500">7 kategoriya</p>
-              </Link>
-              <Link href="/qoidalar/yol-chiziqlari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-orange-500/40 transition-all group">
-                <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-                </div>
-                <p className="font-bold text-white text-sm mb-0.5">Yo&apos;l chiziqlari</p>
-                <p className="text-xs text-slate-500">Yotiq va tik</p>
-              </Link>
-              <Link href="/qoidalar/tezlik-chegaralari" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-blue-500/40 transition-all group">
-                <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                </div>
-                <p className="font-bold text-white text-sm mb-0.5">Tezlik chegaralari</p>
-                <p className="text-xs text-slate-500">Tez ma&apos;lumot</p>
-              </Link>
-              <Link href="/qoidalar/kerakli-hujjatlar" className="rounded-2xl bg-[#1e2130] border border-white/5 p-4 hover:border-slate-400/40 transition-all group sm:col-span-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-slate-500/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+
+          {/* O'ng ustun – Qoidalar + Eslatma */}
+          <aside className="w-full lg:w-[420px] flex-shrink-0 flex flex-col gap-6">
+            <div className="glass-card bg-white/40 dark:bg-slate-900/40 rounded-3xl p-6 border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Qoidalar</h3>
+                <Link href="/qoidalar" className="text-primary text-xs font-semibold hover:underline">Hammasi</Link>
+              </div>
+              <div className="space-y-3">
+                <Link href="/qoidalar/yol-harakati" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
+                  <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center text-primary">
+                    <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-bold text-white text-sm mb-0.5">Kerakli hujjatlar</p>
-                    <p className="text-xs text-slate-500">Toifalar bo&apos;yicha hujjatlar ro&apos;yxati</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l harakati qoidalari</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">30 bob mavjud</p>
                   </div>
-                </div>
-              </Link>
+                </Link>
+                <Link href="/qoidalar/yol-belgilari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
+                  <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/40 rounded-lg flex items-center justify-center text-emerald-500">
+                    <Medal className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l belgilari</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">7 kategoriya</p>
+                  </div>
+                </Link>
+                <Link href="/qoidalar/yol-chiziqlari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
+                  <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/40 rounded-lg flex items-center justify-center text-orange-500">
+                    <Trophy className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l chiziqlari</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Yotiq va tik chiziqlar</p>
+                  </div>
+                </Link>
+                <Link href="/qoidalar/tezlik-chegaralari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
+                  <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/40 rounded-lg flex items-center justify-center text-indigo-500">
+                    <Timer className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Tezlik chegaralari</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Eng so&apos;nggi ma&apos;lumotlar</p>
+                  </div>
+                </Link>
+                <Link href="/qoidalar" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
+                  <div className="w-10 h-10 bg-rose-100 dark:bg-rose-900/40 rounded-lg flex items-center justify-center text-rose-500">
+                    <ClipboardCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Boshqa qoidalar</h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Video darslar va hujjatlar</p>
+                  </div>
+                </Link>
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-primary to-blue-600 !text-white shadow-xl shadow-primary/30">
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-2 ">Eslatma</p>
+              <p className="text-sm font-medium leading-relaxed">Qoidalar 2024-yildagi so&apos;nggi tahrirlar bilan to&apos;liq yangilangan.</p>
+            </div>
 
-      {/* Pastki nav */}
-      <nav className="dashboard-nav glass-card fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 lg:gap-8">
+            {/* Davomiylik – haftalik faollik (yechilgan savollar soniga asoslangan) */}
+            <WeeklyChart data={weeklyStats.daily} />
+          </aside>
+        </div>
+      </main>
+
+      {/* Pastki nav – faqat mobil/planşet */}
+      <nav className="dashboard-nav glass-card fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 lg:gap-8 lg:hidden">
         <Link href="/dashboard" className="p-2 text-primary hover:scale-110">
           <Home className="dashboard-nav-icon !size-10" />
         </Link>
