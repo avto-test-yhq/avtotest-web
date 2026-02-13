@@ -12,7 +12,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 function getMarkingImageUrl(imagePath) {
   if (!imagePath) return null
   const base = `${API_URL}/rules/images/markings`
-  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
+  if (imagePath.startsWith('http')) {
+    try {
+      const url = new URL(imagePath)
+      return `${API_URL}${url.pathname}`
+    } catch { return imagePath }
+  }
+  return `${base}/${imagePath}`
 }
 
 const TYPE_LABELS = { horizontal: 'Yotiq chiziqlar', vertical: 'Tik chiziqlar' }

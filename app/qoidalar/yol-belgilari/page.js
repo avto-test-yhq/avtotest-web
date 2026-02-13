@@ -12,7 +12,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 function getSignImageUrl(imagePath) {
   if (!imagePath) return null
   const base = `${API_URL}/rules/images/signs`
-  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
+  // Har doim backend (API_URL) dan olish — pravachi.uz yoki boshqa domain bo'lsa ham
+  if (imagePath.startsWith('http')) {
+    try {
+      const url = new URL(imagePath)
+      return `${API_URL}${url.pathname}` // path ni backend bilan almashtiramiz
+    } catch { return imagePath }
+  }
+  return `${base}/${imagePath}`
 }
 
 export default function YolBelgilariPage() {
