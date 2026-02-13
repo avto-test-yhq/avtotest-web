@@ -2,6 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
+import UserProfileHeader from '@/components/UserProfileHeader'
 
 const categories = [
   {
@@ -9,14 +11,14 @@ const categories = [
     name: 'Yotiq chiziqlar',
     count: 40,
     icon: 'horizontal',
-    iconBg: 'bg-orange-500/20',
+    iconBg: 'bg-orange-500/10 text-orange-500',
   },
   {
     id: 'vertical',
     name: 'Tik chiziqlar',
     count: 9,
     icon: 'vertical',
-    iconBg: 'bg-orange-500/20',
+    iconBg: 'bg-purple-500/10 text-purple-500',
   },
 ]
 
@@ -24,44 +26,78 @@ export default function YolChiziqlariPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-[#161821] text-white font-sans">
-      <header className="h-16 flex items-center gap-4 px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
-        </button>
-        <h1 className="text-lg font-bold text-white">Yo&apos;l chiziqlari</h1>
+    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center text-slate-600 dark:text-slate-400"
+            >
+              <span className="material-icons-round">arrow_back</span>
+            </button>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white">Yo&apos;l chiziqlari</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-semibold shadow-lg shadow-sky-500/20">
+              <UserProfileHeader />
+            </div>
+          </div>
+        </div>
       </header>
 
-      <main className="p-4 lg:p-8 max-w-2xl mx-auto pb-24">
-        <div className="space-y-2">
-          {categories.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/qoidalar/yol-chiziqlari/${cat.id}`}
-              className="flex items-center justify-between p-4 rounded-xl bg-[#1e2130] border border-white/5 hover:border-orange-500/30 transition-all group"
-            >
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-lg ${cat.iconBg} flex items-center justify-center`}>
-                  <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    {cat.id === 'horizontal' ? (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                    ) : (
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" />
-                    )}
-                  </svg>
+      <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
+        {/* SIDEBAR */}
+        <aside className="hidden lg:block w-80 border-r border-slate-200 dark:border-slate-800 p-6 h-[calc(100vh-64px)] sticky top-16 bg-white dark:bg-[#1e293b]/50">
+          <nav className="space-y-1">
+            <div className="pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3">Turlar</span>
+            </div>
+            {categories.map(cat => (
+              <Link
+                key={cat.id}
+                href={`/qoidalar/yol-chiziqlari/${cat.id}`}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
+              >
+                <span className="material-icons-round text-[20px] text-slate-400 group-hover:text-slate-500">
+                  {cat.id === 'horizontal' ? 'more_horiz' : 'more_vert'}
+                </span>
+                <span className="line-clamp-1">{cat.name}</span>
+              </Link>
+            ))}
+          </nav>
+        </aside>
+
+        {/* MAIN CONTENT */}
+        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/qoidalar/yol-chiziqlari/${cat.id}`}
+                className="group flex flex-col items-center justify-center text-center p-8 rounded-3xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-sky-500/30 transition-all duration-300"
+              >
+                <div className={`w-20 h-20 rounded-2xl mb-6 flex items-center justify-center ${cat.iconBg}`}>
+                  {cat.id === 'horizontal' ? (
+                    <span className="material-icons-round text-4xl">horizontal_rule</span>
+                  ) : (
+                    <span className="material-icons-round text-4xl transform rotate-90">horizontal_rule</span>
+                  )}
                 </div>
-                <div>
-                  <p className="font-semibold text-white">{cat.name}</p>
-                  <p className="text-xs text-slate-500">{cat.count} ta chiziq</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors mb-2">{cat.name}</h3>
+                <p className="text-slate-500 dark:text-slate-400">{cat.count} ta chiziq namunasi</p>
+
+                <div className="mt-8 flex items-center text-sm font-semibold text-sky-500 gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
+                  Ko&apos;rish <span className="material-icons-round text-sm">arrow_forward</span>
                 </div>
-              </div>
-              <svg className="w-5 h-5 text-slate-400 group-hover:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          ))}
-        </div>
-      </main>
+              </Link>
+            ))}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

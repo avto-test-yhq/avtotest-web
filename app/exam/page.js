@@ -63,6 +63,8 @@ function ExamContent() {
   const [savedIds, setSavedIds] = useState([]) // API dan kelgan saqlangan savol IDlari
   const [favoritesEmpty, setFavoritesEmpty] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
+  const [loadError, setLoadError] = useState(null) // Yuklash xatosi
+  const [isLoading, setIsLoading] = useState(true)
 
   const currentIdsRef = useRef([])
   const scrollRef = useRef(null)
@@ -121,9 +123,10 @@ function ExamContent() {
       question: item.question,
       image: imageUrl,
       explanation: item.explanation || "Izoh mavjud emas.",
-      options: item.options.map((opt) => ({
+      options: item.options.map((opt, idx) => ({
         option: opt.text || opt.option || opt.answer || "Matn yo'q",
-        is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
+        is_correct: !!(opt.isCorrect === true || opt.is_correct === true || opt.correct === true),
+        _oi: idx,
       })),
     }
   }, [API_URL])
@@ -135,7 +138,7 @@ function ExamContent() {
     const langCode = getLangCode(newLang)
     try {
       const idsString = ids.join(',')
-      const res = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+      const res = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
       if (!res.ok) return
       const data = await res.json()
       if (!Array.isArray(data) || data.length === 0) return
@@ -149,7 +152,10 @@ function ExamContent() {
             ...q,
             question: fromApi.question,
             explanation: fromApi.explanation,
-            options: q.options.map((opt, j) => ({ ...opt, option: fromApi.options[j]?.option ?? opt.option })),
+            options: q.options.map((opt) => {
+              const origIdx = opt._oi ?? 0
+              return { ...opt, option: fromApi.options[origIdx]?.option ?? opt.option }
+            }),
           }
         })
       )
@@ -160,6 +166,8 @@ function ExamContent() {
 
   // API dan testlarni olish funksiyasi (to'liq yuklash - qayta boshlash)
   const fetchTests = useCallback(async (skipReset = false) => {
+    setLoadError(null)
+    setIsLoading(true)
     if (!skipReset) {
       setAnswers({})
       setCurrentIndex(0)
@@ -193,7 +201,7 @@ function ExamContent() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
         if (!testsRes.ok) throw new Error('API xatolik')
         const rawData = await testsRes.json()
         if (!Array.isArray(rawData) || rawData.length === 0) {
@@ -215,7 +223,7 @@ function ExamContent() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
         if (!testsRes.ok) throw new Error('API xatolik')
         const rawData = await testsRes.json()
         if (!Array.isArray(rawData) || rawData.length === 0) {
@@ -230,15 +238,33 @@ function ExamContent() {
           const idsString = currentIdsRef.current.join(',')
           url += `&ids=${idsString}`
         } else {
-          url += `&count=${questionCount}`
+          // Generate random IDs between 1 and 1228
+          const TOTAL_QUESTIONS_DB = 1228
+          const randomIds = new Set()
+          while (randomIds.size < questionCount) {
+            const r = Math.floor(Math.random() * TOTAL_QUESTIONS_DB) + 1
+            randomIds.add(r)
+          }
+          const idsString = Array.from(randomIds).join(',')
+          url += `&ids=${idsString}`
         }
-        const res = await fetch(url)
+        const res = await fetch(url, { cache: 'no-store' })
         if (!res.ok) throw new Error('API xatolik')
         data = await res.json()
       }
 
-      if (Array.isArray(data) && data.length > 0) {
-        let transformedData = data.map(transformQuestion)
+      let finalData = data
+      if (!Array.isArray(finalData)) {
+        if (Array.isArray(finalData.data)) finalData = finalData.data
+        else if (Array.isArray(finalData.tests)) finalData = finalData.tests
+        else if (Array.isArray(finalData.questions)) finalData = finalData.questions
+      }
+
+      if (Array.isArray(finalData) && finalData.length > 0) {
+        let transformedData = finalData.map(transformQuestion)
+
+        // Savollar ketma-ketligini random qilish
+        transformedData = transformedData.sort(() => Math.random() - 0.5)
 
         if (settings.shuffleOptions && mode !== 'real') {
           transformedData = transformedData.map(q => ({
@@ -250,17 +276,25 @@ function ExamContent() {
         currentIdsRef.current = transformedData.map((q) => q.numeric_id).filter(Boolean)
         setQuestions(transformedData)
         if (!skipReset) startTimeRef.current = Date.now()
+        setLoadError(null)
+      } else if (mode !== 'favorites' && mode !== 'mistakes') {
+        console.log('API validatsiyadan o\'tmadi:', data)
+        setLoadError('Savollar topilmadi. Serverdan noto\'g\'ri format keldi.')
       }
     } catch (err) {
       console.error("Xatolik:", err)
+      setLoadError(err?.message || 'Yuklashda xatolik. Internet aloqasini tekshiring.')
+    } finally {
+      setIsLoading(false)
     }
-  }, [API_URL, getLangCode, transformQuestion, questionCount, reloadTrigger, mode, currentUser])
+  }, [API_URL, getLangCode, transformQuestion, questionCount, reloadTrigger, mode, currentUser, settings.shuffleOptions])
 
   useEffect(() => {
     langRef.current = lang
   }, [lang])
 
   // Testga kirganda backendga bir marta murojaat (qayta urinish bosilganda qayta fetch)
+  // Standard/Real: currentUser kutmasdan darhol yuklash; Favorites/Mistakes: currentUser kerak
   useEffect(() => {
     if (mode === 'favorites' || mode === 'mistakes') {
       if (!currentUser) return
@@ -580,19 +614,45 @@ function ExamContent() {
   if (!questions.length) {
     if (mode === 'favorites' && favoritesEmpty) {
       return (
-        <div className="min-h-screen bg-[#1e2130] text-slate-300 flex items-center justify-center px-4 text-center">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-600 dark:text-slate-300 flex items-center justify-center px-4 text-center">
           Sevimli savollar topilmadi. Avval testlarda savollarni saqlab oling.
         </div>
       )
     }
     if (mode === 'mistakes' && favoritesEmpty) {
       return (
-        <div className="min-h-screen bg-[#1e2130] text-slate-300 flex items-center justify-center px-4 text-center">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-600 dark:text-slate-300 flex items-center justify-center px-4 text-center">
           Xatolar topilmadi. Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savollar shu yerga qo&apos;shiladi.
         </div>
       )
     }
-    return <div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">Yuklanmoqda...</div>
+    if (loadError) {
+      return (
+        <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-600 dark:text-slate-300 flex flex-col items-center justify-center px-4 text-center gap-6">
+          <p className="text-rose-500 dark:text-rose-400 font-medium">{loadError}</p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                initialFetchDoneRef.current = false
+                fetchTests(false)
+              }}
+              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors"
+            >
+              Qayta urinish
+            </button>
+            <Link href="/dashboard" className="px-6 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-semibold transition-colors">
+              Bosh sahifaga
+            </Link>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center gap-4">
+        <span>Yuklanmoqda...</span>
+        <div className="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
   }
 
   const finishPercent = questions.length > 0 ? Math.round((stats.correct / questions.length) * 100) : 0
@@ -604,15 +664,15 @@ function ExamContent() {
   if (isFinished) {
     if (showTimeUp) {
       return (
-        <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6 font-sans">
-          <div className="bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 font-sans">
+          <div className="bg-white dark:bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
             <h2 className="text-xl font-bold text-rose-500 mb-2">Vaqtingiz tugadi</h2>
-            <p className="text-slate-400 mb-6">Haqiqiy imtihon vaqti (25 daqiqa) tugadi. Imtihon yopildi.</p>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">Haqiqiy imtihon vaqti (25 daqiqa) tugadi. Imtihon yopildi.</p>
             <div className="flex flex-col gap-3">
               <button onClick={restartExam} className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-colors flex items-center justify-center gap-2">
                 <Icon name="Refresh" className="w-5 h-5" /> Qayta urinish
               </button>
-              <Link href="/dashboard" className="w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-white font-medium border border-white/10 transition-colors text-center block">
+              <Link href="/dashboard" className="w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-900 dark:text-white font-medium border border-slate-200 dark:border-white/10 transition-colors text-center block">
                 Bosh sahifaga
               </Link>
             </div>
@@ -621,20 +681,20 @@ function ExamContent() {
       )
     }
     return (
-      <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-[#1e2130] border border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-          <h2 className="text-xl font-bold text-white mb-2">Test yakunlandi</h2>
-          <p className="text-slate-400 mb-4">Natijangiz quyida.</p>
-          <div className="text-4xl font-bold text-white mb-1">{stats.correct}/{questions.length}</div>
-          <p className="text-slate-400 mb-1">To&apos;g&apos;ri javob</p>
-          <div className={`text-3xl font-bold mb-4 ${finishPercent >= 85 ? 'text-emerald-400' : 'text-rose-400'}`}>{finishPercent}%</div>
+      <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 font-sans">
+        <div className="bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Test yakunlandi</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-4">Natijangiz quyida.</p>
+          <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1">{stats.correct}/{questions.length}</div>
+          <p className="text-slate-500 dark:text-slate-400 mb-1">To&apos;g&apos;ri javob</p>
+          <div className={`text-3xl font-bold mb-4 ${finishPercent >= 85 ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>{finishPercent}%</div>
           <p className="text-slate-500 text-sm mb-1">Noto&apos;g&apos;ri: {stats.incorrect} ta</p>
-          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-white font-semibold">{resultTimeStr}</span></p>
+          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-slate-900 dark:text-white font-semibold">{resultTimeStr}</span></p>
           <div className="flex flex-col gap-3">
             <button onClick={restartExam} className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
               Qayta ishlash
             </button>
-            <Link href="/dashboard" className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-white font-medium border border-white/10 transition-colors">
+            <Link href="/dashboard" className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-900 dark:text-white font-medium border border-slate-200 dark:border-white/10 transition-colors">
               Dashboardga qaytish
             </Link>
           </div>
@@ -644,28 +704,28 @@ function ExamContent() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] page-bg text-white overflow-hidden font-sans relative">
+    <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#161821] page-bg text-slate-900 dark:text-white overflow-hidden font-sans relative">
 
       {/* FAIL MODAL (POPUP) */}
       {showFailModal && (
         <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300">
+          <div className="bg-white dark:bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300">
             <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Icon name="Wrong" className="w-8 h-8 text-rose-500" />
             </div>
             <h2 className="text-2xl font-bold text-rose-500 mb-2">Imtihon o&apos;tolmading</h2>
-            <p className="text-slate-400 mb-6">
+            <p className="text-slate-500 dark:text-slate-400 mb-6">
               3 ta xato qildingiz. Haqiqiy imtihonda ruxsat etilgan xatolar limitidan oshib ketdingiz.
             </p>
 
-            <div className="bg-[#161821] rounded-xl p-4 mb-6 border border-white/5">
+            <div className="bg-slate-50 dark:bg-[#161821] rounded-xl p-4 mb-6 border border-slate-200 dark:border-white/5">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-slate-400">To'g'ri javoblar:</span>
-                <span className="text-emerald-400 font-bold">{stats.correct}</span>
+                <span className="text-slate-500 dark:text-slate-400">To'g'ri javoblar:</span>
+                <span className="text-emerald-500 dark:text-emerald-400 font-bold">{stats.correct}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-400">Xatolar:</span>
-                <span className="text-rose-400 font-bold">{stats.incorrect}</span>
+                <span className="text-slate-500 dark:text-slate-400">Xatolar:</span>
+                <span className="text-rose-500 dark:text-rose-400 font-bold">{stats.incorrect}</span>
               </div>
             </div>
 
@@ -679,7 +739,7 @@ function ExamContent() {
               </button>
               <Link
                 href="/dashboard"
-                className="w-full py-3 rounded-xl bg-[#2a2d3e] hover:bg-[#35394b] text-slate-300 font-medium transition-colors"
+                className="w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-600 dark:text-slate-300 font-medium transition-colors"
               >
                 Bosh sahifaga qaytish
               </Link>
@@ -689,7 +749,7 @@ function ExamContent() {
       )}
 
       {/* HEADER */}
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0 z-50">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] header-bg border-b border-slate-200 dark:border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-6">
           <Link href="/dashboard" className="flex items-center space-x-2">
             <Image
@@ -700,14 +760,14 @@ function ExamContent() {
               className="rounded-lg object-contain"
             />
             <div className="hidden sm:flex flex-col leading-tight">
-              <h1 className="text-base md:text-lg font-bold text-white">
+              <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">
                 Pravachi<span className="text-brand-cyan">UZ</span>
               </h1>
-              <p className="text-[11px] md:text-xs text-slate-400">Haydovchilik testi</p>
+              <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">Haydovchilik testi</p>
             </div>
           </Link>
 
-          <div className="hidden md:flex bg-[#2a2d3e] p-1.5 rounded-lg">
+          <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg">
             {[
               { label: 'Uzb (lotin)', code: 'uzl' },
               { label: 'Uzb (kirill)', code: 'uzk' },
@@ -717,8 +777,8 @@ function ExamContent() {
                 key={item.code}
                 onClick={() => setLang(item.label)}
                 className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
-                  ? 'bg-[#3e4255] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
               >
                 {item.label}
@@ -727,7 +787,7 @@ function ExamContent() {
           </div>
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-[#2a2d3e] text-slate-400 hover:text-white transition-colors"
+            className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           </button>
@@ -735,45 +795,45 @@ function ExamContent() {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="hidden sm:flex items-center space-x-3 bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-white/5">
-            <div className="flex items-center text-emerald-400 text-sm font-bold space-x-1">
+          <div className="hidden sm:flex items-center space-x-3 bg-slate-100 dark:bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
+            <div className="flex items-center text-emerald-500 dark:text-emerald-400 text-sm font-bold space-x-1">
               <Icon name="Correct" className="w-4 h-4" />
               <span>{stats.correct}</span>
             </div>
-            <div className="w-px h-4 bg-white/10"></div>
-            <div className="flex items-center text-rose-400 text-sm font-bold space-x-1">
+            <div className="w-px h-4 bg-slate-300 dark:bg-white/10"></div>
+            <div className="flex items-center text-rose-500 dark:text-rose-400 text-sm font-bold space-x-1">
               <Icon name="Wrong" className="w-4 h-4" />
               <span>{stats.incorrect}</span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 text-xs text-slate-400">
+          <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
             <span>Savol:</span>
-            <span className="font-bold text-white text-base">{currentIndex + 1}<span className="text-slate-500 text-xs font-normal">/{questions.length}</span></span>
+            <span className="font-bold text-slate-900 dark:text-white text-base">{currentIndex + 1}<span className="text-slate-500 text-xs font-normal">/{questions.length}</span></span>
           </div>
 
           {/* Sevimli savol tugmasi */}
           <button
             onClick={toggleCurrentFavorite}
             className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
-              ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-              : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+              ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
+              : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-amber-400'
               }`}
             title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
           >
             <Icon name="Save" className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/5">
-            <span className="text-slate-400 text-xs">{mode === 'real' ? 'Qolgan vaqt' : 'Vaqt'}</span>
-            <span className={`font-mono font-bold text-base ${mode === 'real' && elapsedSeconds >= REAL_EXAM_SECONDS - 60 ? 'text-rose-400' : 'text-white'}`}>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
+            <span className="text-slate-500 dark:text-slate-400 text-xs">{mode === 'real' ? 'Qolgan vaqt' : 'Vaqt'}</span>
+            <span className={`font-mono font-bold text-base ${mode === 'real' && elapsedSeconds >= REAL_EXAM_SECONDS - 60 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
               {displayTime}
             </span>
           </div>
 
           <button
             onClick={finishExam}
-            className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+            className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
           >
             {isFinished ? 'Natijalar' : "Tugatish"}
           </button>
@@ -783,7 +843,7 @@ function ExamContent() {
       {/* QUESTION BAR */}
       <div className="question-bar bg-blue-700 px-6 py-5 shadow-lg shrink-0 z-40 relative flex items-center min-h-[80px]">
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-8 h-8 rounded-full bg-white/10 items-center justify-center border border-white/20">
-          <span className="text-sm font-bold">?</span>
+          <span className="text-sm font-bold text-white">?</span>
         </div>
         <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
           {currentQuestion.question}
@@ -792,7 +852,7 @@ function ExamContent() {
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex overflow-hidden relative">
-        <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-[#1a1d2d] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+        <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-[#1a1d2d] flex flex-col border-r border-slate-200 dark:border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
               const selected = answers[currentQuestion.id] === idx
@@ -805,27 +865,27 @@ function ExamContent() {
 
               if (hasAnswer || isFinished || showFailModal) {
                 if (isCorrect) {
-                  containerClass += "bg-emerald-500/10 border-emerald-500/50"
-                  labelClass += "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                  textClass += "text-emerald-100"
+                  containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/50"
+                  labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                  textClass += "text-emerald-800 dark:text-emerald-100"
                 } else if (selected && !isCorrect) {
-                  containerClass += "bg-rose-500/10 border-rose-500/50"
-                  labelClass += "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                  textClass += "text-rose-100"
+                  containerClass += "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/50"
+                  labelClass += "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30"
+                  textClass += "text-rose-800 dark:text-rose-100"
                 } else {
-                  containerClass += "bg-[#252836] border-white/5 opacity-50"
-                  labelClass += "bg-[#2d3042] text-slate-500 border-white/5"
+                  containerClass += "bg-slate-50 dark:bg-[#252836] border-slate-100 dark:border-white/5 opacity-50"
+                  labelClass += "bg-slate-100 dark:bg-[#2d3042] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5"
                   textClass += "text-slate-400"
                 }
               } else {
                 if (selected) {
-                  containerClass += "bg-blue-600/20 border-blue-500"
+                  containerClass += "bg-blue-600/10 dark:bg-blue-600/20 border-blue-500"
                   labelClass += "bg-blue-600 text-white border-blue-500"
-                  textClass += "text-white"
+                  textClass += "text-slate-900 dark:text-white"
                 } else {
-                  containerClass += "bg-[#252836] border-[#34374a] hover:border-slate-500 hover:bg-[#2f3345]"
-                  labelClass += "bg-[#2d3042] text-slate-400 border-[#34374a] group-hover:text-white group-hover:bg-[#3e4255]"
-                  textClass += "text-slate-300 group-hover:text-white"
+                  containerClass += "bg-slate-50 dark:bg-[#252836] border-slate-200 dark:border-[#34374a] hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-100 dark:hover:bg-[#2f3345]"
+                  labelClass += "bg-slate-100 dark:bg-[#2d3042] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-[#34374a] group-hover:text-slate-900 dark:group-hover:text-white group-hover:bg-slate-200 dark:group-hover:bg-[#3e4255]"
+                  textClass += "text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
                 }
               }
 
@@ -841,21 +901,21 @@ function ExamContent() {
                   <div className={labelClass}>F{idx + 1}</div>
                   <div className={textClass}>
                     <span className="flex-1">{opt.option}</span>
-                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-400 ml-2 shrink-0" />}
-                    {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-400 ml-2 shrink-0" />}
+                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
+                    {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
                   </div>
                 </button>
               )
             })}
           </div>
 
-          <div className="mt-6 space-y-3 pt-4 border-t border-white/5">
+          <div className="mt-6 space-y-3 pt-4 border-t border-slate-200 dark:border-white/5">
             <button
               onClick={() => setShowExplanation(!showExplanation)}
               disabled={showFailModal}
               className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all shadow-lg ${showExplanation
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
-                : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-900/20'
+                ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-500/50'
+                : 'bg-amber-500 hover:bg-amber-600 text-white border border-amber-600 shadow-amber-900/20'
                 }`}
             >
               <span className="flex items-center">
@@ -867,7 +927,7 @@ function ExamContent() {
           </div>
         </aside>
 
-        <section className="flex-1 bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
+        <section className="flex-1 bg-slate-50 dark:bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
           <div className="relative w-full h-full">
             <Image
               src={
@@ -882,9 +942,9 @@ function ExamContent() {
               unoptimized={currentQuestion.image?.startsWith('http')}
             />
             {showExplanation && currentQuestion.explanation && (
-              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl animate-in slide-in-from-bottom-10 z-10">
-                <h4 className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
-                <p className="text-base leading-relaxed text-slate-200">{currentQuestion.explanation}</p>
+              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-in slide-in-from-bottom-10 z-10">
+                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
+                <p className="text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
               </div>
             )}
           </div>
@@ -892,11 +952,11 @@ function ExamContent() {
       </main>
 
       {/* FOOTER NAV */}
-      <footer className="h-20 bg-[#1e2130] border-t border-white/5 shrink-0 flex items-center px-4 relative z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
+      <footer className="h-20 bg-white dark:bg-[#1e2130] border-t border-slate-200 dark:border-white/5 shrink-0 flex items-center px-4 relative z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] dark:shadow-[0_-5px_20px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
           disabled={currentIndex === 0 || showFailModal}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
+          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
         >
           <Icon name="ArrowLeft" className="w-6 h-6" />
         </button>
@@ -919,7 +979,7 @@ function ExamContent() {
                 btnClass += "bg-rose-600 border-rose-500 text-white shadow-[0_0_10px_rgba(244,63,94,0.3)]"
               }
             } else {
-              btnClass += "bg-[#161821] border-[#2a2d3e] text-slate-500 hover:bg-[#2a2d3e] hover:text-slate-300"
+              btnClass += "bg-slate-100 dark:bg-[#161821] border-slate-200 dark:border-[#2a2d3e] text-slate-500 dark:text-slate-500 hover:bg-slate-200 dark:hover:bg-[#2a2d3e] hover:text-slate-700 dark:hover:text-slate-300"
             }
 
             return (
@@ -938,7 +998,7 @@ function ExamContent() {
         <button
           onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
           disabled={currentIndex === questions.length - 1 || showFailModal}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
+          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
         >
           <Icon name="ArrowRight" className="w-6 h-6" />
         </button>
@@ -947,6 +1007,7 @@ function ExamContent() {
     </div>
   )
 }
+
 
 export default function ExamPage() {
   return (

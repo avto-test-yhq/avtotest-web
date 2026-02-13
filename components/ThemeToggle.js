@@ -5,15 +5,18 @@ import { useTheme } from '@/context/ThemeContext'
 export default function ThemeToggle({ className = '', size = 'md' }) {
   const { theme, toggleTheme } = useTheme()
 
-  const sizeClass = size === 'sm' ? 'w-8 h-8' : size === 'lg' ? 'w-11 h-11' : 'w-9 h-9 sm:w-10 sm:h-10'
-  const iconClass = size === 'sm' ? 'w-4 h-4' : 'w-4 h-4 sm:w-5 sm:h-5'
+  const sizeClass = size === 'sm' ? 'w-9 h-9' : size === 'lg' ? 'w-12 h-12' : 'w-10 h-10 sm:w-11 sm:h-11'
+  const iconClass = size === 'sm' ? 'w-5 h-5' : 'w-5 h-5 sm:w-6 sm:h-6'
 
   return (
     <button
       type="button"
       id="theme-toggle"
       onClick={toggleTheme}
-      className={`flex items-center justify-center rounded-full bg-night-800/50 hover:bg-night-800 border border-white/5 text-slate-400 hover:text-white transition-all theme-toggle-btn ${sizeClass} ${className}`}
+      className={`flex items-center justify-center rounded-full transition-all theme-toggle-btn ${sizeClass} ${className} ${theme === 'dark'
+          ? 'bg-slate-800/50 hover:bg-slate-800 text-white border border-white/5'
+          : 'bg-transparent text-slate-900 hover:bg-slate-100'
+        }`}
       title={theme === 'dark' ? "Kun rejimi" : "Tun rejimi"}
       aria-label={theme === 'dark' ? "Kun rejimiga o'tish" : "Tun rejimiga o'tish"}
     >
@@ -29,3 +32,4 @@ export default function ThemeToggle({ className = '', size = 'md' }) {
     </button>
   )
 }
+

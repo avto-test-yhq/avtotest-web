@@ -81,9 +81,10 @@ export default function BiletTicketPage() {
       question: item.question,
       image: imageUrl,
       explanation: item.explanation || "Izoh mavjud emas.",
-      options: item.options.map((opt) => ({
+      options: item.options.map((opt, idx) => ({
         option: opt.text || opt.option || opt.answer || "Matn yo'q",
-        is_correct: (opt.isCorrect !== undefined) ? opt.isCorrect : (opt.is_correct !== undefined ? opt.is_correct : false),
+        is_correct: !!(opt.isCorrect === true || opt.is_correct === true || opt.correct === true),
+        _oi: idx,
       })),
     }
   }
@@ -105,12 +106,13 @@ export default function BiletTicketPage() {
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
-          let transformedData = data.map(transformQuestion)
+          const sorted = [...data].sort((a, b) => (a.id ?? a._id ?? 0) - (b.id ?? b._id ?? 0))
+          let transformedData = sorted.map(transformQuestion)
 
           if (settings.shuffleOptions) {
             transformedData = transformedData.map(q => ({
               ...q,
-              options: [...q.options].sort(() => Math.random() - 0.5)
+              options: [...q.options].sort(() => Math.random() - 0.5),
             }))
           }
 
@@ -151,7 +153,8 @@ export default function BiletTicketPage() {
       .then((res) => res.ok ? res.json() : [])
       .then((data) => {
         if (!Array.isArray(data) || data.length === 0) return
-        const transformed = data.map(transformQuestion)
+        const sorted = [...data].sort((a, b) => (a.id ?? a._id ?? 0) - (b.id ?? b._id ?? 0))
+        const transformed = sorted.map(transformQuestion)
         // Tartib va javoblarni saqlab, faqat savol/option/explanation matnlarini yangilaymiz
         setQuestions((prev) =>
           prev.map((q) => {
@@ -161,7 +164,10 @@ export default function BiletTicketPage() {
               ...q,
               question: fromApi.question,
               explanation: fromApi.explanation,
-              options: q.options.map((opt, j) => ({ ...opt, option: fromApi.options[j]?.option ?? opt.option })),
+              options: q.options.map((opt) => {
+                const origIdx = opt._oi ?? 0
+                return { ...opt, option: fromApi.options[origIdx]?.option ?? opt.option }
+              }),
             }
           })
         )
@@ -414,10 +420,10 @@ export default function BiletTicketPage() {
 
   if (!questions.length) {
     return (
-      <div className="min-h-screen bg-[#161821] flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#161821] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-2 border-brand-cyan/30 border-t-brand-cyan animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Yuklanmoqda...</p>
+          <p className="text-slate-500 dark:text-slate-400">Yuklanmoqda...</p>
         </div>
       </div>
     )
@@ -427,26 +433,26 @@ export default function BiletTicketPage() {
 
   if (isFinished) {
     return (
-      <div className="min-h-screen bg-[#161821] text-white flex flex-col items-center justify-center p-6">
-        <div className="rounded-2xl bg-[#1e2130] border border-white/5 p-8 max-w-md w-full text-center shadow-xl">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6">
+        <div className="rounded-2xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/5 p-8 max-w-md w-full text-center shadow-xl">
           <div className="w-16 h-16 rounded-full bg-brand-cyan/20 flex items-center justify-center mx-auto mb-6">
             <svg className="w-8 h-8 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">Bilet #{ticketId} yakunlandi</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Bilet #{ticketId} yakunlandi</h2>
           <p className="text-slate-500 text-sm mb-6">Barcha savollar javoblangan</p>
           <div className="flex items-center justify-center gap-6 mb-6">
             <div>
               <div className="text-3xl font-bold text-brand-cyan">{finishPercent}%</div>
               <p className="text-xs text-slate-500">Natija</p>
             </div>
-            <div className="w-px h-12 bg-white/10" />
+            <div className="w-px h-12 bg-slate-200 dark:bg-white/10" />
             <div>
-              <div className="text-2xl font-bold text-white">{stats.correct}<span className="text-slate-500 font-normal">/{questions.length}</span></div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.correct}<span className="text-slate-500 font-normal">/{questions.length}</span></div>
               <p className="text-xs text-slate-500">To&apos;g&apos;ri javob</p>
             </div>
-            <div className="w-px h-12 bg-white/10" />
+            <div className="w-px h-12 bg-slate-200 dark:bg-white/10" />
             <div>
-              <div className="text-2xl font-bold text-white font-mono">{resultTimeStr}</div>
+              <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{resultTimeStr}</div>
               <p className="text-xs text-slate-500">Vaqt</p>
             </div>
           </div>
@@ -463,20 +469,20 @@ export default function BiletTicketPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#161821] text-white overflow-hidden font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0 z-50">
+    <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white overflow-hidden font-sans">
+      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/biletlar" className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300 shrink-0">
+          <Link href="/biletlar" className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
           </Link>
           <div className="flex items-center gap-2">
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
             <div>
-              <h1 className="text-base font-bold text-white">Bilet #{ticketId}</h1>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white">Bilet #{ticketId}</h1>
               <p className="text-[11px] text-slate-500">Savol {currentIndex + 1}/{questions.length}</p>
             </div>
           </div>
-          <div className="hidden md:flex bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
+          <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
             {[
               { label: 'Uzb (lotin)', code: 'uzl' },
               { label: 'Uzb (kirill)', code: 'uzk' },
@@ -486,8 +492,8 @@ export default function BiletTicketPage() {
                 key={item.code}
                 onClick={() => setLang(item.label)}
                 className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
-                  ? 'bg-[#3e4255] text-white shadow-sm'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
               >
                 {item.label}
@@ -497,19 +503,19 @@ export default function BiletTicketPage() {
           <ThemeToggle size="sm" className="hidden md:flex" />
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#2a2d3e] text-slate-400 hover:text-white transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           </button>
         </div>
         <div className="flex items-center space-x-4">
-          <div className="hidden sm:flex items-center space-x-3 bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-white/5">
-            <div className="flex items-center text-emerald-400 text-sm font-bold space-x-1">
+          <div className="hidden sm:flex items-center space-x-3 bg-slate-100 dark:bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
+            <div className="flex items-center text-emerald-500 dark:text-emerald-400 text-sm font-bold space-x-1">
               <Icon name="Correct" className="w-4 h-4" />
               <span>{stats.correct}</span>
             </div>
-            <div className="w-px h-4 bg-white/10" />
-            <div className="flex items-center text-rose-400 text-sm font-bold space-x-1">
+            <div className="w-px h-4 bg-slate-300 dark:bg-white/10" />
+            <div className="flex items-center text-rose-500 dark:text-rose-400 text-sm font-bold space-x-1">
               <Icon name="Wrong" className="w-4 h-4" />
               <span>{stats.incorrect}</span>
             </div>
@@ -517,34 +523,34 @@ export default function BiletTicketPage() {
           <button
             onClick={toggleCurrentFavorite}
             className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
-              ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-              : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+              ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
+              : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-amber-400'
               }`}
             title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
           >
             <Icon name="Bulb" className="w-4 h-4" />
           </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/5">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
             <span className="text-slate-400 text-xs">Vaqt</span>
-            <span className="font-mono font-bold text-base text-white">{formatTime(timerTick)}</span>
+            <span className="font-mono font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
           </div>
           <div className="hidden sm:block text-xs text-slate-400">
-            <span className="font-bold text-white">{currentIndex + 1}</span>/{questions.length}
+            <span className="font-bold text-slate-900 dark:text-white">{currentIndex + 1}</span>/{questions.length}
           </div>
         </div>
       </header>
 
-      <div className="bg-[#1e2130] border-b border-white/5 px-6 py-5 shrink-0 z-40 relative flex items-center min-h-[80px]">
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/20 items-center justify-center">
+      <div className="bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 px-6 py-5 shrink-0 z-40 relative flex items-center min-h-[80px]">
+        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/10 dark:bg-brand-cyan/20 items-center justify-center">
           <span className="text-brand-cyan font-bold">?</span>
         </div>
-        <h2 className="w-full text-center text-base md:text-lg font-medium text-white leading-relaxed max-w-5xl mx-auto">
+        <h2 className="w-full text-center text-base md:text-lg font-medium text-slate-800 dark:text-white leading-relaxed max-w-5xl mx-auto">
           {currentQuestion.question}
         </h2>
       </div>
 
       <main className="flex-1 flex overflow-hidden relative">
-        <aside className="w-full md:w-[400px] lg:w-[450px] bg-[#1e2130] flex flex-col border-r border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+        <aside className="w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-[#1e2130] flex flex-col border-r border-slate-200 dark:border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
               const selected = answers[currentQuestion.id] === idx
@@ -555,27 +561,27 @@ export default function BiletTicketPage() {
               let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
               if (hasAnswer || isFinished) {
                 if (isCorrect) {
-                  containerClass += "bg-emerald-500/10 border-emerald-500/40"
-                  labelClass += "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                  textClass += "text-emerald-100"
+                  containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/40"
+                  labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                  textClass += "text-emerald-800 dark:text-emerald-100"
                 } else if (selected && !isCorrect) {
-                  containerClass += "bg-rose-500/10 border-rose-500/40"
-                  labelClass += "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                  textClass += "text-rose-100"
+                  containerClass += "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/40"
+                  labelClass += "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30"
+                  textClass += "text-rose-800 dark:text-rose-100"
                 } else {
-                  containerClass += "bg-[#2a2d3e] border-white/5 opacity-60"
-                  labelClass += "bg-[#35394b] text-slate-500 border-white/5"
+                  containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-100 dark:border-white/5 opacity-60"
+                  labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5"
                   textClass += "text-slate-400"
                 }
               } else {
                 if (selected) {
-                  containerClass += "bg-brand-cyan/20 border-brand-cyan/50"
-                  labelClass += "bg-brand-cyan/30 text-brand-cyan border-brand-cyan/40"
-                  textClass += "text-white"
+                  containerClass += "bg-brand-cyan/10 dark:bg-brand-cyan/20 border-brand-cyan/50"
+                  labelClass += "bg-brand-cyan/20 dark:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/40"
+                  textClass += "text-slate-900 dark:text-white"
                 } else {
-                  containerClass += "bg-[#2a2d3e] border-white/5 hover:border-brand-cyan/30 hover:bg-[#35394b]"
-                  labelClass += "bg-[#35394b] text-slate-400 border-white/5 group-hover:text-brand-cyan"
-                  textClass += "text-slate-300 group-hover:text-white"
+                  containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 hover:border-brand-cyan/30 hover:bg-slate-100 dark:hover:bg-[#35394b]"
+                  labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/5 group-hover:text-brand-cyan"
+                  textClass += "text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
                 }
               }
               const isDisabled = hasAnswer || isFinished
@@ -589,17 +595,17 @@ export default function BiletTicketPage() {
                   <div className={labelClass}>F{idx + 1}</div>
                   <div className={textClass}>
                     <span className="flex-1">{opt.option}</span>
-                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-400 ml-2 shrink-0" />}
-                    {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-400 ml-2 shrink-0" />}
+                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
+                    {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
                   </div>
                 </button>
               )
             })}
           </div>
-          <div className="mt-6 space-y-3 pt-4 border-t border-white/5">
+          <div className="mt-6 space-y-3 pt-4 border-t border-slate-200 dark:border-white/5">
             <button
               onClick={() => setShowExplanation(!showExplanation)}
-              className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all ${showExplanation ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/40'}`}
+              className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all ${showExplanation ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40' : 'bg-amber-50 dark:bg-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40'}`}
             >
               <span className="flex items-center">
                 <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
@@ -608,7 +614,7 @@ export default function BiletTicketPage() {
             </button>
           </div>
         </aside>
-        <section className="flex-1 bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
+        <section className="flex-1 bg-slate-50 dark:bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
           <div className="relative w-full h-full">
             <Image
               src={currentQuestion.image && currentQuestion.image.trim() !== '' ? currentQuestion.image : '/imgage/background.jpg'}
@@ -619,20 +625,20 @@ export default function BiletTicketPage() {
               unoptimized={currentQuestion.image?.startsWith?.('http')}
             />
             {showExplanation && currentQuestion.explanation && (
-              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl z-10">
-                <h4 className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
-                <p className="!text-base leading-relaxed text-slate-200">{currentQuestion.explanation}</p>
+              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl z-10">
+                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
+                <p className="!text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
               </div>
             )}
           </div>
         </section>
       </main>
 
-      <footer className="h-20 bg-[#1e2130] border-t border-white/5 shrink-0 flex items-center px-4 relative z-50">
+      <footer className="h-20 bg-white dark:bg-[#1e2130] border-t border-slate-200 dark:border-white/5 shrink-0 flex items-center px-4 relative z-50">
         <button
           onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
           disabled={currentIndex === 0}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
+          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
         >
           <Icon name="ArrowLeft" className="w-6 h-6" />
         </button>
@@ -647,7 +653,7 @@ export default function BiletTicketPage() {
             else if (isAnswered) {
               if (isCorrect) btnClass += "bg-emerald-600 border-emerald-500 text-white"
               else btnClass += "bg-rose-600 border-rose-500 text-white"
-            } else btnClass += "bg-[#161821] border-[#2a2d3e] text-slate-500 hover:bg-[#2a2d3e] hover:text-slate-300"
+            } else btnClass += "bg-slate-100 dark:bg-[#161821] border-slate-200 dark:border-[#2a2d3e] text-slate-500 hover:bg-slate-200 dark:hover:bg-[#2a2d3e] hover:text-slate-700 dark:hover:text-slate-300"
             return (
               <button key={q.id} onClick={() => setCurrentIndex(idx)} className={btnClass}>
                 {idx + 1}
@@ -658,7 +664,7 @@ export default function BiletTicketPage() {
         <button
           onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
           disabled={currentIndex === questions.length - 1}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-[#2a2d3e] text-slate-400 hover:text-white hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
+          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
         >
           <Icon name="ArrowRight" className="w-6 h-6" />
         </button>
@@ -667,3 +673,4 @@ export default function BiletTicketPage() {
     </div>
   )
 }
+

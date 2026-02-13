@@ -561,16 +561,16 @@ export default function DashboardPage() {
 
       {/* MODAL - Standart yoki Haqiqiy imtihon */}
       {examModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="glass-card rounded-3xl p-8 w-full max-w-md border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-white dark:bg-[#1e293b] rounded-3xl p-8 w-full max-w-md border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
             {examModalType === 'standard' ? (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-full bg-brand-blue/20 text-brand-cyan flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-brand-blue/20 text-brand-blue dark:text-brand-cyan flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-white mb-2">Standart imtihon</h3>
-                  <p className="text-sm text-slate-400">
+                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">Standart imtihon</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
                     Savollar sonini tanlang. Xato qilsangiz ham imtihon tugamasin — barcha savollarni javoblang.
                   </p>
                 </div>
@@ -579,7 +579,7 @@ export default function DashboardPage() {
                     <button
                       key={count}
                       onClick={() => startStandardExam(count)}
-                      className="flex flex-col items-center justify-center py-4 rounded-2xl bg-night-900 border border-white/10 text-white hover:border-brand-blue hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
+                      className="flex flex-col items-center justify-center py-4 rounded-2xl bg-slate-50 dark:bg-night-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:border-brand-blue hover:bg-blue-50 dark:hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
                     >
                       <span className="text-xl font-bold group-hover:text-brand-blue transition-colors">{count}</span>
                       <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">Savol</span>
@@ -590,16 +590,16 @@ export default function DashboardPage() {
             ) : (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-white mb-2">Haqiqiy imtihon</h3>
-                  <p className="text-sm text-slate-400 mb-4">
+                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">Haqiqiy imtihon</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                     20 ta savol. 3 ta xato qilsangiz imtihon to&apos;xtaydi va &quot;Imtihon o&apos;tolmading&quot; chiqadi.
                   </p>
                   <button
                     onClick={startRealExam}
-                    className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition-colors"
+                    className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition-colors shadow-lg shadow-orange-500/30"
                   >
                     Boshlash
                   </button>
@@ -608,7 +608,7 @@ export default function DashboardPage() {
             )}
             <button
               onClick={() => { setExamModalOpen(false); setExamModalType(null); }}
-              className="w-full py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5 transition-colors mt-4"
+              className="w-full py-3 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors mt-2"
             >
               Bekor qilish
             </button>

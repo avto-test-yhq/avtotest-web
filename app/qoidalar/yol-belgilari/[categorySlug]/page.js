@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
+import UserProfileHeader from '@/components/UserProfileHeader'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -18,6 +20,7 @@ export default function CategorySignsPage() {
   const params = useParams()
   const categorySlug = params?.categorySlug || ''
 
+  const [categories, setCategories] = useState([])
   const [category, setCategory] = useState(null)
   const [signs, setSigns] = useState([])
   const [loading, setLoading] = useState(true)
@@ -30,12 +33,16 @@ export default function CategorySignsPage() {
       const data = await res.json()
       const cats = data.categories || []
       const allSigns = data.signs || []
+
       const cat = cats.find((c) => (c.folder || String(c.id)) === categorySlug)
       const list = allSigns.filter((s) => s.category_id === cat?.id).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+
+      setCategories(cats)
       setCategory(cat || { name: 'Kategoriya' })
       setSigns(list)
     } catch (e) {
       console.error('Belgilarni yuklashda xatolik:', e)
+      setCategories([])
       setCategory({ name: 'Kategoriya' })
       setSigns([])
     } finally {
@@ -48,54 +55,115 @@ export default function CategorySignsPage() {
   }, [fetchData])
 
   return (
-    <div className="min-h-screen bg-[#161821] text-white font-sans">
-      <header className="h-16 flex items-center gap-4 px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0">
-        <button onClick={() => router.back()} className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
-        </button>
-        <h1 className="text-lg font-bold text-white">{category?.name || 'Belgilar'}</h1>
+    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center text-slate-600 dark:text-slate-400"
+            >
+              <span className="material-icons-round">arrow_back</span>
+            </button>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-white truncate max-w-[200px] md:max-w-md">{category?.name || 'Belgilar'}</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-semibold shadow-lg shadow-sky-500/20">
+              <UserProfileHeader />
+            </div>
+          </div>
+        </div>
       </header>
 
-      <main className="p-4 lg:p-8 max-w-2xl mx-auto pb-24">
-        {loading ? (
-          <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
-        ) : (
-          <div className="space-y-2">
-            {signs.map((s, idx) => (
-              <Link
-                key={s.id}
-                href={`/qoidalar/yol-belgilari/${categorySlug}/${s.id}`}
-                className="flex items-center gap-4 p-4 rounded-xl bg-[#1e2130] border border-white/5 hover:border-emerald-500/30 transition-all group"
-              >
-                <div className="relative w-14 h-14 rounded-lg bg-slate-800/50 shrink-0 overflow-hidden flex items-center justify-center">
-                  <Image
-                    src={getSignImageUrl(s.image)}
-                    alt={s.name}
-                    width={48}
-                    height={48}
-                    className="object-contain"
-                    unoptimized
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-brand-cyan">{s.code}</p>
-                  <p className="font-semibold text-white truncate">{s.name}</p>
-                  <p className="text-xs text-slate-500 line-clamp-2">{s.description}</p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <button className="w-9 h-9 rounded-lg bg-transparent hover:bg-white/5 flex items-center justify-center text-slate-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                  </button>
-                  <svg className="w-5 h-5 text-slate-400 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-            {signs.length === 0 && <p className="text-center py-12 text-slate-400">Belgilar topilmadi</p>}
-          </div>
-        )}
-      </main>
+      <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
+        {/* SIDEBAR */}
+        <aside className="hidden lg:block w-80 border-r border-slate-200 dark:border-slate-800 p-6 h-[calc(100vh-64px)] sticky top-16 bg-white dark:bg-[#1e293b]/50 overflow-y-auto custom-scrollbar">
+          <nav className="space-y-1">
+            <div className="pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3">Guruhlar</span>
+            </div>
+            {loading && categories.length === 0 ? (
+              <div className="px-3 text-sm text-slate-400">Yuklanmoqda...</div>
+            ) : (
+              categories.map(cat => {
+                const isActive = (cat.folder || String(cat.id)) === categorySlug
+                return (
+                  <Link
+                    key={cat.id}
+                    href={`/qoidalar/yol-belgilari/${cat.folder || cat.id}`}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive
+                      ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      }`}
+                  >
+                    <span className={`material-icons-round text-[20px] ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-500'}`}>folder</span>
+                    <span className="line-clamp-1">{cat.name}</span>
+                  </Link>
+                )
+              })
+            )}
+          </nav>
+        </aside>
+
+        {/* MAIN CONTENT */}
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto">
+          {loading ? (
+            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
+              {signs.map((s) => (
+                <Link
+                  key={s.id}
+                  href={`/qoidalar/yol-belgilari/${categorySlug}/${s.id}`}
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/30 transition-all group"
+                >
+                  <div className="relative w-16 h-16 rounded-xl bg-slate-50 dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                    <Image
+                      src={getSignImageUrl(s.image)}
+                      alt={s.name}
+                      width={48}
+                      height={48}
+                      className="object-contain p-1 group-hover:scale-110 transition-transform duration-300"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400">{s.code}</span>
+                    </div>
+                    <p className="font-bold text-slate-900 dark:text-white truncate mb-1 group-hover:text-sky-500 transition-colors">{s.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{s.description}</p>
+                  </div>
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 group-hover:bg-sky-500 group-hover:text-white transition-colors text-slate-400">
+                    <span className="material-icons-round text-lg">arrow_forward</span>
+                  </div>
+                </Link>
+              ))}
+              {signs.length === 0 && <p className="col-span-full text-center py-12 text-slate-400">Belgilar topilmadi</p>}
+            </div>
+          )}
+        </main>
+      </div>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+          height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #475569;
+        }
+      `}</style>
     </div>
   )
 }

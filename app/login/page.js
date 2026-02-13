@@ -12,13 +12,15 @@ import { signInWithPopup, signInWithCustomToken, onAuthStateChanged } from "fire
 export default function LoginPage() {
   const router = useRouter()
   
-  // Rejimlar: 'login-pass' | 'phone-sms' | 'verify-sms' | 'complete-profile'
+  // Rejimlar: 'login-pass' | 'login-email' | 'register' | 'phone-sms' | 'verify-sms' | 'complete-profile' | 'reset-password' | 'reset-password-code'
   const [viewMode, setViewMode] = useState('login-pass')
-  const [phone, setPhone] = useState('') 
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [otp, setOtp] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [fullName, setFullName] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -76,7 +78,7 @@ export default function LoginPage() {
   }
 
   // ==========================================
-  // 1. PAROL BILAN KIRISH
+  // TELEFON + PAROL BILAN KIRISH
   // ==========================================
   const handlePasswordLogin = async () => {
     setErrorMsg('')
@@ -118,7 +120,110 @@ export default function LoginPage() {
   }
 
   // ==========================================
-  // 2. SMS KOD YUBORISH (Ro'yxatdan o'tish / Parolni unutdim)
+  // EMAIL + PAROL BILAN KIRISH
+  // ==========================================
+  const handleEmailLogin = async () => {
+    setErrorMsg('')
+    if (!email.trim()) { setErrorMsg("Email kiriting"); return }
+    if (!password.trim()) { setErrorMsg("Parolni kiriting"); return }
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      })
+      const data = await res.json()
+      if (data.success && data.token) {
+        const userCredential = await signInWithCustomToken(auth, data.token)
+        const firebaseToken = await userCredential.user.getIdToken()
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userToken', firebaseToken)
+        localStorage.setItem('loginMethod', 'email')
+        if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
+        router.push('/dashboard')
+      } else {
+        setErrorMsg(data.message || "Email yoki parol noto'g'ri")
+      }
+    } catch (err) {
+      setErrorMsg("Tizim xatosi")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ==========================================
+  // EMAIL BILAN RO'YXATDAN O'TISH
+  // ==========================================
+  const handleRegister = async () => {
+    setErrorMsg('')
+    if (!email.trim()) { setErrorMsg("Email kiriting"); return }
+    if (!password.trim()) { setErrorMsg("Parolni kiriting"); return }
+    if (password.length < 6) { setErrorMsg("Parol kamida 6 ta belgi"); return }
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password, fullName: fullName.trim() || undefined }),
+      })
+      const data = await res.json()
+      if (data.success && data.token) {
+        const userCredential = await signInWithCustomToken(auth, data.token)
+        const firebaseToken = await userCredential.user.getIdToken()
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userToken', firebaseToken)
+        localStorage.setItem('loginMethod', 'email')
+        if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
+        router.push('/dashboard')
+      } else {
+        setErrorMsg(data.message || "Ro'yxatdan o'tishda xatolik")
+      }
+    } catch (err) {
+      setErrorMsg("Tizim xatosi")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ==========================================
+  // PAROLNI TIKLASH (SMS orqali)
+  // ==========================================
+  const handleResetPassword = async () => {
+    setErrorMsg('')
+    const cleanPhone = phone.replace(/\D/g, '')
+    if (cleanPhone.length !== 9) { setErrorMsg("Telefon raqamni to'liq kiriting"); return }
+    if (otp.length !== 4) { setErrorMsg("Kod 4 xonali bo'lishi kerak"); return }
+    if (!newPassword.trim() || newPassword.length < 6) { setErrorMsg("Parol kamida 6 ta belgi"); return }
+    setLoading(true)
+    const phoneNumber = `+998${cleanPhone}`
+    try {
+      const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber, code: otp, newPassword }),
+      })
+      const data = await res.json()
+      if (data.success && data.token) {
+        const userCredential = await signInWithCustomToken(auth, data.token)
+        const firebaseToken = await userCredential.user.getIdToken()
+        localStorage.setItem('isLoggedIn', 'true')
+        localStorage.setItem('userToken', firebaseToken)
+        localStorage.setItem('loginMethod', 'phone')
+        if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
+        router.push('/dashboard')
+      } else {
+        setErrorMsg(data.message || "Parolni yangilashda xatolik")
+      }
+    } catch (err) {
+      setErrorMsg("Tizim xatosi")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ==========================================
+  // SMS KOD YUBORISH (Ro'yxatdan o'tish / Parolni unutdim)
   // ==========================================
   const sendSmsCode = async () => {
     setErrorMsg('')
@@ -133,11 +238,11 @@ export default function LoginPage() {
       const res = await fetch(`${API_URL}/api/auth/send-sms`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber, type: 'signup' })
+        body: JSON.stringify({ phone: phoneNumber }),
       })
       const data = await res.json()
       if (res.ok) {
-        setViewMode('verify-sms')
+        setViewMode(viewMode === 'reset-password' ? 'reset-password-code' : 'verify-sms')
         setOtp('')
       } else {
         setErrorMsg(data.message || "SMS yuborishda xatolik")
@@ -361,8 +466,95 @@ export default function LoginPage() {
                   )}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('phone-sms'); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('reset-password'); setErrorMsg(''); setOtp(''); setNewPassword(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
                     Parolni unutdingizmi?
+                  </button>
+                </div>
+                <div className="text-center mt-2">
+                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                    Email bilan kirish
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* LOGIN EMAIL */}
+            {viewMode === 'login-email' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">EMAIL</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">PAROL</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <button onClick={handleEmailLogin} disabled={loading || !email.trim() || !password.trim()} className="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all mb-4">
+                  {loading ? 'Kirilmoqda...' : 'Kirish'}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setViewMode('register'); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
+                    Hisobingiz yo&apos;qmi? Ro&apos;yxatdan o&apos;ting
+                  </button>
+                </div>
+                <div className="text-center mt-2">
+                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                    Telefon bilan kirish
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* REGISTER EMAIL */}
+            {viewMode === 'register' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">ISM (ixtiyoriy)</label>
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="To'liq ism" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">EMAIL</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">PAROL (kamida 6 belgi)</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <button onClick={handleRegister} disabled={loading || !email.trim() || password.length < 6} className="w-full bg-brand-cyan hover:bg-cyan-600 text-white font-bold py-3.5 rounded-xl transition-all mb-4">
+                  {loading ? 'Ro\'yxatdan o\'tilmoqda...' : "Ro'yxatdan o'tish"}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                    Hisobingiz bormi? Kirish
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* RESET PASSWORD - Telefon */}
+            {viewMode === 'reset-password' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <p className="text-slate-400 text-sm text-center mb-4">Parolni tiklash uchun telefon raqamingizga kod yuboriladi.</p>
+                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">TELEFON RAQAM</label>
+                <div className="flex bg-night-800 rounded-xl border border-white/10 overflow-hidden mb-4">
+                  <span className="py-3.5 pl-4 pr-2 text-slate-400 bg-night-900/50 border-r border-white/5 w-[120px]">+998</span>
+                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-white w-full py-3 px-3 outline-none" />
+                </div>
+                <button onClick={sendSmsCode} disabled={loading || phone.replace(/\D/g, '').length < 9} className="w-full bg-brand-blue text-white font-bold py-3.5 rounded-xl mb-4">
+                  {loading ? 'Kod yuborilmoqda...' : 'Kod yuborish'}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                    Ortga
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* RESET PASSWORD - Kod + Yangi parol */}
+            {viewMode === 'reset-password-code' && (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <p className="text-slate-400 text-xs mb-2">+998 {phone.replace(/\D/g, '')} raqamiga yuborilgan kod va yangi parolni kiriting.</p>
+                <label className="block text-xs font-bold text-slate-400 mb-2">SMS Kod</label>
+                <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" maxLength={4} disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 text-center text-xl tracking-widest mb-4 font-mono text-white" />
+                <label className="block text-xs font-bold text-slate-400 mb-2">Yangi parol (6+ belgi)</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Yangi parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white mb-4" />
+                <button onClick={handleResetPassword} disabled={loading || otp.length < 4 || newPassword.length < 6} className="w-full bg-brand-cyan text-white font-bold py-3.5 rounded-xl mb-4">
+                  {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => { setViewMode('reset-password'); setOtp(''); setNewPassword(''); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                    Raqamni o&apos;zgartirish
                   </button>
                 </div>
               </div>
@@ -434,23 +626,26 @@ export default function LoginPage() {
             )}
           </div>
 
-          {/* Switcher: Login ⟷ Ro'yxatdan o'tish */}
-          <div className="glass-card bg-night-900/60 backdrop-blur-xl rounded-3xl p-5 border border-white/10 flex items-center justify-center mt-4">
-            <p className="text-sm text-slate-300">
-              {viewMode === 'login-pass' ? "Hisobingiz yo'qmi?" : "Hisobingiz bormi?"}
-              <button
-                type="button"
-                onClick={() => {
-                  setViewMode(viewMode === 'login-pass' ? 'phone-sms' : 'login-pass')
-                  setOtp('')
-                  setErrorMsg('')
-                }}
-                className="text-brand-cyan font-semibold ml-1 hover:text-white transition-colors"
-              >
-                {viewMode === 'login-pass' ? "Ro'yxatdan o'tish" : 'Kirish'}
-              </button>
-            </p>
-          </div>
+          {/* Switcher */}
+          {!['verify-sms', 'complete-profile', 'reset-password-code'].includes(viewMode) && (
+            <div className="glass-card bg-night-900/60 backdrop-blur-xl rounded-3xl p-5 border border-white/10 flex items-center justify-center mt-4">
+              <p className="text-sm text-slate-300">
+                {['login-pass', 'login-email'].includes(viewMode) ? "Hisobingiz yo'qmi?" : "Hisobingiz bormi?"}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const toMode = ['login-pass', 'login-email'].includes(viewMode) ? 'phone-sms' : 'login-pass'
+                    setViewMode(toMode)
+                    setOtp('')
+                    setErrorMsg('')
+                  }}
+                  className="text-brand-cyan font-semibold ml-1 hover:text-white transition-colors"
+                >
+                  {['login-pass', 'login-email'].includes(viewMode) ? "Ro'yxatdan o'tish" : 'Kirish'}
+                </button>
+              </p>
+            </div>
+          )}
           
           <div className="text-center mt-6 text-xs text-slate-500">
              &copy; 2026 AvtoTest AI. Barcha huquqlar himoyalangan.

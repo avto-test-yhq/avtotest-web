@@ -41,6 +41,9 @@ const themeScript = `
 export default function RootLayout({ children }) {
   return (
     <html lang="uz" className="scroll-smooth">
+      <head>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+      </head>
       <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ExamSettingsProvider>
