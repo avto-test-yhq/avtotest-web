@@ -2,6 +2,8 @@ import './globals.css'
 import { Inter, Outfit, Plus_Jakarta_Sans } from 'next/font/google'
 import Script from 'next/script'
 import ThemeProviderWrapper from './ThemeProviderWrapper'
+import { ExamSettingsProvider } from '@/context/ExamSettingsContext'
+
 
 const inter = Inter({
   subsets: ['latin'],
@@ -41,9 +43,11 @@ export default function RootLayout({ children }) {
     <html lang="uz" className="scroll-smooth">
       <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <ThemeProviderWrapper>
-          {children}
-        </ThemeProviderWrapper>
+        <ExamSettingsProvider>
+          <ThemeProviderWrapper>
+            {children}
+          </ThemeProviderWrapper>
+        </ExamSettingsProvider>
         <Script src="https://unpkg.com/aos@2.3.1/dist/aos.js" strategy="afterInteractive" />
         <Script id="aos-init" strategy="afterInteractive">
           {`AOS.init({ duration: 800, once: true, offset: 50 });`}

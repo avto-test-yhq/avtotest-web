@@ -90,7 +90,7 @@ export default function DashboardPage() {
         const token = await user.getIdToken();
         localStorage.setItem('userToken', token);
         localStorage.setItem('isLoggedIn', 'true');
-        
+
         // User ma'lumotlarini o'rnatamiz
         const userData = localStorage.getItem('userData');
         if (userData) {
@@ -99,7 +99,7 @@ export default function DashboardPage() {
             if (parsed.name) setUserName(parsed.name);
             else if (parsed.email) setUserName(parsed.email);
             else if (parsed.phone) setUserName(parsed.phone);
-          } catch (e) {}
+          } catch (e) { }
         } else {
           // Agar userData bo'lmasa, Firebase user ma'lumotlaridan olamiz
           if (user.displayName) setUserName(user.displayName);
@@ -112,7 +112,7 @@ export default function DashboardPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ uid: user.uid })
-        }).catch(() => {})
+        }).catch(() => { })
 
         // Sevimli savollar, bilet progress, xatolar va samaradorlikni API dan olamiz
         try {
@@ -207,7 +207,7 @@ export default function DashboardPage() {
               percent: m.percent || 0
             })
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     refreshData()
@@ -221,14 +221,14 @@ export default function DashboardPage() {
       } catch (error) {
         console.error("Logout xatolik:", error);
       }
-      
+
       // Barcha localStorage ma'lumotlarini tozalaymiz
       localStorage.removeItem('isLoggedIn');
       localStorage.removeItem('userToken');
       localStorage.removeItem('userData');
       localStorage.removeItem('loginMethod');
       localStorage.removeItem('phoneNumber');
-      
+
       // Login pagega o'tkazamiz
       router.push('/login');
     }
@@ -255,7 +255,7 @@ export default function DashboardPage() {
         const parsed = JSON.parse(savedData);
         const solvedCount = Object.values(parsed).filter(t => t.status === 'completed').length;
         setStats({ solved: solvedCount, total: 120, percent: Math.round((solvedCount / 120) * 100) });
-      } catch (e) {}
+      } catch (e) { }
     }
   }, []);
 
@@ -294,10 +294,10 @@ export default function DashboardPage() {
             <ClipboardCheck className="w-5 h-5" />
             <span>Biletlar</span>
           </Link>
-          <button type="button" className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400 text-left">
+          <Link href="/savollar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <Search className="w-5 h-5" />
-            <span>Qidirish</span>
-          </button>
+            <span>Savollar</span>
+          </Link>
           <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-8 mb-2">Tizim</p>
           <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <SettingsIcon className="w-5 h-5" />
@@ -545,9 +545,9 @@ export default function DashboardPage() {
         <Link href="/biletlar" className="dashboard-nav-link p-2">
           <ClipboardCheck className="dashboard-nav-icon !size-10" />
         </Link>
-        <button type="button" className="dashboard-nav-link p-2">
+        <Link href="/savollar" className="dashboard-nav-link p-2">
           <Search className="dashboard-nav-icon !size-10" />
-        </button>
+        </Link>
         <Link href="/mistakes" className="dashboard-nav-link p-2">
           <Medal className="dashboard-nav-icon !size-10" />
         </Link>

@@ -111,6 +111,21 @@ export default function BiletlarPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/exam/settings"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-colors"
+              title="Imtihon sozlamalari"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M11.983 4.5a1.5 1.5 0 012.916 0l.149.894a1.5 1.5 0 001.04 1.175l.842.281a1.5 1.5 0 01.83 2.16l-.448.777a1.5 1.5 0 000 1.5l.448.777a1.5 1.5 0 01-.83 2.16l-.842.281a1.5 1.5 0 00-1.04 1.175l-.149.894a1.5 1.5 0 01-2.916 0l-.149-.894a1.5 1.5 0 00-1.04-1.175l-.842-.281a1.5 1.5 0 01-.83-2.16l.448-.777a1.5 1.5 0 000-1.5l-.448-.777a1.5 1.5 0 01.83-2.16l.842-.281a1.5 1.5 0 001.04-1.175l.149-.894z"
+                />
+                <circle cx="12" cy="12" r="2.25" />
+              </svg>
+            </Link>
             <ThemeToggle size="sm" />
             <Link
               href="/dashboard"

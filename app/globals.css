@@ -447,6 +447,16 @@ body.light-mode .header-bg {
 body.light-mode [class*="bg-[#161821]"] {
   background-color: #f1f5f9 !important;
 }
+body.light-mode .question-explanation {
+  background-color: rgba(15, 23, 42, 0.96) !important;
+  border-color: rgba(15, 23, 42, 0.96) !important;
+}
+body.light-mode .question-explanation h4 {
+  color: #fbbf24 !important;
+}
+body.light-mode .question-explanation p {
+  color: #e2e8f0 !important;
+}
 body.light-mode [class*="bg-[#1e2130]"] {
   background-color: #e2e8f0 !important;
 }

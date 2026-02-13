@@ -6,22 +6,24 @@ import { onAuthStateChanged } from 'firebase/auth'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
-const DEFAULT_DAYS = [
-  { label: 'Du', count: 0, percent: 0 },
-  { label: 'Se', count: 0, percent: 0 },
-  { label: 'Cho', count: 0, percent: 0 },
-  { label: 'Pa', count: 0, percent: 0 },
-  { label: 'Ju', count: 0, percent: 0 },
-  { label: 'Sha', count: 0, percent: 0 },
-  { label: 'Ya', count: 0, percent: 0 },
-]
+const DAY_LABELS = ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha', 'Ya']
+const DEFAULT_DAYS = DAY_LABELS.map((label) => ({ label, count: 0, accuracy: 0 }))
+
+/** Bar rang: aniqligi bo'yicha */
+function getBarColor(accuracy) {
+  if (accuracy >= 90) return 'bg-emerald-500 dark:bg-emerald-500'   // Green - Excellent
+  if (accuracy >= 70) return 'bg-blue-500 dark:bg-blue-500'         // Blue - Good
+  if (accuracy >= 50) return 'bg-amber-500 dark:bg-amber-500'       // Amber - Needs improvement
+  return 'bg-red-500 dark:bg-red-500'  
+                               // Red - Poor
+}
 
 export default function WeeklyChart({ data: propData }) {
   const [fetchedData, setFetchedData] = useState(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const hasValidPropData = Array.isArray(propData) && propData.length >= 7 && propData.some((d) => (d.count || 0) > 0 || (d.percent || 0) > 0)
+    const hasValidPropData = Array.isArray(propData) && propData.length >= 7 && propData.some((d) => (d.count || 0) > 0)
     if (hasValidPropData) {
       setFetchedData(null)
       return
@@ -61,28 +63,37 @@ export default function WeeklyChart({ data: propData }) {
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">Davomiylik (hafta bo&apos;yicha)</h3>
         <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide">
-          Bu hafta
+          Oxirgi 7 kun
         </span>
       </div>
 
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Kunlik maqsad: 50 ta savol = 100%</p>
-
-      <div className="flex items-end justify-between gap-3 h-48">
-        {chartData.map((day, index) => (
-          <div key={index} className="flex flex-col items-center flex-1 h-48 group">
-            <div className="relative w-full flex-1 min-h-[80px] bg-blue-50 dark:bg-blue-900/20 rounded-2xl overflow-hidden flex items-end group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 transition-colors duration-300">
-              <div
-                className="w-full bg-blue-600 rounded-2xl transition-all duration-700 ease-out relative"
-                style={{ height: `${(Number(day.percent) || 0) > 0 ? Math.max(Number(day.percent) || 0, 10) : 0}%` }}
-              >
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 !text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                  {day.count} savol
+      <div className="flex items-end justify-between gap-3 h-48 mt-4">
+        {(() => {
+          const maxCount = Math.max(...chartData.map((d) => d.count || 0), 1)
+          return chartData.map((day, index) => {
+            const count = Number(day.count) || 0
+            const heightPercent = maxCount > 0 && count > 0 ? Math.max((count / maxCount) * 100, 8) : 0
+            const accuracy = Number(day.accuracy) || 0
+            const barColor = getBarColor(accuracy)
+            return (
+              <div key={index} className="flex flex-col items-center flex-1 h-48 group">
+                <div className="relative w-full flex-1 min-h-[80px] bg-slate-100 dark:bg-slate-700/40 rounded-2xl overflow-hidden flex items-end group-hover:bg-slate-200 dark:group-hover:bg-slate-600/40 transition-colors duration-300">
+                  <div
+                    className={`w-full ${barColor} rounded-2xl transition-all duration-700 ease-out relative`}
+                    style={{ height: `${heightPercent}%` }}
+                  >
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 !text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                      {count} savol{accuracy > 0 ? ` • ${accuracy}%` : ''}
+                    </div>
+                  </div>
                 </div>
+                <span className={`mt-3 text-sm font-bold ${day.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                  {day.label}
+                </span>
               </div>
-            </div>
-            <span className="mt-3 text-sm font-bold text-slate-500 dark:text-slate-400">{day.label}</span>
-          </div>
-        ))}
+            )
+          })
+        })()}
       </div>
     </div>
   )

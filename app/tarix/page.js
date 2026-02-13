@@ -62,6 +62,15 @@ export default function TarixPage() {
   const [activeTab, setActiveTab] = useState('imtihonlar')
   const [attempts, setAttempts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [filterType, setFilterType] = useState('all')
+
+  const filteredAttempts = attempts.map(group => {
+    const filteredItems = group.items.filter(item => {
+      if (filterType === 'all') return true
+      return item.type === filterType
+    })
+    return { ...group, items: filteredItems }
+  }).filter(group => group.items.length > 0)
 
   const fetchHistory = useCallback(
     async (uid) => {
@@ -103,13 +112,39 @@ export default function TarixPage() {
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
             <h1 className="text-base md:text-lg font-bold text-white">Tarix</h1>
           </div>
+          <Link href="/statistika" className="hidden md:block px-3 py-1.5 rounded-lg bg-[#2a2d3e] text-xs font-medium text-brand-cyan hover:bg-[#35394b] transition-colors">
+            Saxvollar Statistikasi
+          </Link>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/statistika" className="md:hidden p-2 rounded-lg bg-[#2a2d3e] text-brand-cyan">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          </Link>
           <ThemeToggle size="sm" />
-          <button className="px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/10 text-xs text-slate-400 flex items-center gap-1">
-            Barcha turlar
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-          </button>
+          <div className="relative group z-50">
+            <button className="px-3 py-1.5 rounded-lg bg-[#2a2d3e] border border-white/10 text-xs text-slate-400 flex items-center gap-1 hover:text-white transition-colors">
+              {filterType === 'all' ? 'Barcha turlar' : getTypeLabel(filterType)}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div className="absolute right-0 top-full mt-2 w-48 bg-[#2a2d3e] border border-white/10 rounded-xl shadow-xl overflow-hidden hidden group-hover:block transition-all">
+              {[
+                { label: 'Barcha turlar', value: 'all' },
+                { label: 'Standart imtihon', value: 'standart' },
+                { label: 'Haqiqiy imtihon', value: 'haqiqiy' },
+                { label: 'Biletlar', value: 'bilet' },
+                { label: 'Sevimlilar', value: 'favorites' },
+                { label: 'Xatolar', value: 'mistakes' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setFilterType(opt.value)}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-white/5 transition-colors ${filterType === opt.value ? 'text-brand-cyan bg-white/5' : 'text-slate-400'}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </header>
 
@@ -117,17 +152,15 @@ export default function TarixPage() {
       <div className="flex border-b border-white/5 bg-[#1e2130] px-4">
         <button
           onClick={() => setActiveTab('imtihonlar')}
-          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'imtihonlar' ? 'border-brand-cyan text-white' : 'border-transparent text-slate-400'
-          }`}
+          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'imtihonlar' ? 'border-brand-cyan text-white' : 'border-transparent text-slate-400'
+            }`}
         >
           Imtihonlar
         </button>
         <button
           onClick={() => setActiveTab('savollar')}
-          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-            activeTab === 'savollar' ? 'border-brand-cyan text-white' : 'border-transparent text-slate-400'
-          }`}
+          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'savollar' ? 'border-brand-cyan text-white' : 'border-transparent text-slate-400'
+            }`}
         >
           Savollar
         </button>
@@ -144,14 +177,15 @@ export default function TarixPage() {
             </div>
           ) : (
             <div className="space-y-6">
-              {attempts.map(({ date, items }) => (
+              {filteredAttempts.map(({ date, items }) => (
                 <div key={date}>
                   <h3 className="text-sm font-semibold text-slate-400 mb-3">{formatDate(date)}</h3>
                   <div className="space-y-3">
                     {items.map((item) => (
-                      <div
+                      <Link
                         key={item.id}
-                        className="rounded-xl bg-[#1e2130] border border-white/5 p-4"
+                        href={`/tarix/${item.id}`}
+                        className="block rounded-xl bg-[#1e2130] border border-white/5 p-4 hover:border-brand-cyan/30 transition-colors"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <StatusBadge status={item.status} />
@@ -179,7 +213,7 @@ export default function TarixPage() {
                             </p>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>

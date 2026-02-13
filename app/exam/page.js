@@ -9,6 +9,9 @@ import 'aos/dist/aos.css'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useExamSettings } from '@/context/ExamSettingsContext'
+import ExamSettingsModal from '@/components/ExamSettingsModal'
+
 
 // Ikonkalar (O'zgarishsiz)
 const Icons = {
@@ -43,13 +46,16 @@ function ExamContent() {
     return isNaN(n) || n <= 0 ? 20 : n > 100 ? 100 : n
   }, [countParam])
 
+  const { settings } = useExamSettings()
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
+
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
   const [lang, setLang] = useState('uz-lotin')
-  
+
   const [showFailModal, setShowFailModal] = useState(false)
   const [showTimeUp, setShowTimeUp] = useState(false) // Vaqt tugaganda
   const [reloadTrigger, setReloadTrigger] = useState(0)
@@ -232,7 +238,15 @@ function ExamContent() {
       }
 
       if (Array.isArray(data) && data.length > 0) {
-        const transformedData = data.map(transformQuestion)
+        let transformedData = data.map(transformQuestion)
+
+        if (settings.shuffleOptions && mode !== 'real') {
+          transformedData = transformedData.map(q => ({
+            ...q,
+            options: [...q.options].sort(() => Math.random() - 0.5)
+          }))
+        }
+
         currentIdsRef.current = transformedData.map((q) => q.numeric_id).filter(Boolean)
         setQuestions(transformedData)
         if (!skipReset) startTimeRef.current = Date.now()
@@ -302,8 +316,10 @@ function ExamContent() {
         activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
       }
     }
-    setShowExplanation(false)
-  }, [currentIndex])
+    if (!settings.showExplanation) {
+      setShowExplanation(false)
+    }
+  }, [currentIndex, settings.showExplanation])
 
   const currentQuestion = questions[currentIndex]
 
@@ -440,7 +456,7 @@ function ExamContent() {
 
     // Hozirgi tanlangan javob to'g'rimi?
     const isCurrentCorrect = questions[currentIndex].options[optionIndex].is_correct
-    
+
     // Javobni saqlaymiz
     const newAnswers = { ...answers, [questionId]: optionIndex }
     setAnswers(newAnswers)
@@ -471,7 +487,14 @@ function ExamContent() {
 
     // Keyingi savolga o'tish (favorites va mistakes rejimida avtomatik o'tmaydi)
     if (mode !== 'favorites' && mode !== 'mistakes' && currentIndex < questions.length - 1) {
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
+      if (settings.autoNext) {
+        setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
+      }
+    }
+
+    // Show Explanation logic based on settings
+    if (settings.showExplanation && mode !== 'real') {
+      setShowExplanation(true)
     }
   }
 
@@ -480,28 +503,56 @@ function ExamContent() {
     setIsFinished(true)
   }
 
-  // Imtihon natijasini Tarix uchun saqlash
+  // Imtihon natijasini Tarix uchun saqlash (dashboard davomiylik grafigi uchun)
   const saveExamAttempt = useCallback(async (status) => {
-    if (!currentUser?.uid || examAttemptSavedRef.current) return
+    const uid = currentUser?.uid || auth.currentUser?.uid
+    if (!uid || examAttemptSavedRef.current) return
     const total = questions.length
     if (total === 0) return
     const elapsed = (endTimeRef.current && startTimeRef.current)
       ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
     const typeMap = { standard: 'standart', real: 'haqiqiy', favorites: 'favorites', mistakes: 'mistakes' }
+
+    // Prepare details
+    const details = questions.map(q => {
+      const qId = q.numeric_id || q.id;
+      const userAnswer = answers[q.id]; // answers uses original ID (string/number mixed from API)
+      const isCorrect = userAnswer === undefined ? false : q.options[userAnswer]?.is_correct;
+      const correctAnswer = q.options.findIndex(o => o.is_correct);
+
+      return {
+        questionId: qId,
+        userAnswer: userAnswer,
+        correctAnswer: correctAnswer,
+        isCorrect: isCorrect,
+        questionData: {
+          question: q.question,
+          options: q.options,
+          media: { name: q.image ? q.image.split('/').pop() : null } // simplified media
+        }
+      };
+    });
+
     try {
-      await fetch(`${API_URL}/api/exam-history/save`, {
+      const res = await fetch(`${API_URL}/api/exam-history/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          uid: currentUser.uid,
+          uid,
           type: typeMap[mode] || 'standart',
           correct: stats.correct,
           total,
           durationSeconds: elapsed,
           status,
+          details: details
         }),
       })
-      examAttemptSavedRef.current = true
+      if (res.ok) {
+        examAttemptSavedRef.current = true
+      } else {
+        const err = await res.json().catch(() => ({}))
+        console.error('Tarix saqlashda xatolik:', res.status, err)
+      }
     } catch (e) {
       console.error('Tarix saqlashda xatolik:', e)
     }
@@ -600,22 +651,22 @@ function ExamContent() {
         <div className="absolute inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-[#1e2130] border border-rose-500/30 rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300">
             <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-               <Icon name="Wrong" className="w-8 h-8 text-rose-500" />
+              <Icon name="Wrong" className="w-8 h-8 text-rose-500" />
             </div>
             <h2 className="text-2xl font-bold text-rose-500 mb-2">Imtihon o&apos;tolmading</h2>
             <p className="text-slate-400 mb-6">
               3 ta xato qildingiz. Haqiqiy imtihonda ruxsat etilgan xatolar limitidan oshib ketdingiz.
             </p>
-            
+
             <div className="bg-[#161821] rounded-xl p-4 mb-6 border border-white/5">
-                <div className="flex justify-between text-sm mb-2">
-                    <span className="text-slate-400">To'g'ri javoblar:</span>
-                    <span className="text-emerald-400 font-bold">{stats.correct}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                    <span className="text-slate-400">Xatolar:</span>
-                    <span className="text-rose-400 font-bold">{stats.incorrect}</span>
-                </div>
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-slate-400">To'g'ri javoblar:</span>
+                <span className="text-emerald-400 font-bold">{stats.correct}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-400">Xatolar:</span>
+                <span className="text-rose-400 font-bold">{stats.incorrect}</span>
+              </div>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -665,16 +716,21 @@ function ExamContent() {
               <button
                 key={item.code}
                 onClick={() => setLang(item.label)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                  lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
-                    ? 'bg-[#3e4255] text-white shadow-sm'
-                    : 'text-slate-300 hover:text-white'
-                }`}
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
+                  ? 'bg-[#3e4255] text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white'
+                  }`}
               >
                 {item.label}
               </button>
             ))}
           </div>
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-[#2a2d3e] text-slate-400 hover:text-white transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          </button>
           <ThemeToggle size="sm" />
         </div>
 
@@ -699,11 +755,10 @@ function ExamContent() {
           {/* Sevimli savol tugmasi */}
           <button
             onClick={toggleCurrentFavorite}
-            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
-              isCurrentFavorite
-                ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
-            }`}
+            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
+              ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+              : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+              }`}
             title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
           >
             <Icon name="Save" className="w-4 h-4" />
@@ -799,8 +854,8 @@ function ExamContent() {
               onClick={() => setShowExplanation(!showExplanation)}
               disabled={showFailModal}
               className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all shadow-lg ${showExplanation
-                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
-                  : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-900/20'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/50'
+                : 'bg-amber-600 hover:bg-amber-500 text-white border border-amber-500 shadow-amber-900/20'
                 }`}
             >
               <span className="flex items-center">
@@ -824,10 +879,10 @@ function ExamContent() {
               fill
               className="object-contain"
               priority
-              unoptimized={currentQuestion.image?.startsWith('http')} 
+              unoptimized={currentQuestion.image?.startsWith('http')}
             />
             {showExplanation && currentQuestion.explanation && (
-              <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl animate-in slide-in-from-bottom-10 z-10">
+              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl animate-in slide-in-from-bottom-10 z-10">
                 <h4 className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
                 <p className="text-base leading-relaxed text-slate-200">{currentQuestion.explanation}</p>
               </div>
@@ -888,6 +943,7 @@ function ExamContent() {
           <Icon name="ArrowRight" className="w-6 h-6" />
         </button>
       </footer>
+      <ExamSettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
     </div>
   )
 }

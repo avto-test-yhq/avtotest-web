@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useExamSettings } from '@/context/ExamSettingsContext'
+import ExamSettingsModal from '@/components/ExamSettingsModal'
 
 const QUESTIONS_PER_TICKET = 10
 
@@ -44,6 +46,9 @@ export default function BiletTicketPage() {
   const params = useParams()
   const ticketId = useMemo(() => parseInt(params?.ticketId, 10) || 1, [params?.ticketId])
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+
+  const { settings } = useExamSettings()
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
 
   const [questions, setQuestions] = useState([])
   const [lang, setLang] = useState('uz-lotin')
@@ -100,7 +105,15 @@ export default function BiletTicketPage() {
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
-          const transformedData = data.map(transformQuestion)
+          let transformedData = data.map(transformQuestion)
+
+          if (settings.shuffleOptions) {
+            transformedData = transformedData.map(q => ({
+              ...q,
+              options: [...q.options].sort(() => Math.random() - 0.5)
+            }))
+          }
+
           setQuestions(transformedData)
           startTimeRef.current = Date.now()
         }
@@ -209,8 +222,13 @@ export default function BiletTicketPage() {
     if (scrollRef.current?.children[currentIndex]) {
       scrollRef.current.children[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
     }
-    setShowExplanation(false)
-  }, [currentIndex])
+    // Agar settings.showExplanation bo'lsa, har yangi savolda ochiq qolishi mumkin, 
+    // lekin odatda yangi savolga o'tganda yopiladi, faqat javob berganda ochiladi.
+    // Lakin user "Izohni ko'rsatish"ni yoqib qo'ygan bo'lsa, har doim ochiq turishini xohlasa:
+    if (!settings.showExplanation) {
+      setShowExplanation(false)
+    }
+  }, [currentIndex, settings.showExplanation])
 
   const currentQuestion = questions[currentIndex]
   const isCurrentFavorite = useMemo(() => {
@@ -270,25 +288,53 @@ export default function BiletTicketPage() {
   useEffect(() => {
     if (isFinished && questions.length > 0 && !resultSaved) {
       const saveResult = async () => {
-        if (currentUser?.uid) {
-          await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length)
-          const elapsed = (endTimeRef.current && startTimeRef.current)
-            ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
-          fetch(`${API_URL}/api/exam-history/save`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              uid: currentUser.uid,
-              type: 'bilet',
-              correct: stats.correct,
-              total: questions.length,
-              durationSeconds: elapsed,
-              status: 'tugallangan',
-              ticketId,
-            }),
-          }).catch(() => {})
+        try {
+          if (currentUser?.uid) {
+            await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length)
+            const elapsed = (endTimeRef.current && startTimeRef.current)
+              ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
+
+            // Prepare details
+            const details = questions.map(q => {
+              const qId = q.numeric_id || q.id;
+              const userAnswer = answers[q.id];
+              const isCorrect = userAnswer === undefined ? false : q.options[userAnswer]?.is_correct;
+              const correctAnswer = q.options.findIndex(o => o.is_correct);
+
+              return {
+                questionId: qId,
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer,
+                isCorrect: isCorrect,
+                questionData: {
+                  question: q.question,
+                  options: q.options,
+                  media: { name: q.image ? q.image.split('/').pop() : null }
+                }
+              };
+            });
+
+            const saveRes = await fetch(`${API_URL}/api/exam-history/save`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                uid: currentUser.uid,
+                type: 'bilet',
+                correct: stats.correct,
+                total: questions.length,
+                durationSeconds: elapsed,
+                status: 'tugallangan',
+                ticketId,
+                details: details
+              }),
+            })
+            if (!saveRes.ok) console.error('Bilet natijasi saqlanmadi:', saveRes.status)
+          }
+        } catch (e) {
+          console.error('Bilet saqlashda xatolik:', e)
+        } finally {
+          setResultSaved(true)
         }
-        setResultSaved(true)
       }
       saveResult()
     }
@@ -354,7 +400,16 @@ export default function BiletTicketPage() {
       saveMistakeToApi(questionId)
     }
     setAnswers((prev) => ({ ...prev, [questionId]: optionIndex }))
-    if (currentIndex < questions.length - 1) setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
+
+    // Auto Next setting
+    if (settings.autoNext && currentIndex < questions.length - 1) {
+      setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
+    }
+
+    // Show Explanation setting
+    if (settings.showExplanation) {
+      setShowExplanation(true)
+    }
   }
 
   if (!questions.length) {
@@ -430,17 +485,22 @@ export default function BiletTicketPage() {
               <button
                 key={item.code}
                 onClick={() => setLang(item.label)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                  lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
-                    ? 'bg-[#3e4255] text-white shadow-sm'
-                    : 'text-slate-300 hover:text-white'
-                }`}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
+                  ? 'bg-[#3e4255] text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white'
+                  }`}
               >
                 {item.label}
               </button>
             ))}
           </div>
           <ThemeToggle size="sm" className="hidden md:flex" />
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#2a2d3e] text-slate-400 hover:text-white transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          </button>
         </div>
         <div className="flex items-center space-x-4">
           <div className="hidden sm:flex items-center space-x-3 bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-white/5">
@@ -456,11 +516,10 @@ export default function BiletTicketPage() {
           </div>
           <button
             onClick={toggleCurrentFavorite}
-            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${
-              isCurrentFavorite
-                ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
-            }`}
+            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
+              ? 'bg-amber-500/20 border-amber-400 text-amber-300'
+              : 'bg-[#2a2d3e] border-white/10 text-slate-400 hover:text-white hover:border-amber-400'
+              }`}
             title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
           >
             <Icon name="Bulb" className="w-4 h-4" />
@@ -560,9 +619,9 @@ export default function BiletTicketPage() {
               unoptimized={currentQuestion.image?.startsWith?.('http')}
             />
             {showExplanation && currentQuestion.explanation && (
-              <div className="absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl z-10">
+              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-[#161821]/95 backdrop-blur-md text-white p-6 rounded-2xl border border-white/10 shadow-2xl z-10">
                 <h4 className="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
-                <p className="text-base leading-relaxed text-slate-200">{currentQuestion.explanation}</p>
+                <p className="!text-base leading-relaxed text-slate-200">{currentQuestion.explanation}</p>
               </div>
             )}
           </div>
@@ -604,6 +663,7 @@ export default function BiletTicketPage() {
           <Icon name="ArrowRight" className="w-6 h-6" />
         </button>
       </footer>
+      <ExamSettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
     </div>
   )
 }
