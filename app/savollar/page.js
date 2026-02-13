@@ -28,6 +28,25 @@ export default function SavollarPage() {
     return () => clearTimeout(timer)
   }, [search])
 
+  const transformQuestion = useCallback((item) => {
+    let imageUrl = ''
+    if (item.image && item.image.trim() !== '') {
+      imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+    }
+    return {
+      id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
+      numeric_id: typeof item.id === 'number' ? item.id : (item.id ?? item._id),
+      question: item.question,
+      image: imageUrl,
+      explanation: item.explanation || "Izoh mavjud emas.",
+      options: item.options.map((opt, idx) => ({
+        option: opt.text || opt.option || opt.answer || "Matn yo'q",
+        is_correct: !!(opt.isCorrect === true || opt.is_correct === true || opt.correct === true),
+        _oi: idx,
+      })),
+    }
+  }, [])
+
   const fetchQuestions = useCallback(async () => {
     setLoading(true)
     setError(null)
@@ -46,7 +65,7 @@ export default function SavollarPage() {
       }
 
       if (data && Array.isArray(data.data)) {
-        setQuestions(data.data)
+        setQuestions(data.data.map(transformQuestion))
         setTotalPages(data.pages || 1)
         setTotalCount(data.total || 0)
       } else {
@@ -59,7 +78,7 @@ export default function SavollarPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, sort, hasImage, debouncedSearch])
+  }, [page, sort, hasImage, debouncedSearch, transformQuestion])
 
   useEffect(() => {
     fetchQuestions()
@@ -103,8 +122,7 @@ export default function SavollarPage() {
     }
   }
 
-  const getOptText = (opt) => opt?.text || opt?.option || opt?.answer || "Matn yo'q"
-  const isOptCorrect = (opt) => !!(opt?.isCorrect === true || opt?.is_correct === true)
+
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white font-sans flex flex-col">
@@ -141,8 +159,8 @@ export default function SavollarPage() {
                 key={value}
                 onClick={() => setHasImage(value)}
                 className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${hasImage === value
-                    ? 'bg-brand-blue text-white'
-                    : 'bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
+                  ? 'bg-brand-blue text-white'
+                  : 'bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
                   }`}
               >
                 {label}
@@ -178,9 +196,8 @@ export default function SavollarPage() {
         ) : (
           <div className="space-y-6">
             {questions.map((q) => {
-              const qId = q.id ?? q._id
+              const qId = q.numeric_id || q.id
               const isSaved = savedIds.includes(Number(qId))
-              const imgSrc = q.image && (q.image.startsWith('http') ? q.image : `${API_URL}/uploads/${q.image}`)
 
               return (
                 <div key={qId} className="bg-white dark:bg-[#1e2130] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm">
@@ -202,29 +219,28 @@ export default function SavollarPage() {
 
                     <p className="text-base md:text-lg font-medium text-slate-800 dark:text-white mb-4 leading-relaxed">{q.question}</p>
 
-                    {imgSrc && (
+                    {q.image && (
                       <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200 dark:border-white/5 mb-4">
-                        <Image src={imgSrc} alt="Savol rasmi" fill className="object-contain" />
+                        <Image src={q.image} alt="Savol rasmi" fill className="object-contain" />
                       </div>
                     )}
 
                     <div className="space-y-2">
                       {(q.options || []).map((opt, idx) => {
-                        const correct = isOptCorrect(opt)
                         return (
                           <div
                             key={idx}
-                            className={`p-3 rounded-xl border flex items-center gap-3 ${correct
-                                ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-100'
-                                : 'bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400'
+                            className={`p-3 rounded-xl border flex items-center gap-3 ${opt.is_correct
+                              ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-100'
+                              : 'bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400'
                               }`}
                           >
-                            <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${correct ? 'bg-emerald-100 dark:bg-emerald-600/50 text-emerald-700 dark:text-emerald-50' : 'bg-slate-200 dark:bg-[#35394b] text-slate-500 dark:text-slate-400'
+                            <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${opt.is_correct ? 'bg-emerald-100 dark:bg-emerald-600/50 text-emerald-700 dark:text-emerald-50' : 'bg-slate-200 dark:bg-[#35394b] text-slate-500 dark:text-slate-400'
                               }`}>
                               F{idx + 1}
                             </span>
-                            <span className="text-sm md:text-base">{getOptText(opt)}</span>
-                            {correct && (
+                            <span className="text-sm md:text-base">{opt.option}</span>
+                            {opt.is_correct && (
                               <svg className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-auto shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                             )}
                           </div>
