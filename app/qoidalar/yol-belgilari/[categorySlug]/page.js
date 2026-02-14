@@ -7,7 +7,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
-const RULES_BASE = 'http://170.168.60.161:5001'
+const RULES_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
 function getSignImageUrl(imagePath) {
   if (!imagePath) return null

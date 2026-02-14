@@ -100,7 +100,7 @@ export default function ExamDetailPage({ params }) {
                                     {item.questionData?.media && item.questionData.media.name && (
                                         <div className="mb-4 relative h-48 w-full max-w-md rounded-lg overflow-hidden bg-black/20">
                                             <Image
-                                                src={`http://170.168.60.161:5001/uploads/${item.questionData.media.name}`}
+                                                src={`${API_URL}/uploads/${item.questionData.media.name}`}
                                                 alt="Savol rasmi"
                                                 fill
                                                 className="object-contain"
