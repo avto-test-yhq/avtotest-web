@@ -7,6 +7,8 @@ import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import QoidalarSidebar from '@/components/QoidalarSidebar'
+import QoidalarHeader from '@/components/QoidalarHeader'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -64,8 +66,8 @@ export default function MistakesPage() {
                   opt.isCorrect !== undefined
                     ? opt.isCorrect
                     : opt.is_correct !== undefined
-                    ? opt.is_correct
-                    : false,
+                      ? opt.is_correct
+                      : false,
               })),
             }
           })
@@ -104,208 +106,180 @@ export default function MistakesPage() {
 
   return (
     <div className="min-h-screen bg-[#161821] page-bg text-white flex flex-col font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] header-bg border-b border-white/5 shrink-0">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.back()}
-            className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300"
-          >
-            <Icon name="ArrowLeft" className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-2">
-            <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
-            <div className="flex flex-col leading-tight">
-              <h1 className="text-base md:text-lg font-bold text-white">
-                Xatolar rejimi
-              </h1>
-              <p className="text-[11px] md:text-xs text-slate-400">Noto&apos;g&apos;ri javob bergan savollardan mashq qiling</p>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle size="sm" />
-          <div className="px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/30 text-xs text-rose-300">
-            Jami: <span className="font-bold text-white">{count}</span>
-          </div>
-          <button
-            onClick={handleStartPractice}
-            disabled={!count}
-            className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold shadow-lg shadow-rose-900/30"
-          >
-            <Icon name="Wrong" className="w-4 h-4" />
-            Mashqni boshlash
-          </button>
-        </div>
-      </header>
+      <QoidalarSidebar />
 
-      <main className="flex-1 px-4 lg:px-8 py-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg md:text-xl font-semibold">Xatolik qilingan savollar</h2>
-            <button
-              onClick={handleStartPractice}
-              disabled={!count}
-              className="sm:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold shadow-lg shadow-rose-900/30"
-            >
-              <Icon name="Wrong" className="w-4 h-4" />
-              Mashqni boshlash
-            </button>
-          </div>
+      <div className="lg:ml-72 min-h-screen flex flex-col">
+        <QoidalarHeader title="Xatolar rejimi" />
 
-          {loading ? (
-            <div className="flex items-center justify-center py-16 text-slate-400">
-              Yuklanmoqda...
-            </div>
-          ) : !count ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 rounded-full bg-[#1e2130] border border-dashed border-white/10 flex items-center justify-center mb-4">
-                <Icon name="Wrong" className="w-8 h-8 text-slate-500" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">Hozircha xatolar yo&apos;q</h3>
-              <p className="text-sm text-slate-400 mb-4 max-w-sm">
-                Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savol avtomatik ravishda shu ro&apos;yxatga qo&apos;shiladi va keyin mashq qilishingiz mumkin.
-              </p>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold"
+        <main className="flex-1 px-4 lg:px-8 py-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg md:text-xl font-semibold">Xatolik qilingan savollar</h2>
+              <button
+                onClick={handleStartPractice}
+                disabled={!count}
+                className="sm:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold shadow-lg shadow-rose-900/30"
               >
-                Dashboardga qaytish
-              </Link>
+                <Icon name="Wrong" className="w-4 h-4" />
+                Mashqni boshlash
+              </button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {questions.map((q, idx) => (
-                <div
-                  key={q.id || idx}
-                  onClick={() => setSelectedQuestion(q)}
-                  className="group rounded-2xl bg-[#1e2130] border border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg hover:shadow-rose-900/20 transition-all cursor-pointer overflow-hidden flex flex-col"
+
+            {loading ? (
+              <div className="flex items-center justify-center py-16 text-slate-400">
+                Yuklanmoqda...
+              </div>
+            ) : !count ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 rounded-full bg-[#1e2130] border border-dashed border-white/10 flex items-center justify-center mb-4">
+                  <Icon name="Wrong" className="w-8 h-8 text-slate-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Hozircha xatolar yo&apos;q</h3>
+                <p className="text-sm text-slate-400 mb-4 max-w-sm">
+                  Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savol avtomatik ravishda shu ro&apos;yxatga qo&apos;shiladi va keyin mashq qilishingiz mumkin.
+                </p>
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold"
                 >
-                  <div className="relative w-full h-32 md:h-36 bg-black/40">
-                    <Image
-                      src={q.image || '/imgage/background.jpg'}
-                      alt="Savol rasmi"
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      unoptimized={q.image?.startsWith?.('http')}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                    <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-rose-600/80 text-[10px] font-semibold">
-                      Xato #{idx + 1}
+                  Dashboardga qaytish
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {questions.map((q, idx) => (
+                  <div
+                    key={q.id || idx}
+                    onClick={() => setSelectedQuestion(q)}
+                    className="group rounded-2xl bg-[#1e2130] border border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg hover:shadow-rose-900/20 transition-all cursor-pointer overflow-hidden flex flex-col"
+                  >
+                    <div className="relative w-full h-32 md:h-36 bg-black/40">
+                      <Image
+                        src={q.image || '/imgage/background.jpg'}
+                        alt="Savol rasmi"
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        unoptimized={q.image?.startsWith?.('http')}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-rose-600/80 text-[10px] font-semibold">
+                        Xato #{idx + 1}
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-3 flex flex-col gap-2 flex-1">
-                    <p className="text-sm md:text-[15px] text-slate-100 leading-relaxed line-clamp-3">
-                      {q.question}
-                    </p>
-                    {/* {q.explanation && (
+                    <div className="p-3 flex flex-col gap-2 flex-1">
+                      <p className="text-sm md:text-[15px] text-slate-100 leading-relaxed line-clamp-3">
+                        {q.question}
+                      </p>
+                      {/* {q.explanation && (
                       <p className="text-[11px] text-slate-400 flex items-center gap-1.5 line-clamp-2">
                         <Icon name="Bulb" className="w-3.5 h-3.5" />
                         {q.explanation}
                       </p>
                     )} */}
-                    <div className="mt-2 flex items-center justify-end text-[11px] text-slate-500">
-                      <span>To&apos;liq ko&apos;rish</span>
+                      <div className="mt-2 flex items-center justify-end text-[11px] text-slate-500">
+                        <span>To&apos;liq ko&apos;rish</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* MODAL: Savol va javoblari */}
-      {selectedQuestion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
-          <div className="bg-[#181b2b] border border-white/10 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-rose-600/30 text-rose-200 text-xs font-bold">
-                  Xato
-                </span>
-                <h3 className="text-sm md:text-base font-semibold">Noto&apos;g&apos;ri javob berilgan savol</h3>
+                ))}
               </div>
-              <button
-                onClick={() => setSelectedQuestion(null)}
-                className="w-8 h-8 rounded-full bg-[#252836] hover:bg-[#2f3345] flex items-center justify-center text-slate-300"
-              >
-                <Icon name="Close" className="w-4 h-4" />
-              </button>
-            </div>
+            )}
+          </div>
+        </main>
 
-            <div className="flex-1 overflow-y-auto">
-              {selectedQuestion.image && (
-                <div className="relative w-full h-72 md:h-80 bg-black">
-                  <Image
-                    src={selectedQuestion.image}
-                    alt="Savol rasmi"
-                    fill
-                    className="object-contain"
-                    unoptimized={selectedQuestion.image?.startsWith?.('http')}
-                  />
+        {/* MODAL: Savol va javoblari */}
+        {selectedQuestion && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
+            <div className="bg-[#181b2b] border border-white/10 rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-rose-600/30 text-rose-200 text-xs font-bold">
+                    Xato
+                  </span>
+                  <h3 className="text-sm md:text-base font-semibold">Noto&apos;g&apos;ri javob berilgan savol</h3>
                 </div>
-              )}
-              <div className="p-5 space-y-4">
-                <p className="text-base md:text-lg text-slate-50 leading-relaxed">
-                  {selectedQuestion.question}
-                </p>
+                <button
+                  onClick={() => setSelectedQuestion(null)}
+                  className="w-8 h-8 rounded-full bg-[#252836] hover:bg-[#2f3345] flex items-center justify-center text-slate-300"
+                >
+                  <Icon name="Close" className="w-4 h-4" />
+                </button>
+              </div>
 
-                {Array.isArray(selectedQuestion.options) && selectedQuestion.options.length > 0 && (
-                  <div className="space-y-2">
-                    {selectedQuestion.options.map((opt, idx) => {
-                      const isCorrect = !!opt.is_correct
-                      let containerClass =
-                        'w-full rounded-xl border px-4 py-2.5 text-sm md:text-base flex items-center '
-                      let labelClass =
-                        'inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold mr-3 '
-                      let textClass = 'flex-1 text-left '
+              <div className="flex-1 overflow-y-auto">
+                {selectedQuestion.image && (
+                  <div className="relative w-full h-72 md:h-80 bg-black">
+                    <Image
+                      src={selectedQuestion.image}
+                      alt="Savol rasmi"
+                      fill
+                      className="object-contain"
+                      unoptimized={selectedQuestion.image?.startsWith?.('http')}
+                    />
+                  </div>
+                )}
+                <div className="p-5 space-y-4">
+                  <p className="text-base md:text-lg text-slate-50 leading-relaxed">
+                    {selectedQuestion.question}
+                  </p>
 
-                      if (isCorrect) {
-                        containerClass += 'bg-emerald-500/15 border-emerald-400 text-emerald-50 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
-                        labelClass += 'bg-emerald-600/70 text-emerald-50 border border-emerald-300'
-                      } else {
-                        containerClass += 'bg-[#202335] border-white/10 text-slate-100'
-                        labelClass += 'bg-[#272b3f] text-slate-300 border border-white/10'
-                      }
+                  {Array.isArray(selectedQuestion.options) && selectedQuestion.options.length > 0 && (
+                    <div className="space-y-2">
+                      {selectedQuestion.options.map((opt, idx) => {
+                        const isCorrect = !!opt.is_correct
+                        let containerClass =
+                          'w-full rounded-xl border px-4 py-2.5 text-sm md:text-base flex items-center '
+                        let labelClass =
+                          'inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold mr-3 '
+                        let textClass = 'flex-1 text-left '
 
-                      return (
-                        <div key={idx} className={containerClass}>
-                          <div className={labelClass}>F{idx + 1}</div>
-                          <div className="flex-1 flex items-center justify-between gap-2">
-                            <div className={textClass}>{opt.option}</div>
-                            {isCorrect && (
-                              <div className="flex items-center gap-2 shrink-0">
-                                <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 text-[10px] font-semibold text-emerald-50 border border-emerald-300/70">
-                                  To&apos;g&apos;ri javob
-                                </span>
-                                <Icon name="Check" className="w-5 h-5 text-emerald-300" />
-                              </div>
-                            )}
+                        if (isCorrect) {
+                          containerClass += 'bg-emerald-500/15 border-emerald-400 text-emerald-50 shadow-[0_0_15px_rgba(16,185,129,0.4)]'
+                          labelClass += 'bg-emerald-600/70 text-emerald-50 border border-emerald-300'
+                        } else {
+                          containerClass += 'bg-[#202335] border-white/10 text-slate-100'
+                          labelClass += 'bg-[#272b3f] text-slate-300 border border-white/10'
+                        }
+
+                        return (
+                          <div key={idx} className={containerClass}>
+                            <div className={labelClass}>F{idx + 1}</div>
+                            <div className="flex-1 flex items-center justify-between gap-2">
+                              <div className={textClass}>{opt.option}</div>
+                              {isCorrect && (
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/25 text-[10px] font-semibold text-emerald-50 border border-emerald-300/70">
+                                    To&apos;g&apos;ri javob
+                                  </span>
+                                  <Icon name="Check" className="w-5 h-5 text-emerald-300" />
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-
-                {selectedQuestion.explanation && (
-                  <div className="mt-4 rounded-xl bg-[#121422] border border-amber-500/40 px-4 py-3 flex items-start gap-2">
-                    <Icon name="Bulb" className="w-5 h-5 text-amber-400 mt-0.5" />
-                    <div>
-                      <p className="text-[11px] uppercase tracking-wide text-amber-400 font-semibold mb-1">
-                        Izoh
-                      </p>
-                      <p className="text-sm text-slate-100 leading-relaxed">
-                        {selectedQuestion.explanation}
-                      </p>
+                        )
+                      })}
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {selectedQuestion.explanation && (
+                    <div className="mt-4 rounded-xl bg-[#121422] border border-amber-500/40 px-4 py-3 flex items-start gap-2">
+                      <Icon name="Bulb" className="w-5 h-5 text-amber-400 mt-0.5" />
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wide text-amber-400 font-semibold mb-1">
+                          Izoh
+                        </p>
+                        <p className="text-sm text-slate-100 leading-relaxed">
+                          {selectedQuestion.explanation}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

@@ -52,27 +52,27 @@ export default function StatistikaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-[#161821] text-white font-sans flex flex-col">
-            <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-[#1e2130] border-b border-white/5 shrink-0">
+        <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white font-sans flex flex-col transition-colors duration-200">
+            <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 shrink-0 transition-colors duration-200">
                 <div className="flex items-center gap-4">
-                    <button onClick={() => router.back()} className="w-9 h-9 rounded-lg bg-[#2a2d3e] hover:bg-[#35394b] flex items-center justify-center text-slate-300">
+                    <button onClick={() => router.back()} className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
                     </button>
-                    <h1 className="text-lg font-bold text-white">Savollar Statistikasi</h1>
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-white">Savollar Statistikasi</h1>
                 </div>
                 <ThemeToggle size="sm" />
             </header>
 
             <main className="flex-1 px-4 py-6 overflow-y-auto max-w-5xl mx-auto w-full">
-                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
                     {['date', 'attempts', 'accuracy'].map(key => (
                         <button
                             key={key}
                             onClick={() => handleSort(key)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${sort === key ? 'bg-brand-cyan text-white' : 'bg-[#2a2d3e] text-slate-400 hover:text-white'}`}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${sort === key ? 'bg-brand-cyan text-white shadow-lg shadow-cyan-500/20' : 'bg-slate-200 dark:bg-[#2a2d3e] text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-[#35394b]'}`}
                         >
                             {key === 'date' && 'Oxirgi urinish'}
-                            {key === 'attempts' && 'Eng kop yechilgan'}
+                            {key === 'attempts' && 'Eng ko\'p yechilgan'}
                             {key === 'accuracy' && 'Aniqlik'}
                             {sort === key && (order === 'asc' ? ' ↑' : ' ↓')}
                         </button>
@@ -80,25 +80,27 @@ export default function StatistikaPage() {
                 </div>
 
                 {loading ? (
-                    <div className="text-center py-20 text-slate-400">Yuklanmoqda...</div>
+                    <div className="flex items-center justify-center py-20 text-slate-400">
+                        <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-brand-cyan animate-spin" />
+                    </div>
                 ) : stats.length === 0 ? (
                     <div className="text-center py-20 text-slate-400">Statistika topilmadi</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {stats.map((stat) => (
-                            <div key={stat.questionId} className="bg-[#1e2130] p-4 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                            <div key={stat.questionId} className="bg-white dark:bg-[#1e2130] p-4 rounded-xl border border-slate-200 dark:border-white/5 hover:border-brand-cyan/30 dark:hover:border-white/10 transition-all shadow-sm hover:shadow-md">
                                 <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-mono text-slate-500">ID: {stat.questionId}</span>
-                                    <span className="text-xs text-slate-500">{new Date(stat.lastAttemptAt).toLocaleDateString()}</span>
+                                    <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded">ID: {stat.questionId}</span>
+                                    <span className="text-xs text-slate-400 dark:text-slate-500">{new Date(stat.lastAttemptAt).toLocaleDateString()}</span>
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div>
-                                        <p className="text-2xl font-bold text-white mb-1">{stat.accuracy}%</p>
-                                        <p className="text-xs text-slate-400">{stat.correct} to'g'ri / {stat.attempts} urinish</p>
+                                        <p className="text-3xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">{stat.accuracy}%</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{stat.correct} to'g'ri / {stat.attempts} urinish</p>
                                     </div>
-                                    <div className="h-10 w-1 bg-slate-700/50 rounded-full overflow-hidden relative">
+                                    <div className="h-10 w-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden relative">
                                         <div
-                                            className={`absolute bottom-0 left-0 w-full ${stat.accuracy >= 80 ? 'bg-emerald-500' : stat.accuracy >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                            className={`absolute bottom-0 left-0 w-full rounded-full transition-all duration-500 ${stat.accuracy >= 80 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]' : stat.accuracy >= 50 ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.4)]' : 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.4)]'}`}
                                             style={{ height: `${stat.accuracy}%` }}
                                         />
                                     </div>

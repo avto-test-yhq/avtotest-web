@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
+import QoidalarHeader from '@/components/QoidalarHeader'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -55,25 +56,7 @@ export default function ChapterDetailPage() {
     <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1e293b]/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => router.back()}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center text-slate-600 dark:text-slate-400"
-            >
-              <span className="material-icons-round">arrow_back</span>
-            </button>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-white line-clamp-1">{currentChapter?.title || 'Yuklanmoqda...'}</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-semibold shadow-lg shadow-sky-500/20">
-              <UserProfileHeader />
-            </div>
-          </div>
-        </div>
-      </header>
+      <QoidalarHeader title={currentChapter?.title || 'Yuklanmoqda...'} />
 
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
 

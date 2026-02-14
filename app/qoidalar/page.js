@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
+import QoidalarSidebar from '@/components/QoidalarSidebar'
 
 const categories = [
   {
@@ -65,32 +66,7 @@ export default function QoidalarPage() {
     <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-200 font-sans">
 
       {/* DESKTOP SIDEBAR */}
-      <aside className="fixed left-0 top-0 h-full w-72 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col z-50">
-        <div className="p-6">
-          <div className="flex items-center gap-3 text-sky-500 mb-10">
-            <span className="material-icons-round text-3xl">traffic</span>
-            <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight">Yo'l Harakati</span>
-          </div>
-          <nav className="space-y-1">
-            <Link href="/qoidalar" className="flex items-center gap-3 px-4 py-3 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-xl font-semibold">
-              <span className="material-icons-round">menu_book</span>
-              Qoidalar
-            </Link>
-            <Link href="/biletlar" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-              <span className="material-icons-round">quiz</span>
-              Testlar
-            </Link>
-            <Link href="/qoidalar/yol-belgilari" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-              <span className="material-icons-round">warning</span>
-              Belgilar
-            </Link>
-            <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
-              <span className="material-icons-round">dashboard</span>
-              Dashboard
-            </Link>
-          </nav>
-        </div>
-      </aside>
+      <QoidalarSidebar />
 
       <main className="lg:ml-72 min-h-screen pb-10">
         <header className="sticky top-0 bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-40">

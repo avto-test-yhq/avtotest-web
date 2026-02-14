@@ -14,8 +14,8 @@ function getBarColor(accuracy) {
   if (accuracy >= 90) return 'bg-emerald-500 dark:bg-emerald-500'   // Green - Excellent
   if (accuracy >= 70) return 'bg-blue-500 dark:bg-blue-500'         // Blue - Good
   if (accuracy >= 50) return 'bg-amber-500 dark:bg-amber-500'       // Amber - Needs improvement
-  return 'bg-red-500 dark:bg-red-500'  
-                               // Red - Poor
+  return 'bg-red-500 dark:bg-red-500'
+  // Red - Poor
 }
 
 export default function WeeklyChart({ data: propData }) {
@@ -67,26 +67,38 @@ export default function WeeklyChart({ data: propData }) {
         </span>
       </div>
 
-      <div className="flex items-end justify-between gap-3 h-48 mt-4">
+      <div className="flex items-end justify-between gap-3 h-52 mt-6">
         {(() => {
-          const maxCount = Math.max(...chartData.map((d) => d.count || 0), 1)
+          const maxCount = Math.max(...chartData.map((d) => d.count || 0), 10) // Min max 10 to avoid flat bars
           return chartData.map((day, index) => {
             const count = Number(day.count) || 0
-            const heightPercent = maxCount > 0 && count > 0 ? Math.max((count / maxCount) * 100, 8) : 0
+            const heightPercent = maxCount > 0 ? (count / maxCount) * 100 : 0
             const accuracy = Number(day.accuracy) || 0
             const barColor = getBarColor(accuracy)
+
             return (
-              <div key={index} className="flex flex-col items-center flex-1 h-48 group">
-                <div className="relative w-full flex-1 min-h-[80px] bg-slate-100 dark:bg-slate-700/40 rounded-2xl overflow-hidden flex items-end group-hover:bg-slate-200 dark:group-hover:bg-slate-600/40 transition-colors duration-300">
+              <div key={index} className="flex flex-col items-center flex-1 h-full group">
+                {/* Count Label - Always visible at top */}
+                <div className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 transition-all">
+                  {count > 0 ? count : ''}
+                </div>
+
+                {/* Bar Track */}
+                <div className="relative w-full flex-1 bg-slate-100 dark:bg-slate-700/40 rounded-2xl overflow-hidden flex items-end group-hover:bg-slate-200 dark:group-hover:bg-slate-600/40 transition-colors duration-300">
                   <div
                     className={`w-full ${barColor} rounded-2xl transition-all duration-700 ease-out relative`}
                     style={{ height: `${heightPercent}%` }}
                   >
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 !text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                      {count} savol{accuracy > 0 ? ` • ${accuracy}%` : ''}
-                    </div>
+                    {/* Accuracy Tooltip (optional, inside or on hover) */}
+                    {count > 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-[10px] font-bold text-white/90 drop-shadow-md">{accuracy}%</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {/* Day Label */}
                 <span className={`mt-3 text-sm font-bold ${day.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`}>
                   {day.label}
                 </span>
