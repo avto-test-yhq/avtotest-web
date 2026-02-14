@@ -7,11 +7,18 @@ import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+const RULES_BASE = 'http://170.168.60.161:5001'
 
 function getMarkingImageUrl(imagePath) {
   if (!imagePath) return null
-  const base = `${API_URL}/rules/images/markings`
-  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
+  const base = `${RULES_BASE}/rules/images/markings`
+  if (imagePath.startsWith('http')) {
+    try {
+      const url = new URL(imagePath)
+      return `${RULES_BASE}${url.pathname}`
+    } catch { return `${base}/${imagePath}` }
+  }
+  return `${base}/${imagePath}`
 }
 
 const TYPE_LABELS = { horizontal: 'Yotiq chiziqlar', vertical: 'Tik chiziqlar' }
