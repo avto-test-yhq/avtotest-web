@@ -11,11 +11,12 @@ const RULES_BASE = 'http://170.168.60.161:5001'
 
 function getSignImageUrl(imagePath) {
   if (!imagePath) return null
-  const base = `${RULES_BASE}/rules/images/signs`
+  const base = `${RULES_BASE}/uploads/rules/signs`
   if (imagePath.startsWith('http')) {
     try {
       const url = new URL(imagePath)
-      return `${RULES_BASE}${url.pathname}`
+      const p = url.pathname.replace(/^\/rules\/images\/signs\//, '').replace(/^\/uploads\/rules\/signs\//, '')
+      return p ? `${base}/${p}` : base
     } catch { return `${base}/${imagePath}` }
   }
   return `${base}/${imagePath}`
