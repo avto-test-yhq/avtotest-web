@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
@@ -12,13 +11,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 function getMarkingImageUrl(imagePath) {
   if (!imagePath) return null
   const base = `${API_URL}/rules/images/markings`
-  if (imagePath.startsWith('http')) {
-    try {
-      const url = new URL(imagePath)
-      return `${API_URL}${url.pathname}`
-    } catch { return imagePath }
-  }
-  return `${base}/${imagePath}`
+  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
 }
 
 const TYPE_LABELS = { horizontal: 'Yotiq chiziqlar', vertical: 'Tik chiziqlar' }
@@ -131,13 +124,11 @@ export default function MarkingDetailPage() {
           ) : marking ? (
             <div className="space-y-8 pb-24">
               <div className="flex justify-center py-8">
-                <div className="relative w-64 h-48 md:w-80 md:h-64 rounded-3xl bg-white dark:bg-[#1e293b] flex items-center justify-center shadow-lg shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800">
-                  <Image
+                <div className="relative w-64 h-48 md:w-80 md:h-64 rounded-3xl bg-white dark:bg-[#1e293b] flex items-center justify-center shadow-lg shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800 p-6">
+                  <img
                     src={getMarkingImageUrl(marking.image)}
                     alt={marking.name}
-                    fill
-                    className="object-contain p-6"
-                    unoptimized
+                    className="object-contain max-w-full max-h-full"
                   />
                   <div className="absolute top-4 right-4 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md text-xs font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                     {marking.code}

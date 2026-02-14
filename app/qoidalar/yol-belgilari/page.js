@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
@@ -12,14 +11,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 function getSignImageUrl(imagePath) {
   if (!imagePath) return null
   const base = `${API_URL}/rules/images/signs`
-  // Har doim backend (API_URL) dan olish — pravachi.uz yoki boshqa domain bo'lsa ham
-  if (imagePath.startsWith('http')) {
-    try {
-      const url = new URL(imagePath)
-      return `${API_URL}${url.pathname}` // path ni backend bilan almashtiramiz
-    } catch { return imagePath }
-  }
-  return `${base}/${imagePath}`
+  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
 }
 
 export default function YolBelgilariPage() {
@@ -121,13 +113,12 @@ export default function YolBelgilariPage() {
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center p-2 border border-slate-100 dark:border-slate-700">
                           {sampleSign?.image ? (
-                            <Image
+                            <img
                               src={getSignImageUrl(sampleSign.image)}
                               alt=""
                               width={48}
                               height={48}
-                              className="object-contain"
-                              unoptimized
+                              className="object-contain w-12 h-12"
                             />
                           ) : (
                             <span className="material-icons-round text-slate-400 text-3xl">sms_failed</span>
@@ -157,12 +148,10 @@ export default function YolBelgilariPage() {
                         className="shrink-0 w-32 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md hover:border-sky-500/30 transition-all group"
                       >
                         <div className="relative w-full h-24 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center p-4">
-                          <Image
-                            src={getSignImageUrl(s.image)}
+                          <img
+                            src={getSignImageUrl(s.image) || '/imgage/background.jpg'}
                             alt={s.name}
-                            fill
-                            className="object-contain p-2 group-hover:scale-110 transition-transform duration-300"
-                            unoptimized
+                            className="object-contain max-w-full max-h-full p-2 group-hover:scale-110 transition-transform duration-300"
                           />
                         </div>
                         <div className="p-3">

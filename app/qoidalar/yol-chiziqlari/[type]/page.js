@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import UserProfileHeader from '@/components/UserProfileHeader'
@@ -12,13 +11,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 function getMarkingImageUrl(imagePath) {
   if (!imagePath) return null
   const base = `${API_URL}/rules/images/markings`
-  if (imagePath.startsWith('http')) {
-    try {
-      const url = new URL(imagePath)
-      return `${API_URL}${url.pathname}`
-    } catch { return imagePath }
-  }
-  return `${base}/${imagePath}`
+  return imagePath.startsWith('http') ? imagePath : `${base}/${imagePath}`
 }
 
 const TYPE_LABELS = { horizontal: 'Yotiq chiziqlar', vertical: 'Tik chiziqlar' }
@@ -124,13 +117,10 @@ export default function MarkingsListPage() {
                   className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/30 transition-all group"
                 >
                   <div className="relative w-20 h-10 rounded-lg bg-slate-50 dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-slate-100 dark:border-slate-700">
-                    <Image
+                    <img
                       src={getMarkingImageUrl(m.image)}
                       alt={m.name}
-                      width={56}
-                      height={32}
-                      className="object-contain"
-                      unoptimized
+                      className="object-contain max-w-full max-h-full"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
