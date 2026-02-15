@@ -105,7 +105,7 @@ export default function MistakesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#161821] page-bg text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#161821] page-bg text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
@@ -114,11 +114,11 @@ export default function MistakesPage() {
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-xl font-semibold">Xatolik qilingan savollar</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">Xatolik qilingan savollar</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
-                className="sm:hidden inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-sm font-semibold shadow-lg shadow-rose-900/30"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-lg shadow-rose-900/20 transition-all hover:shadow-rose-900/40"
               >
                 <Icon name="Wrong" className="w-4 h-4" />
                 Mashqni boshlash

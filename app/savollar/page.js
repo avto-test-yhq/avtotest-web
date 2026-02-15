@@ -218,7 +218,13 @@ export default function SavollarPage() {
 
                       {q.image && (
                         <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200 dark:border-white/5 mb-4">
-                          <Image src={q.image} alt="Savol rasmi" fill className="object-contain" />
+                          <Image
+                            src={q.image}
+                            alt="Savol rasmi"
+                            fill
+                            className="object-contain"
+                            unoptimized={q.image?.startsWith('http')}
+                          />
                         </div>
                       )}
 
