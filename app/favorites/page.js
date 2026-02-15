@@ -145,16 +145,16 @@ export default function FavoritesPage() {
               </div>
             ) : !count ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full bg-[#1e2130] border border-dashed border-white/10 flex items-center justify-center mb-4">
-                  <Icon name="Star" className="w-8 h-8 text-slate-500" />
+                <div className="w-16 h-16 rounded-full bg-white dark:bg-[#1e2130] border border-dashed border-slate-300 dark:border-white/10 flex items-center justify-center mb-4">
+                  <Icon name="Star" className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Hozircha sevimli savollar yo&apos;q</h3>
-                <p className="text-sm text-slate-400 mb-4 max-w-sm">
+                <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Hozircha sevimli savollar yo&apos;q</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 max-w-sm">
                   Imtihon yoki biletlar sahifasida savollar yonidagi belgi orqali ularni sevimlilarga saqlab oling va bu yerda mashq qiling.
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-semibold"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-blue-500/30"
                 >
                   Dashboardga qaytish
                 </Link>
@@ -165,9 +165,9 @@ export default function FavoritesPage() {
                   <div
                     key={q.id || idx}
                     onClick={() => setSelectedQuestion(q)}
-                    className="group rounded-2xl bg-[#1e2130] border border-white/10 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-900/30 transition-all cursor-pointer overflow-hidden flex flex-col"
+                    className="group rounded-2xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/10 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-900/10 dark:hover:shadow-blue-900/30 transition-all cursor-pointer overflow-hidden flex flex-col"
                   >
-                    <div className="relative w-full h-32 md:h-36 bg-black/40">
+                    <div className="relative w-full h-32 md:h-36 bg-slate-100 dark:bg-black/40">
                       <Image
                         src={q.image || '/imgage/background.jpg'}
                         alt="Savol rasmi"
@@ -175,23 +175,23 @@ export default function FavoritesPage() {
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                         unoptimized={q.image?.startsWith?.('http')}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                      <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-600/80 text-[10px] font-semibold">
+
+                      <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-600/90 text-white text-[10px] font-semibold shadow-sm">
                         #{idx + 1}
                       </div>
                     </div>
-                    <div className="p-3 flex flex-col gap-2 flex-1">
-                      <p className="text-sm md:text-[15px] text-slate-100 leading-relaxed line-clamp-3">
+                    <div className="p-4 flex flex-col gap-2 flex-1">
+                      <p className="text-sm md:text-[15px] text-slate-700 dark:text-slate-100 leading-relaxed line-clamp-3 font-medium">
                         {q.question}
                       </p>
-                      <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-                        <span>To&apos;liq ko&apos;rish</span>
+                      <div className="mt-auto pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                        <span className="group-hover:text-blue-500 transition-colors">To&apos;liq ko&apos;rish</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             removeFromFavorites(q.numeric_id ?? q.id)
                           }}
-                          className="px-2 py-1 rounded-lg bg-[#252836] hover:bg-[#2f3345] border border-white/10 text-[10px] text-slate-300"
+                          className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-[#252836] hover:bg-red-50 dark:hover:bg-red-500/20 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500/30 text-slate-500 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                         >
                           O&apos;chirish
                         </button>
@@ -206,26 +206,26 @@ export default function FavoritesPage() {
 
         {/* MODAL */}
         {selectedQuestion && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-2 py-4 sm:p-4 backdrop-blur-sm">
-            <div className="bg-[#181b2b] border border-white/10 rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-[#1e2130]">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-600/30 text-blue-200 text-xs font-bold">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 px-2 py-4 sm:p-4 backdrop-blur-sm transition-all duration-300">
+            <div className="bg-white dark:bg-[#181b2b] border border-slate-200 dark:border-white/10 rounded-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-white/10 bg-slate-50 dark:bg-[#1e2130]">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-600/30 text-blue-600 dark:text-blue-200 text-xs font-bold">
                     Fav
                   </span>
-                  <h3 className="text-sm md:text-base font-semibold text-slate-200">Saqlangan savol</h3>
+                  <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-slate-200">Saqlangan savol</h3>
                 </div>
                 <button
                   onClick={() => setSelectedQuestion(null)}
-                  className="w-8 h-8 rounded-full bg-[#252836] hover:bg-[#2f3345] flex items-center justify-center text-slate-300 transition-colors"
+                  className="w-8 h-8 rounded-full bg-white dark:bg-[#252836] hover:bg-slate-200 dark:hover:bg-[#2f3345] border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-500 dark:text-slate-300 transition-colors"
                 >
-                  <Icon name="Close" className="w-4 h-4" />
+                  <Icon name="Close" className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {selectedQuestion.image && (
-                  <div className="relative w-full bg-black flex items-center justify-center border-b border-white/5">
+                  <div className="relative w-full bg-slate-50 dark:bg-black flex items-center justify-center border-b border-slate-200 dark:border-white/5">
                     <div className="relative w-full h-[300px] sm:h-[400px] md:h-[550px]">
                       <Image
                         src={selectedQuestion.image}
@@ -238,8 +238,8 @@ export default function FavoritesPage() {
                   </div>
                 )}
 
-                <div className="p-5 space-y-5">
-                  <p className="text-base md:text-xl font-medium text-slate-50 leading-relaxed">
+                <div className="p-6 space-y-6">
+                  <p className="text-lg md:text-xl font-medium text-slate-900 dark:text-slate-50 leading-relaxed">
                     {selectedQuestion.question}
                   </p>
 
@@ -248,16 +248,16 @@ export default function FavoritesPage() {
                       {selectedQuestion.options.map((opt, idx) => {
                         const isCorrect = !!opt.is_correct
 
-                        let containerClass = 'group w-full rounded-xl border px-4 py-3 text-base flex items-center transition-all duration-200 '
-                        let labelClass = 'inline-flex items-center justify-center w-8 h-8 rounded-lg text-sm font-bold mr-4 shrink-0 transition-colors '
+                        let containerClass = 'group w-full rounded-xl border px-5 py-3.5 text-base flex items-center transition-all duration-200 '
+                        let labelClass = 'inline-flex items-center justify-center w-9 h-9 rounded-lg text-sm font-bold mr-4 shrink-0 transition-colors '
                         let textClass = 'flex-1 text-left font-medium '
 
                         if (isCorrect) {
-                          containerClass += 'bg-emerald-500/20 border-emerald-500/50 text-white shadow-[0_0_20px_rgba(16,185,129,0.15)]'
-                          labelClass += 'bg-emerald-600 text-white border border-emerald-400'
+                          containerClass += 'bg-emerald-50 dark:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500/50 text-emerald-900 dark:text-white shadow-sm'
+                          labelClass += 'bg-emerald-200 dark:bg-emerald-600 text-emerald-800 dark:text-white border border-emerald-300 dark:border-emerald-400'
                         } else {
-                          containerClass += 'bg-[#202335] border-white/5 text-slate-300 opacity-60'
-                          labelClass += 'bg-[#272b3f] text-slate-400 border border-white/5'
+                          containerClass += 'bg-slate-50 dark:bg-[#202335] border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-300 dark:opacity-60'
+                          labelClass += 'bg-white dark:bg-[#272b3f] text-slate-400 dark:text-slate-400 border border-slate-200 dark:border-white/5 shadow-sm'
                         }
 
                         return (
@@ -267,7 +267,7 @@ export default function FavoritesPage() {
                               <div className={textClass}>{opt.option}</div>
                               {isCorrect && (
                                 <div className="flex items-center gap-2 shrink-0 animate-in fade-in slide-in-from-right-2">
-                                  <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-emerald-500/20 text-[11px] font-bold text-emerald-300 border border-emerald-500/30 uppercase tracking-wide">
+                                  <span className="hidden sm:inline-block px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 uppercase tracking-wide">
                                     To&apos;g&apos;ri javob
                                   </span>
                                   <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/40">
@@ -283,15 +283,15 @@ export default function FavoritesPage() {
                   )}
 
                   {selectedQuestion.explanation && (
-                    <div className="mt-6 rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 flex items-start gap-3">
-                      <div className="p-2 bg-amber-500/20 rounded-lg shrink-0">
-                        <Icon name="Bulb" className="w-5 h-5 text-amber-400" />
+                    <div className="mt-6 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 p-5 flex items-start gap-4">
+                      <div className="p-2 bg-amber-100 dark:bg-amber-500/20 rounded-lg shrink-0 text-amber-600 dark:text-amber-400">
+                        <Icon name="Bulb" className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-wider text-amber-400 font-bold mb-1">
+                        <p className="text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 font-bold mb-1.5">
                           Izoh
                         </p>
-                        <p className="text-sm md:text-base text-slate-200 leading-relaxed">
+                        <p className="text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium">
                           {selectedQuestion.explanation}
                         </p>
                       </div>
