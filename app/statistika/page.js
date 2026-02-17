@@ -6,9 +6,11 @@ import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useI18n } from '@/lib/i18n'
 
 export default function StatistikaPage() {
     const router = useRouter()
+    const t = useI18n()
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
     const [stats, setStats] = useState([])
@@ -58,7 +60,7 @@ export default function StatistikaPage() {
                     <button onClick={() => router.back()} className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] flex items-center justify-center text-slate-600 dark:text-slate-300 transition-colors">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
                     </button>
-                    <h1 className="text-lg font-bold text-slate-900 dark:text-white">Savollar Statistikasi</h1>
+                    <h1 className="text-lg font-bold text-slate-900 dark:text-white">{t('stats.title')}</h1>
                 </div>
                 <ThemeToggle size="sm" />
             </header>
@@ -71,9 +73,9 @@ export default function StatistikaPage() {
                             onClick={() => handleSort(key)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${sort === key ? 'bg-brand-cyan text-white shadow-lg shadow-cyan-500/20' : 'bg-slate-200 dark:bg-[#2a2d3e] text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-[#35394b]'}`}
                         >
-                            {key === 'date' && 'Oxirgi urinish'}
-                            {key === 'attempts' && 'Eng ko\'p yechilgan'}
-                            {key === 'accuracy' && 'Aniqlik'}
+                            {key === 'date' && t('stats.sortDate')}
+                            {key === 'attempts' && t('stats.sortAttempts')}
+                            {key === 'accuracy' && t('stats.sortAccuracy')}
                             {sort === key && (order === 'asc' ? ' ↑' : ' ↓')}
                         </button>
                     ))}
@@ -84,7 +86,7 @@ export default function StatistikaPage() {
                         <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-brand-cyan animate-spin" />
                     </div>
                 ) : stats.length === 0 ? (
-                    <div className="text-center py-20 text-slate-400">Statistika topilmadi</div>
+                    <div className="text-center py-20 text-slate-400">{t('stats.noData')}</div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {stats.map((stat) => (
@@ -96,7 +98,7 @@ export default function StatistikaPage() {
                                 <div className="flex justify-between items-end">
                                     <div>
                                         <p className="text-3xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight">{stat.accuracy}%</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{stat.correct} to'g'ri / {stat.attempts} urinish</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{stat.correct} {t('stats.correctAttempts')} / {stat.attempts} {t('stats.attemptsLabel')}</p>
                                     </div>
                                     <div className="h-10 w-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden relative">
                                         <div

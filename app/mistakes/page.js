@@ -10,6 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
 import { useLanguage } from '@/context/LanguageContext'
+import { useI18n } from '@/lib/i18n'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -28,6 +29,7 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
 export default function MistakesPage() {
   const router = useRouter()
   const { lang } = useLanguage()
+  const t = useI18n()
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [questions, setQuestions] = useState([])
@@ -111,40 +113,49 @@ export default function MistakesPage() {
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
-        <QoidalarHeader title="Xatolar rejimi" />
+        <QoidalarHeader
+          title={t('mistakes.title')}
+          beforeDashboard={
+            !loading && count > 0 ? (
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-sm font-semibold border border-rose-200 dark:border-rose-800/50">
+                {count} {t('mistakes.countBadge')}
+              </span>
+            ) : null
+          }
+        />
 
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">Xatolik qilingan savollar</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">{t('mistakes.pageTitle')}</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-lg shadow-rose-900/20 transition-all hover:shadow-rose-900/40"
               >
                 <Icon name="Wrong" className="w-4 h-4" />
-                Mashqni boshlash
+                {t('mistakes.startPractice')}
               </button>
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-16 text-slate-400">
-                Yuklanmoqda...
+                {t('common.loading')}
               </div>
             ) : !count ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-16 h-16 rounded-full bg-white dark:bg-[#1e2130] border border-dashed border-slate-300 dark:border-white/10 flex items-center justify-center mb-4">
                   <Icon name="Wrong" className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Hozircha xatolar yo&apos;q</h3>
+                <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">{t('mistakes.emptyTitle')}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 max-w-sm">
-                  Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savol avtomatik ravishda shu ro&apos;yxatga qo&apos;shiladi va keyin mashq qilishingiz mumkin.
+                  {t('mistakes.emptyDesc')}
                 </p>
                 <Link
                   href="/dashboard"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-blue-500/30"
                 >
-                  Dashboardga qaytish
+                  {t('mistakes.gotoDashboard')}
                 </Link>
               </div>
             ) : (
@@ -165,7 +176,7 @@ export default function MistakesPage() {
                       />
 
                       <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-rose-600/90 text-white text-[10px] font-semibold shadow-sm">
-                        Xato #{idx + 1}
+                        {t('mistakes.errorLabel')} #{idx + 1}
                       </div>
                     </div>
                     <div className="p-4 flex flex-col gap-2 flex-1">
@@ -173,7 +184,7 @@ export default function MistakesPage() {
                         {q.question}
                       </p>
                       <div className="mt-auto pt-2 flex items-center justify-end text-[11px] text-slate-400 dark:text-slate-500 font-medium group-hover:text-rose-500 transition-colors">
-                        <span>To&apos;liq ko&apos;rish</span>
+                        <span>{t('mistakes.viewFull')}</span>
                       </div>
                     </div>
                   </div>
@@ -192,7 +203,7 @@ export default function MistakesPage() {
                   <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-600/30 text-rose-600 dark:text-rose-200 text-xs font-bold">
                     <Icon name="Wrong" className="w-4 h-4" />
                   </span>
-                  <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">Noto&apos;g&apos;ri javob berilgan savol</h3>
+                  <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">{t('mistakes.modalTitle')}</h3>
                 </div>
                 <button
                   onClick={() => setSelectedQuestion(null)}
@@ -245,7 +256,7 @@ export default function MistakesPage() {
                               {isCorrect && (
                                 <div className="flex items-center gap-2 shrink-0">
                                   <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/25 text-[10px] font-bold text-emerald-600 dark:text-emerald-50 border border-emerald-200 dark:border-emerald-300/70 uppercase tracking-wide">
-                                    To&apos;g&apos;ri javob
+                                    {t('exam.correctAnswer')}
                                   </span>
                                   <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white">
                                     <Icon name="Check" className="w-3.5 h-3.5 stroke-[3]" />
@@ -266,7 +277,7 @@ export default function MistakesPage() {
                       </div>
                       <div>
                         <p className="text-[11px] uppercase tracking-wide text-amber-600 dark:text-amber-400 font-bold mb-1">
-                          Izoh
+                          {t('mistakes.explanation')}
                         </p>
                         <p className="text-sm md:text-base text-slate-700 dark:text-slate-100 leading-relaxed">
                           {selectedQuestion.explanation}

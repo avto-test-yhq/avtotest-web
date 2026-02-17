@@ -405,7 +405,7 @@ export default function DashboardPage() {
                           {t('dashboard.practice.byTickets')}
                         </h4>
                         <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider !text-white whitespace-nowrap">
-                          {mastery.totalTickets} bilet
+                          {mastery.totalTickets} {t('bilet.count')}
                         </span>
                       </div>
                       <p className="text-white/80 max-w-md text-xs sm:text-sm">

@@ -114,7 +114,7 @@ export default function YolHarakatiPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-none focus:ring-2 focus:ring-sky-500 rounded-2xl text-slate-800 dark:text-white placeholder:text-slate-400 transition-all outline-none"
-                placeholder="Bob nomini qidiring..."
+                placeholder={t('rules.traffic.searchPlaceholder')}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -130,12 +130,12 @@ export default function YolHarakatiPage() {
 
         <main className="p-6 lg:p-10 max-w-7xl mx-auto">
           <div className="mb-10">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Yo'l harakati qoidalari</h1>
-            <p className="text-slate-500 dark:text-slate-400">O'zbekiston Respublikasi Yo'l harakati qoidalarining to'liq ro'yxati</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">{t('rules.traffic.pageTitle')}</h1>
+            <p className="text-slate-500 dark:text-slate-400">{t('rules.traffic.pageSubtitle')}</p>
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-slate-400">{t('common.loading')}</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filtered.map((ch, idx) => {
@@ -154,15 +154,15 @@ export default function YolHarakatiPage() {
                       <span className="text-xs font-bold px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full">{ch.number}-BOB</span>
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors mb-2">{ch.title}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">Ushbu bobda {ch.title.toLowerCase()} haqida to'liq ma'lumot berilgan.</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{t('rules.traffic.chapterDesc').replace('{topic}', ch.title.toLowerCase())}</p>
                     <div className="mt-6 flex items-center justify-between">
-                      <span className="text-sm font-medium text-slate-400">{ch.article_count} ta modda</span>
+                      <span className="text-sm font-medium text-slate-400">{ch.article_count} {t('rules.traffic.articlesCount')}</span>
                       <span className="material-icons-round text-slate-300 group-hover:text-sky-500 group-hover:translate-x-1 transition-all">arrow_forward</span>
                     </div>
                   </Link>
                 )
               })}
-              {filtered.length === 0 && <p className="col-span-full text-center py-12 text-slate-400">Natija topilmadi</p>}
+              {filtered.length === 0 && <p className="col-span-full text-center py-12 text-slate-400">{t('rules.traffic.noResults')}</p>}
             </div>
           )}
         </main>

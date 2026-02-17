@@ -6,7 +6,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import UserProfileHeader from '@/components/UserProfileHeader'
 
-export default function QoidalarHeader({ title, backUrl, showDashboard = true }) {
+export default function QoidalarHeader({ title, backUrl, showDashboard = true, beforeDashboard }) {
     const router = useRouter()
 
     const handleBack = () => {
@@ -32,6 +32,7 @@ export default function QoidalarHeader({ title, backUrl, showDashboard = true })
                 </div>
 
                 <div className="flex items-center gap-3">
+                    {beforeDashboard}
                     {showDashboard && (
                         <Link
                             href="/dashboard"

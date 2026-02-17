@@ -532,11 +532,9 @@ function ExamContent() {
       }
     }
 
-    // Keyingi savolga o'tish (favorites va mistakes rejimida avtomatik o'tmaydi)
-    if (mode !== 'favorites' && mode !== 'mistakes' && currentIndex < questions.length - 1) {
-      if (settings.autoNext) {
-        setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
-      }
+    // Keyingi savolga o'tish (autoNext sozlamasi yoqilganda)
+    if (currentIndex < questions.length - 1 && settings.autoNext) {
+      setTimeout(() => setCurrentIndex(prev => prev + 1), 400)
     }
 
     // Show Explanation logic based on settings
@@ -662,7 +660,7 @@ function ExamContent() {
     }
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center gap-4">
-        <span>Yuklanmoqda...</span>
+        <span>{t('common.loading')}</span>
         <div className="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -696,19 +694,19 @@ function ExamContent() {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 font-sans">
         <div className="bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Test yakunlandi</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-4">Natijangiz quyida.</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t('exam.resultTitle')}</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-4">{t('exam.resultSubtitle')}</p>
           <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1">{stats.correct}/{questions.length}</div>
-          <p className="text-slate-500 dark:text-slate-400 mb-1">To&apos;g&apos;ri javob</p>
+          <p className="text-slate-500 dark:text-slate-400 mb-1">{t('exam.correctAnswer')}</p>
           <div className={`text-3xl font-bold mb-4 ${finishPercent >= 85 ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>{finishPercent}%</div>
-          <p className="text-slate-500 text-sm mb-1">Noto&apos;g&apos;ri: {stats.incorrect} ta</p>
-          <p className="text-slate-400 text-sm mb-6">Sarflangan vaqt: <span className="text-slate-900 dark:text-white font-semibold">{resultTimeStr}</span></p>
+          <p className="text-slate-500 text-sm mb-1">{t('exam.incorrectLabel')}: {stats.incorrect} ta</p>
+          <p className="text-slate-400 text-sm mb-6">{t('exam.timeSpent')}: <span className="text-slate-900 dark:text-white font-semibold">{resultTimeStr}</span></p>
           <div className="flex flex-col gap-3">
             <button onClick={restartExam} className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
-              Qayta ishlash
+              {t('exam.retryWork')}
             </button>
             <Link href="/dashboard" className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-900 dark:text-white font-medium border border-slate-200 dark:border-white/10 transition-colors">
-              Dashboardga qaytish
+              {t('exam.gotoDashboard')}
             </Link>
           </div>
         </div>
@@ -726,18 +724,18 @@ function ExamContent() {
             <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Icon name="Wrong" className="w-8 h-8 text-rose-500" />
             </div>
-            <h2 className="text-2xl font-bold text-rose-500 mb-2">Imtihon o&apos;tolmading</h2>
+            <h2 className="text-2xl font-bold text-rose-500 mb-2">{t('exam.failedTitle')}</h2>
             <p className="text-slate-500 dark:text-slate-400 mb-6">
-              3 ta xato qildingiz. Haqiqiy imtihonda ruxsat etilgan xatolar limitidan oshib ketdingiz.
+              {t('exam.failedDesc')}
             </p>
 
             <div className="bg-slate-50 dark:bg-[#161821] rounded-xl p-4 mb-6 border border-slate-200 dark:border-white/5">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-slate-500 dark:text-slate-400">To'g'ri javoblar:</span>
+                <span className="text-slate-500 dark:text-slate-400">{t('exam.correctAnswers')}:</span>
                 <span className="text-emerald-500 dark:text-emerald-400 font-bold">{stats.correct}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 dark:text-slate-400">Xatolar:</span>
+                <span className="text-slate-500 dark:text-slate-400">{t('exam.errorsCount')}:</span>
                 <span className="text-rose-500 dark:text-rose-400 font-bold">{stats.incorrect}</span>
               </div>
             </div>
@@ -748,13 +746,13 @@ function ExamContent() {
                 className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all flex items-center justify-center gap-2"
               >
                 <Icon name="Refresh" className="w-5 h-5" />
-                Qayta urinish
+                {t('exam.retryBtn')}
               </button>
               <Link
                 href="/dashboard"
                 className="w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-600 dark:text-slate-300 font-medium transition-colors"
               >
-                Bosh sahifaga qaytish
+                {t('exam.backToHome')}
               </Link>
             </div>
           </div>
@@ -773,7 +771,7 @@ function ExamContent() {
               className="rounded-lg object-contain"
             />
             <div className="hidden sm:flex flex-col leading-tight">
-              <h1 className="font-heading text-base md:text-lg font-bold text-slate-900 dark:text-white">
+               <h1 className="font-heading text-base md:text-lg font-bold text-slate-900 dark:text-white">
                 Pravachi<span className="text-brand-cyan">UZ</span>
               </h1>
               <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">{t('exam.drivingTest')}</p>
@@ -800,7 +798,7 @@ function ExamContent() {
           </div>
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="hidden md:flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            className="flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
           </button>
@@ -846,7 +844,7 @@ function ExamContent() {
 
           <button
             onClick={finishExam}
-            className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
           >
             {isFinished ? t('exam.results') : t('exam.finish')}
           </button>
@@ -877,7 +875,8 @@ function ExamContent() {
               let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
 
               if (hasAnswer || isFinished || showFailModal) {
-                if (isCorrect) {
+                const showCorrectAnswer = settings?.showCorrect !== false
+                if (isCorrect && (selected || showCorrectAnswer)) {
                   containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/50"
                   labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
                   textClass += "text-emerald-800 dark:text-emerald-100"
@@ -914,7 +913,7 @@ function ExamContent() {
                   <div className={labelClass}>F{idx + 1}</div>
                   <div className={textClass}>
                     <span className="flex-1">{opt.option}</span>
-                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
+                    {hasAnswer && isCorrect && (selected || settings?.showCorrect !== false) && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
                     {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
                   </div>
                 </button>

@@ -571,7 +571,8 @@ export default function BiletTicketPage() {
               let labelClass = "w-14 flex items-center justify-center text-base font-bold border-r "
               let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
               if (hasAnswer || isFinished) {
-                if (isCorrect) {
+                const showCorrectAnswer = settings?.showCorrect !== false
+                if (isCorrect && (selected || showCorrectAnswer)) {
                   containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/40"
                   labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
                   textClass += "text-emerald-800 dark:text-emerald-100"
@@ -606,7 +607,7 @@ export default function BiletTicketPage() {
                   <div className={labelClass}>F{idx + 1}</div>
                   <div className={textClass}>
                     <span className="flex-1">{opt.option}</span>
-                    {hasAnswer && isCorrect && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
+                    {hasAnswer && isCorrect && (selected || settings?.showCorrect !== false) && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
                     {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
                   </div>
                 </button>
