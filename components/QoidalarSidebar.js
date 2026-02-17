@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { useI18n } from '@/lib/i18n'
 
 export default function QoidalarSidebar() {
     const pathname = usePathname()
+    const t = useI18n()
 
     const isActive = (path) => pathname === path || pathname.startsWith(path + '/')
 
@@ -22,15 +24,10 @@ export default function QoidalarSidebar() {
                                 className="object-contain group-hover:scale-110 transition-transform duration-300"
                             />
                         </div>
-                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
+                        <span className="font-heading text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
                             PravachiUZ
                         </span>
                     </Link>
-
-                    <div className="flex items-center gap-3 text-sky-500 px-2">
-                        <span className="material-icons-round text-2xl">traffic</span>
-                        <span className="text-lg font-bold tracking-tight text-slate-800 dark:text-white leading-tight">Yo'l Harakati</span>
-                    </div>
                 </div>
                 <nav className="space-y-1">
                     <Link
@@ -41,7 +38,7 @@ export default function QoidalarSidebar() {
                             }`}
                     >
                         <span className="material-icons-round">menu_book</span>
-                        Qoidalar
+                        {t('sidebar.rules')}
                     </Link>
                     <Link
                         href="/biletlar"
@@ -51,7 +48,7 @@ export default function QoidalarSidebar() {
                             }`}
                     >
                         <span className="material-icons-round">quiz</span>
-                        Testlar
+                        {t('sidebar.tests')}
                     </Link>
                     <Link
                         href="/qoidalar/yol-belgilari"
@@ -61,7 +58,7 @@ export default function QoidalarSidebar() {
                             }`}
                     >
                         <span className="material-icons-round">warning</span>
-                        Belgilar
+                        {t('rules.signs.title')}
                     </Link>
                     <Link
                         href="/dashboard"
@@ -71,7 +68,7 @@ export default function QoidalarSidebar() {
                             }`}
                     >
                         <span className="material-icons-round">dashboard</span>
-                        Dashboard
+                        {t('sidebar.dashboard')}
                     </Link>
                 </nav>
             </div>

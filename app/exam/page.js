@@ -10,6 +10,8 @@ import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useExamSettings } from '@/context/ExamSettingsContext'
+import { useLanguage } from '@/context/LanguageContext'
+import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
 
 
@@ -47,6 +49,8 @@ function ExamContent() {
   }, [countParam])
 
   const { settings } = useExamSettings()
+  const { lang: globalLang, setLang: setGlobalLang } = useLanguage()
+  const t = useI18n()
   const [showSettingsModal, setShowSettingsModal] = useState(false)
 
   const [questions, setQuestions] = useState([])
@@ -54,7 +58,7 @@ function ExamContent() {
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
-  const [lang, setLang] = useState('uz-lotin')
+  const [lang, setLang] = useState(globalLang) // globalLang bilan sinxron (uzl, uzk, ru)
 
   const [showFailModal, setShowFailModal] = useState(false)
   const [showTimeUp, setShowTimeUp] = useState(false) // Vaqt tugaganda
@@ -106,11 +110,7 @@ function ExamContent() {
     return () => unsubscribe()
   }, [loadSavedIds])
 
-  const getLangCode = useCallback((l) => {
-    if (l === 'Uzb (kirill)') return 'uzk'
-    if (l === 'Русский') return 'ru'
-    return 'uzl'
-  }, [])
+  const getLangCode = useCallback((l) => (['uzl', 'uzk', 'ru'].includes(l) ? l : 'uzl'), [])
 
   const transformQuestion = useCallback((item) => {
     let imageUrl = ''
@@ -292,6 +292,19 @@ function ExamContent() {
   useEffect(() => {
     langRef.current = lang
   }, [lang])
+
+  // Global til o'zgarganda exam tilini yangilash (header LanguageSwitcher)
+  useEffect(() => {
+    if (globalLang && globalLang !== lang) {
+      setLang(globalLang)
+    }
+  }, [globalLang])
+
+  // Exam sahifada til o'zgarganda global tilni yangilash
+  const handleSetLang = useCallback((code) => {
+    setLang(code)
+    setGlobalLang(code)
+  }, [setGlobalLang])
 
   // Testga kirganda backendga bir marta murojaat (qayta urinish bosilganda qayta fetch)
   // Standard/Real: currentUser kutmasdan darhol yuklash; Favorites/Mistakes: currentUser kerak
@@ -760,10 +773,10 @@ function ExamContent() {
               className="rounded-lg object-contain"
             />
             <div className="hidden sm:flex flex-col leading-tight">
-              <h1 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">
+              <h1 className="font-heading text-base md:text-lg font-bold text-slate-900 dark:text-white">
                 Pravachi<span className="text-brand-cyan">UZ</span>
               </h1>
-              <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">Haydovchilik testi</p>
+              <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">{t('exam.drivingTest')}</p>
             </div>
           </Link>
 
@@ -775,8 +788,8 @@ function ExamContent() {
             ].map((item) => (
               <button
                 key={item.code}
-                onClick={() => setLang(item.label)}
-                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
+                onClick={() => handleSetLang(item.code)}
+                className={`px-3.5 py-1.5 text-xs font-semibold rounded-md transition-all ${lang === item.code
                   ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
@@ -808,7 +821,7 @@ function ExamContent() {
           </div>
 
           <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-slate-400">
-            <span>Savol:</span>
+            <span>{t('exam.question')}:</span>
             <span className="font-bold text-slate-900 dark:text-white text-base">{currentIndex + 1}<span className="text-slate-500 text-xs font-normal">/{questions.length}</span></span>
           </div>
 
@@ -819,13 +832,13 @@ function ExamContent() {
               ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
               : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-amber-400'
               }`}
-            title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
+            title={isCurrentFavorite ? t('exam.favoriteRemove') : t('exam.favoriteAdd')}
           >
             <Icon name="Save" className="w-4 h-4" />
           </button>
 
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
-            <span className="text-slate-500 dark:text-slate-400 text-xs">{mode === 'real' ? 'Qolgan vaqt' : 'Vaqt'}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-xs">{mode === 'real' ? t('exam.remainingTime') : t('exam.time')}</span>
             <span className={`font-mono font-bold text-base ${mode === 'real' && elapsedSeconds >= REAL_EXAM_SECONDS - 60 ? 'text-rose-500 dark:text-rose-400' : 'text-slate-900 dark:text-white'}`}>
               {displayTime}
             </span>
@@ -835,7 +848,7 @@ function ExamContent() {
             onClick={finishExam}
             className="hidden md:flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
           >
-            {isFinished ? 'Natijalar' : "Tugatish"}
+            {isFinished ? t('exam.results') : t('exam.finish')}
           </button>
         </div>
       </header>
@@ -920,7 +933,7 @@ function ExamContent() {
             >
               <span className="flex items-center">
                 <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
-                Izohni {showExplanation ? 'yashirish' : "ko'rish"}
+                {showExplanation ? t('exam.hideExplanation') : t('exam.viewExplanation')}
               </span>
               <kbd className="hidden md:inline-block px-2 py-0.5 bg-black/20 rounded text-[10px] uppercase opacity-70">Enter</kbd>
             </button>
@@ -935,7 +948,7 @@ function ExamContent() {
                   ? currentQuestion.image
                   : '/imgage/background.jpg'
               }
-              alt="Savol rasmi"
+              alt={t('tarix.questionImage')}
               fill
               className="object-contain"
               priority
@@ -943,7 +956,7 @@ function ExamContent() {
             />
             {showExplanation && currentQuestion.explanation && (
               <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-in slide-in-from-bottom-10 z-10">
-                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
+                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">{t('exam.explanation')}</h4>
                 <p className="text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
               </div>
             )}
@@ -1011,7 +1024,7 @@ function ExamContent() {
 
 export default function ExamPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center">Yuklanmoqda...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#1e2130] text-slate-400 flex items-center justify-center font-sans">Yuklanmoqda...</div>}>
       <ExamContent />
     </Suspense>
   )

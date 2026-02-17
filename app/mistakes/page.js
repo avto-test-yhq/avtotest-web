@@ -9,6 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
+import { useLanguage } from '@/context/LanguageContext'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -26,6 +27,7 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
 
 export default function MistakesPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [questions, setQuestions] = useState([])
@@ -45,7 +47,7 @@ export default function MistakesPage() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=uzl&ids=${idsString}`)
+        const testsRes = await fetch(`${API_URL}/api/tests?lang=${lang || 'uzl'}&ids=${idsString}`)
         if (!testsRes.ok) throw new Error('Tests API xatolik')
         const data = await testsRes.json()
         if (Array.isArray(data) && data.length > 0) {
@@ -82,7 +84,7 @@ export default function MistakesPage() {
         setLoading(false)
       }
     },
-    [API_URL]
+    [API_URL, lang]
   )
 
   useEffect(() => {

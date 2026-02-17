@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 import UserProfileHeader from '@/components/UserProfileHeader'
 
 export default function QoidalarHeader({ title, backUrl, showDashboard = true }) {
@@ -42,6 +43,9 @@ export default function QoidalarHeader({ title, backUrl, showDashboard = true })
                     )}
 
                     <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-700">
+                        <div className="hidden md:block">
+                            <LanguageSwitcher size="sm" />
+                        </div>
                         <ThemeToggle />
                         <div className="h-8 w-8 rounded-full bg-sky-500 flex items-center justify-center text-white text-sm font-semibold shadow-lg shadow-sky-500/20 ring-2 ring-white dark:ring-slate-800">
                             <UserProfileHeader />

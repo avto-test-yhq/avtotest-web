@@ -4,20 +4,19 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import ThemeToggle from './ThemeToggle'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useI18n } from '@/lib/i18n'
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const t = useI18n()
 
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-dark border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Bar - Language Selector */}
         <div className="flex justify-end items-center h-10 border-b border-white/5">
-          <div className="flex items-center space-x-1 text-xs font-bold text-slate-500 bg-night-800/50 px-3 py-1.5 rounded-full border border-white/5 language-switcher">
-            <span className="text-brand-cyan">UZ</span>
-            <span className="w-px h-3 bg-slate-700 mx-2 language-divider"></span>
-            <span className="hover:text-white cursor-pointer transition-colors language-option">RU</span>
-          </div>
+          <LanguageSwitcher size="sm" />
         </div>
         
         {/* Main Navbar */}
@@ -39,6 +38,7 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden lg:flex items-center space-x-8">
             <a href="#how-it-works" className="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+              {/* Hozircha matnlarni qo'lda qoldiramiz, keyin t() ga o'tkazish mumkin */}
               Qanday ishlaydi
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cyan transition-all group-hover:w-full"></span>
             </a>

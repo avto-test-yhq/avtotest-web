@@ -3,11 +3,16 @@
 import { useEffect, useState } from 'react'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import { useI18n } from '@/lib/i18n'
+import { useLanguage } from '@/context/LanguageContext'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
-const DAY_LABELS = ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha', 'Ya']
-const DEFAULT_DAYS = DAY_LABELS.map((label) => ({ label, count: 0, accuracy: 0 }))
+const DAY_LABELS = {
+  uzl: ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha', 'Ya'],
+  uzk: ['Ду', 'Се', 'Чо', 'Па', 'Жу', 'Ша', 'Я'],
+  ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+}
 
 /** Bar rang: aniqligi bo'yicha */
 function getBarColor(accuracy) {
@@ -21,6 +26,11 @@ function getBarColor(accuracy) {
 export default function WeeklyChart({ data: propData }) {
   const [fetchedData, setFetchedData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const t = useI18n()
+  const { lang } = useLanguage()
+
+  const labels = DAY_LABELS[lang] || DAY_LABELS.uzl
+  const defaultDays = labels.map((label) => ({ label, count: 0, accuracy: 0 }))
 
   useEffect(() => {
     const hasValidPropData = Array.isArray(propData) && propData.length >= 7 && propData.some((d) => (d.count || 0) > 0)
@@ -48,7 +58,11 @@ export default function WeeklyChart({ data: propData }) {
 
   const hasPropData = Array.isArray(propData) && propData.length >= 7
   const hasFetchedData = Array.isArray(fetchedData) && fetchedData.length >= 7
-  const chartData = hasPropData ? propData : hasFetchedData ? fetchedData : DEFAULT_DAYS
+  const chartSource = hasPropData ? propData : hasFetchedData ? fetchedData : defaultDays
+  const chartData = chartSource.map((d, idx) => ({
+    ...d,
+    label: labels[idx % labels.length],
+  }))
 
   if (loading && !hasPropData && !hasFetchedData) {
     return (
@@ -61,9 +75,11 @@ export default function WeeklyChart({ data: propData }) {
   return (
     <div className="bg-white dark:bg-slate-800 p-6 rounded-[30px] border border-slate-100 dark:border-slate-700 shadow-sm w-full">
       <div className="flex justify-between items-center mb-8">
-        <h3 className="text-xl font-bold text-slate-900 dark:text-white">Davomiylik (hafta bo&apos;yicha)</h3>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          {t('weekly.title')}
+        </h3>
         <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide">
-          Oxirgi 7 kun
+          {t('weekly.subtitle')}
         </span>
       </div>
 

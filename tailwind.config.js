@@ -28,8 +28,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Outfit', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        heading: ['var(--font-outfit)', 'Outfit', 'sans-serif'],
         display: ['var(--font-display)', 'Plus Jakarta Sans', 'sans-serif'],
       },
       colors: {

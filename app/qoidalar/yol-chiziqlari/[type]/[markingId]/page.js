@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
 import UserProfileHeader from '@/components/UserProfileHeader'
 import QoidalarHeader from '@/components/QoidalarHeader'
 
@@ -34,6 +35,7 @@ const categories = [
 export default function MarkingDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const { lang } = useLanguage()
   const type = params?.type || 'horizontal'
   const markingId = parseInt(params?.markingId, 10) || 0
 
@@ -44,7 +46,7 @@ export default function MarkingDetailPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/markings?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/markings?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       const list = (data.markings || [])
@@ -60,7 +62,7 @@ export default function MarkingDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [type, markingId])
+  }, [type, markingId, lang])
 
   useEffect(() => {
     fetchData()

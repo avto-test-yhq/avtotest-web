@@ -14,7 +14,7 @@ export default function Footer() {
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
 
                         <div className="text-center md:text-left">
-                            <h3 className="text-white font-bold text-lg mb-1">Pravachi<span className="text-brand-cyan">UZ</span></h3>
+                            <h3 className="font-heading text-white font-bold text-lg mb-1">Pravachi<span className="text-brand-cyan">UZ</span></h3>
                             <p className="text-slate-500 text-sm">Avtomaktab o'quvchilari uchun maxsus.</p>
                         </div>
 

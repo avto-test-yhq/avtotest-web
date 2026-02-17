@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useI18n } from '@/lib/i18n'
+import { useLanguage } from '@/context/LanguageContext'
 import UserProfileHeader from '@/components/UserProfileHeader'
 import QoidalarHeader from '@/components/QoidalarHeader'
 
@@ -12,6 +14,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 export default function ChapterDetailPage() {
   const router = useRouter()
   const params = useParams()
+  const { lang } = useLanguage()
+  const t = useI18n()
   const chapterId = parseInt(params?.chapterId, 10) || 1
 
   const [allChapters, setAllChapters] = useState([])
@@ -22,7 +26,7 @@ export default function ChapterDetailPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/traffic?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/traffic?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
 
@@ -41,7 +45,7 @@ export default function ChapterDetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [chapterId])
+  }, [chapterId, lang])
 
   useEffect(() => {
     fetchData()
@@ -119,7 +123,7 @@ export default function ChapterDetailPage() {
                         <span className="material-icons-round text-amber-500">lightbulb</span>
                       </div>
                       <div>
-                        <h4 className="text-amber-800 dark:text-amber-400 font-bold text-sm uppercase tracking-wide mb-1">Imtihon uchun muhim</h4>
+                        <h4 className="text-amber-800 dark:text-amber-400 font-bold text-sm uppercase tracking-wide mb-1">{t('rules.examImportant')}</h4>
                         <p className="text-amber-900/70 dark:text-amber-200/60 text-sm">
                           {a.exam_tips}
                         </p>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
 import UserProfileHeader from '@/components/UserProfileHeader'
 import QoidalarHeader from '@/components/QoidalarHeader'
 
@@ -38,13 +39,14 @@ const ICON_COLORS = {
 
 export default function TezlikChegaralariPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
   const [zones, setZones] = useState([])
   const [loading, setLoading] = useState(true)
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/speed-limits?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/speed-limits?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       setZones(data.zones || [])
@@ -54,7 +56,7 @@ export default function TezlikChegaralariPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [lang])
 
   useEffect(() => {
     fetchData()

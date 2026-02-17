@@ -7,7 +7,9 @@ import Image from 'next/image'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 import WeeklyChart from '@/components/WeeklyChart'
+import { useI18n } from '@/lib/i18n'
 import {
   Car,
   Home,
@@ -55,6 +57,7 @@ const fetchBiletlarProgress = async (uid) => {
 export default function DashboardPage() {
   const router = useRouter()
   const pathname = usePathname()
+  const t = useI18n()
   const [userName, setUserName] = useState('Foydalanuvchi')
   const [examModalOpen, setExamModalOpen] = useState(false)
   const [examModalType, setExamModalType] = useState(null) // 'standard' | 'real'
@@ -275,51 +278,60 @@ export default function DashboardPage() {
                 priority
               />
             </div>
-            <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">
+            <span className="font-heading text-xl font-bold tracking-tight text-slate-800 dark:text-white">
               Pravachi<span className="text-primary font-extrabold text-2xl leading-none">UZ</span>
             </span>
           </Link>
         </div>
         <nav className="flex-1 mt-4 px-4 space-y-2">
-          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">Menyu</p>
+          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+            {t('dashboard.menu')}
+          </p>
           <Link href="/dashboard" className="flex items-center gap-3 p-3 rounded-xl sidebar-item-active">
             <Home className="w-5 h-5" />
-            <span>Bosh sahifa</span>
+            <span>{t('nav.dashboard')}</span>
           </Link>
           <Link href="/qoidalar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <BookOpen className="w-5 h-5" />
-            <span>Qoidalar</span>
+            <span>{t('nav.rules')}</span>
           </Link>
           <Link href="/biletlar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <ClipboardCheck className="w-5 h-5" />
-            <span>Biletlar</span>
+            <span>{t('nav.tickets')}</span>
           </Link>
           <Link href="/savollar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <Search className="w-5 h-5" />
-            <span>Savollar</span>
+            <span>{t('nav.questions')}</span>
           </Link>
-          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-8 mb-2">Tizim</p>
+          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-8 mb-2">
+            {t('dashboard.system')}
+          </p>
           <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <SettingsIcon className="w-5 h-5" />
-            <span>Sozlamalar</span>
+            <span>{t('dashboard.system.settings')}</span>
           </Link>
         </nav>
         <div className="p-4 mt-auto">
           <button onClick={handleLogout} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-all font-medium">
             <LogOut className="w-5 h-5" />
-            <span>Chiqish</span>
+            <span>{t('dashboard.logout')}</span>
           </button>
         </div>
       </aside>
 
       <main className="dashboard-main-content">
         <header className="dashboard-sticky-header p-6 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-white">Xush kelibsiz, {userName} 👋</h1>
-          <div className="flex items-center gap-4">
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-white">
+            {t('dashboard.welcome')}, {userName} 👋
+          </h1>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="hidden md:block">
+              <LanguageSwitcher size="sm" />
+            </div>
             <ThemeToggle size="sm" />
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-900/30 text-primary text-sm font-semibold border border-blue-100 dark:border-blue-800">
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>Premium A&apos;zo</span>
+              <span>{t('dashboard.premium')}</span>
             </div>
             <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border-2 border-white dark:border-slate-800">
               {userName.charAt(0).toUpperCase()}
@@ -331,21 +343,27 @@ export default function DashboardPage() {
           <div className="flex-1 space-y-8">
             {/* 3 ta stat karta + Barcha hisobotlar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
-              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Statistika</h2>
-              <Link href="/tarix" className="text-primary text-sm font-semibold hover:underline">Barcha hisobotlar</Link>
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white">{t('dashboard.stats')}</h2>
+              <Link href="/tarix" className="text-primary text-sm font-semibold hover:underline">
+                {t('dashboard.stats.allReports')}
+              </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50">
                 <div className="relative z-10">
                   <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Jami Savollar</p>
                   <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.totalQuestions.toLocaleString()}</h2>
-                  <p className="text-xs text-green-500 mt-2 font-medium">O&apos;zlashtirilgan: {mastery.masteredCount}</p>
+                  <p className="text-xs text-green-500 mt-2 font-medium">
+                    {t('dashboard.stats.mastered')}: {mastery.masteredCount}
+                  </p>
                 </div>
                 <HelpCircle className="absolute -right-2 -bottom-2 w-12 h-12 text-primary/10 group-hover:scale-110 transition-transform" />
               </div>
               <div className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50">
                 <div className="relative z-10">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Samaradorlik</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    {t('dashboard.stats.efficiency')}
+                  </p>
                   <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.percent}%</h2>
                   <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-4 overflow-hidden">
                     <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${Math.min(100, mastery.percent)}%` }} />
@@ -355,10 +373,12 @@ export default function DashboardPage() {
               </div>
               <Link href="/tarix" className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50 block">
                 <div className="relative z-10">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Davomiylik</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    {t('dashboard.stats.streak')}
+                  </p>
                   <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{activityDays} kun</h2>
                   <span className="text-xs text-primary mt-3 font-medium flex items-center hover:underline">
-                    Tashriflar tarixi <ChevronRight className="w-3 h-3 ml-1" />
+                    {t('dashboard.stats.history')} <ChevronRight className="w-3 h-3 ml-1" />
                   </span>
                 </div>
                 <Flame className="absolute -right-2 -bottom-2 w-12 h-12 text-orange-500/10 group-hover:scale-110 transition-transform" />
@@ -368,34 +388,44 @@ export default function DashboardPage() {
             {/* Mashq qilish – Biletlar (to'liq kenglik) */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Mashq qilish</h3>
-                <Link href="/biletlar" className="text-primary text-sm font-semibold hover:underline">Barchasini ko&apos;rish</Link>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">{t('dashboard.practice')}</h3>
+                <Link href="/biletlar" className="text-primary text-sm font-semibold hover:underline">
+                  {t('dashboard.practice.seeAll')}
+                </Link>
               </div>
               <Link href="/biletlar" className="block relative group cursor-pointer overflow-hidden rounded-3xl bg-primary p-6 md:p-8 text-white shadow-xl shadow-primary/30">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-                  <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                      <BookOpen className="w-8 h-8 md:w-10 md:h-10 !text-white" />
+                <div className="flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-6 relative z-10">
+                  <div className="flex items-center gap-5 sm:gap-6">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                      <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 !text-white" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="text-2xl font-bold !text-white">Biletlar bo&apos;yicha</h4>
-                        <span className="bg-white/20 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider !text-white">{mastery.totalTickets} bilet</span>
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1">
+                        <h4 className="text-xl sm:text-2xl font-bold !text-white">
+                          {t('dashboard.practice.byTickets')}
+                        </h4>
+                        <span className="bg-white/20 text-[10px] font-bold px-2 py-0.5 sm:px-3 sm:py-1 rounded-full uppercase tracking-wider !text-white whitespace-nowrap">
+                          {mastery.totalTickets} bilet
+                        </span>
                       </div>
-                      <p className="text-white/80 max-w-md text-sm">Har bir biletni alohida mashq qiling va bilimingizni tizimli ravishda mustahkamlang.</p>
+                      <p className="text-white/80 max-w-md text-xs sm:text-sm">
+                        {t('dashboard.practice.desc')}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex-1 max-w-xs space-y-3">
+                  <div className="flex-1 w-full 2xl:max-w-xs space-y-3 mt-2 2xl:mt-0">
                     <div className="flex justify-between text-xs font-bold">
-                      <span className="text-white/80 uppercase tracking-tighter">{biletlarProgress.completed}/{mastery.totalTickets} yechilgan</span>
+                      <span className="text-white/80 uppercase tracking-tighter">
+                        {biletlarProgress.completed}/{mastery.totalTickets} {t('dashboard.practice.progress')}
+                      </span>
                       <span className="!text-white">{biletlarProgress.percent}%</span>
                     </div>
                     <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
                       <div className="h-full bg-white rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, biletlarProgress.percent)}%` }} />
                     </div>
                     <span className="inline-flex items-center justify-center gap-2 w-full mt-2 bg-white text-primary py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-slate-50 transition-colors">
-                      <span>Davom ettirish</span>
-                      <Play className="w-4 h-4" />
+                      <span>{t('dashboard.practice.continue')}</span>
+                      <Play className="w-4 h-4 ml-1" />
                     </span>
                   </div>
                 </div>
@@ -415,10 +445,14 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Progress</p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Standart imtihon</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-10 line-clamp-2">10, 20 yoki 50 ta savol. Xato qilsangiz ham davom ettiring.</p>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                  {t('dashboard.activity.standard.title')}
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-10 line-clamp-2">
+                  {t('dashboard.activity.standard.desc')}
+                </p>
                 <span className="flex items-center justify-center gap-2 text-primary font-bold text-sm group-hover:translate-x-1 transition-transform">
-                  Boshlash <ChevronRight className="w-4 h-4" />
+                  {t('dashboard.activity.standard.cta')} <ChevronRight className="w-4 h-4" />
                 </span>
               </button>
               <button
@@ -431,10 +465,14 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Haqiqiy</p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Haqiqiy imtihon</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">20 ta savol. 3 ta xato — imtihon to&apos;xtatiladi. Jiddiy sinov!</p>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                  {t('dashboard.activity.real.title')}
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
+                  {t('dashboard.activity.real.desc')}
+                </p>
                 <span className="flex items-center justify-center gap-2 text-orange-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
-                  Boshlash <Zap className="w-4 h-4" />
+                  {t('dashboard.activity.real.cta')} <Zap className="w-4 h-4" />
                 </span>
               </button>
               <Link href="/mistakes" className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 block">
@@ -442,13 +480,19 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 bg-rose-100 dark:bg-rose-900/30 rounded-xl flex items-center justify-center text-rose-500">
                     <AlertCircle className="w-6 h-6" />
                   </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Xatolar</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {t('dashboard.activity.mistakes.badge')}
+                  </p>
                   <p className="text-sm font-bold text-rose-500">{mistakesCount} ta</p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Xatolar bilan ishlash</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Oldin xato qilgan savollaringizni qayta ko&apos;rib chiqing va o&apos;zlashtiring.</p>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                  {t('dashboard.activity.mistakes.title')}
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
+                  {t('dashboard.activity.mistakes.desc')}
+                </p>
                 <span className="flex items-center justify-center gap-2 text-rose-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
-                  Xatolarni tozalash <ChevronRight className="w-4 h-4" />
+                  {t('dashboard.activity.mistakes.cta')} <ChevronRight className="w-4 h-4" />
                 </span>
               </Link>
               <Link href="/favorites" className="glass-card bg-white/60 dark:bg-slate-800/40 p-6 rounded-2xl group hover:shadow-xl transition-all duration-300 border border-white/20 dark:border-slate-700/50 block">
@@ -456,13 +500,19 @@ export default function DashboardPage() {
                   <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center text-amber-500">
                     <Star className="w-6 h-6" />
                   </div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sevimli</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {t('dashboard.activity.favorites.badge')}
+                  </p>
                   <p className="text-sm font-bold text-amber-500">{favoritesCount} ta</p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Sevimli savollar</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">Siz belgilab qo&apos;ygan murakkab savollar jamlanmasi.</p>
+                <h4 className="text-lg font-bold text-slate-800 dark:text-white mb-2">
+                  {t('dashboard.activity.favorites.title')}
+                </h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2">
+                  {t('dashboard.activity.favorites.desc')}
+                </p>
                 <span className="flex items-center justify-center gap-2 text-amber-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
-                  Ko&apos;rish <ChevronRight className="w-4 h-4" />
+                  {t('dashboard.activity.favorites.cta')} <ChevronRight className="w-4 h-4" />
                 </span>
               </Link>
             </div>
@@ -472,8 +522,12 @@ export default function DashboardPage() {
           <aside className="w-full lg:w-[420px] flex-shrink-0 flex flex-col gap-6">
             <div className="glass-card bg-white/40 dark:bg-slate-900/40 rounded-3xl p-6 border border-white/20 dark:border-slate-700/50">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white">Qoidalar</h3>
-                <Link href="/qoidalar" className="text-primary text-xs font-semibold hover:underline">Hammasi</Link>
+                <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                  {t('dashboard.rules.cardTitle')}
+                </h3>
+                <Link href="/qoidalar" className="text-primary text-xs font-semibold hover:underline">
+                  {t('dashboard.rules.all')}
+                </Link>
               </div>
               <div className="space-y-3">
                 <Link href="/qoidalar/yol-harakati" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
@@ -481,8 +535,12 @@ export default function DashboardPage() {
                     <BookOpen className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l harakati qoidalari</h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">30 bob mavjud</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {t('dashboard.rules.traffic.title')}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {t('dashboard.rules.traffic.desc')}
+                    </p>
                   </div>
                 </Link>
                 <Link href="/qoidalar/yol-belgilari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
@@ -490,8 +548,12 @@ export default function DashboardPage() {
                     <Medal className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l belgilari</h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">7 kategoriya</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {t('dashboard.rules.signs.title')}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {t('dashboard.rules.signs.desc')}
+                    </p>
                   </div>
                 </Link>
                 <Link href="/qoidalar/yol-chiziqlari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
@@ -499,8 +561,12 @@ export default function DashboardPage() {
                     <Trophy className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Yo&apos;l chiziqlari</h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Yotiq va tik chiziqlar</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {t('dashboard.rules.lines.title')}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {t('dashboard.rules.lines.desc')}
+                    </p>
                   </div>
                 </Link>
                 <Link href="/qoidalar/tezlik-chegaralari" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
@@ -508,8 +574,12 @@ export default function DashboardPage() {
                     <Timer className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Tezlik chegaralari</h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Eng so&apos;nggi ma&apos;lumotlar</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {t('dashboard.rules.speed.title')}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {t('dashboard.rules.speed.desc')}
+                    </p>
                   </div>
                 </Link>
                 <Link href="/qoidalar" className="p-3 glass-card bg-white/50 dark:bg-slate-800/50 rounded-xl flex items-center gap-3 hover:bg-white/80 dark:hover:bg-slate-700 transition-all border border-white/20 dark:border-slate-700/50">
@@ -517,15 +587,23 @@ export default function DashboardPage() {
                     <ClipboardCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">Boshqa qoidalar</h4>
-                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Video darslar va hujjatlar</p>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">
+                      {t('dashboard.rules.other.title')}
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      {t('dashboard.rules.other.desc')}
+                    </p>
                   </div>
                 </Link>
               </div>
             </div>
             <div className="p-6 rounded-3xl bg-gradient-to-br from-primary to-blue-600 !text-white shadow-xl shadow-primary/30">
-              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-2 ">Eslatma</p>
-              <p className="text-sm font-medium leading-relaxed">Qoidalar 2024-yildagi so&apos;nggi tahrirlar bilan to&apos;liq yangilangan.</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-2 ">
+                {t('dashboard.rules.note.title')}
+              </p>
+              <p className="text-sm font-medium leading-relaxed">
+                {t('dashboard.rules.note.text')}
+              </p>
             </div>
 
             {/* Davomiylik – haftalik faollik (yechilgan savollar soniga asoslangan) */}
@@ -569,9 +647,11 @@ export default function DashboardPage() {
                   <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-brand-blue/20 text-brand-blue dark:text-brand-cyan flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">Standart imtihon</h3>
+                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">
+                    {t('exam.modal.standard.title')}
+                  </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Savollar sonini tanlang. Xato qilsangiz ham imtihon tugamasin — barcha savollarni javoblang.
+                    {t('exam.modal.standard.desc')}
                   </p>
                 </div>
                 <div className="grid grid-cols-3 gap-4 mb-6">
@@ -582,7 +662,9 @@ export default function DashboardPage() {
                       className="flex flex-col items-center justify-center py-4 rounded-2xl bg-slate-50 dark:bg-night-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:border-brand-blue hover:bg-blue-50 dark:hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
                     >
                       <span className="text-xl font-bold group-hover:text-brand-blue transition-colors">{count}</span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">Savol</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                        {t('exam.modal.standard.badge')}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -593,15 +675,17 @@ export default function DashboardPage() {
                   <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">Haqiqiy imtihon</h3>
+                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">
+                    {t('exam.modal.real.title')}
+                  </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                    20 ta savol. 3 ta xato qilsangiz imtihon to&apos;xtaydi va &quot;Imtihon o&apos;tolmading&quot; chiqadi.
+                    {t('exam.modal.real.desc')}
                   </p>
                   <button
                     onClick={startRealExam}
                     className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold transition-colors shadow-lg shadow-orange-500/30"
                   >
-                    Boshlash
+                    {t('exam.modal.real.start')}
                   </button>
                 </div>
               </>
@@ -610,7 +694,7 @@ export default function DashboardPage() {
               onClick={() => { setExamModalOpen(false); setExamModalType(null); }}
               className="w-full py-3 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors mt-2"
             >
-              Bekor qilish
+              {t('exam.modal.cancel')}
             </button>
           </div>
         </div>

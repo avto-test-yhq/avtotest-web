@@ -3,12 +3,17 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
+import { useI18n } from '@/lib/i18n'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
 export default function YolHarakatiPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
+  const t = useI18n()
   const [chapters, setChapters] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -16,7 +21,7 @@ export default function YolHarakatiPage() {
   const fetchChapters = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/traffic?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/traffic?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       setChapters(data.chapters || [])
@@ -26,7 +31,7 @@ export default function YolHarakatiPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [lang])
 
   useEffect(() => {
     fetchChapters()
@@ -63,26 +68,37 @@ export default function YolHarakatiPage() {
       {/* DESKTOP SIDEBAR */}
       <aside className="fixed left-0 top-0 h-full w-72 bg-white dark:bg-[#1e293b] border-r border-slate-200 dark:border-slate-800 hidden lg:flex flex-col z-50">
         <div className="p-6">
-          <div className="flex items-center gap-3 text-sky-500 mb-10">
-            <span className="material-icons-round text-3xl">traffic</span>
-            <span className="text-xl font-bold tracking-tight text-slate-800 dark:text-white leading-tight">Yo'l Harakati</span>
+          <div className="flex flex-col gap-6 mb-10">
+            <Link href="/dashboard" className="flex items-center gap-2 group">
+              <div className="relative w-10 h-10">
+                <Image
+                  src="/imgage/avtotest-logo.png"
+                  alt="AvtoTest Logo"
+                  fill
+                  className="object-contain group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <span className="font-heading text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">
+                PravachiUZ
+              </span>
+            </Link>
           </div>
           <nav className="space-y-1">
             <Link href="/qoidalar" className="flex items-center gap-3 px-4 py-3 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-xl font-semibold">
               <span className="material-icons-round">menu_book</span>
-              Qoidalar
+              {t('sidebar.rules')}
             </Link>
             <Link href="/biletlar" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
               <span className="material-icons-round">quiz</span>
-              Testlar
+              {t('sidebar.tests')}
             </Link>
             <Link href="/qoidalar/yol-belgilari" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
               <span className="material-icons-round">warning</span>
-              Belgilar
+              {t('rules.signs.title')}
             </Link>
             <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors">
               <span className="material-icons-round">dashboard</span>
-              Dashboard
+              {t('sidebar.dashboard')}
             </Link>
           </nav>
         </div>

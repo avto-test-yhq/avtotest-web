@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
 import UserProfileHeader from '@/components/UserProfileHeader'
 import QoidalarHeader from '@/components/QoidalarHeader'
 
@@ -20,6 +21,7 @@ const mapDocIcon = (iconName) => {
 
 export default function KerakliHujjatlarPage() {
   const router = useRouter()
+  const { lang } = useLanguage()
   const [categories, setCategories] = useState([])
   const [activeId, setActiveId] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -27,7 +29,7 @@ export default function KerakliHujjatlarPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/documents?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/documents?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       const list = data.categories || []
@@ -39,7 +41,7 @@ export default function KerakliHujjatlarPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [lang])
 
   useEffect(() => {
     fetchData()

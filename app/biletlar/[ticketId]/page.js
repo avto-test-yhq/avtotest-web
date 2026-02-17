@@ -8,6 +8,8 @@ import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useExamSettings } from '@/context/ExamSettingsContext'
+import { useLanguage } from '@/context/LanguageContext'
+import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
 
 const QUESTIONS_PER_TICKET = 10
@@ -48,10 +50,12 @@ export default function BiletTicketPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const { settings } = useExamSettings()
+  const { lang: globalLang, setLang: setGlobalLang } = useLanguage()
+  const t = useI18n()
   const [showSettingsModal, setShowSettingsModal] = useState(false)
 
   const [questions, setQuestions] = useState([])
-  const [lang, setLang] = useState('uz-lotin')
+  const [lang, setLang] = useState(globalLang) // globalLang bilan sinxron (uzl, uzk, ru)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
@@ -64,11 +68,7 @@ export default function BiletTicketPage() {
   const startTimeRef = useRef(null)
   const endTimeRef = useRef(null)
 
-  const getLangCode = (l) => {
-    if (l === 'Uzb (kirill)') return 'uzk'
-    if (l === 'Русский') return 'ru'
-    return 'uzl'
-  }
+  const getLangCode = (l) => (['uzl', 'uzk', 'ru'].includes(l) ? l : 'uzl')
 
   const transformQuestion = (item) => {
     let imageUrl = ''
@@ -89,7 +89,18 @@ export default function BiletTicketPage() {
     }
   }
 
-  // Bilet yuklash (ticketId o'zgaganda)
+  // Global til o'zgarganda bilet tilini yangilash
+  useEffect(() => {
+    if (globalLang && globalLang !== lang) setLang(globalLang)
+  }, [globalLang])
+
+  // Bilet sahifada til o'zgarganda global tilni yangilash
+  const handleSetLang = (code) => {
+    setLang(code)
+    setGlobalLang(code)
+  }
+
+  // Bilet yuklash (ticketId yoki lang o'zgaganda)
   useEffect(() => {
     const fetchTests = async () => {
       setAnswers({})
@@ -423,7 +434,7 @@ export default function BiletTicketPage() {
       <div className="min-h-screen bg-slate-50 dark:bg-[#161821] flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-2 border-brand-cyan/30 border-t-brand-cyan animate-spin mx-auto mb-4" />
-          <p className="text-slate-500 dark:text-slate-400">Yuklanmoqda...</p>
+          <p className="text-slate-500 dark:text-slate-400">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -439,7 +450,7 @@ export default function BiletTicketPage() {
             <svg className="w-8 h-8 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Bilet #{ticketId} yakunlandi</h2>
-          <p className="text-slate-500 text-sm mb-6">Barcha savollar javoblangan</p>
+          <p className="text-slate-500 text-sm mb-6">{t('bilet.allAnswered')}</p>
           <div className="flex items-center justify-center gap-6 mb-6">
             <div>
               <div className="text-3xl font-bold text-brand-cyan">{finishPercent}%</div>
@@ -453,7 +464,7 @@ export default function BiletTicketPage() {
             <div className="w-px h-12 bg-slate-200 dark:bg-white/10" />
             <div>
               <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{resultTimeStr}</div>
-              <p className="text-xs text-slate-500">Vaqt</p>
+              <p className="text-xs text-slate-500">{t('tarix.time')}</p>
             </div>
           </div>
           <Link
@@ -479,7 +490,7 @@ export default function BiletTicketPage() {
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
             <div>
               <h1 className="text-base font-bold text-slate-900 dark:text-white">Bilet #{ticketId}</h1>
-              <p className="text-[11px] text-slate-500">Savol {currentIndex + 1}/{questions.length}</p>
+              <p className="text-[11px] text-slate-500">{t('exam.question')} {currentIndex + 1}/{questions.length}</p>
             </div>
           </div>
           <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
@@ -490,8 +501,8 @@ export default function BiletTicketPage() {
             ].map((item) => (
               <button
                 key={item.code}
-                onClick={() => setLang(item.label)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.label || (lang === 'uz-lotin' && item.code === 'uzl')
+                onClick={() => handleSetLang(item.code)}
+                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.code
                   ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
                   : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                   }`}
@@ -526,12 +537,12 @@ export default function BiletTicketPage() {
               ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
               : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-amber-400'
               }`}
-            title={isCurrentFavorite ? "Sevimlilardan o'chirish" : "Sevimlilarga qo'shish"}
+            title={isCurrentFavorite ? t('exam.favoriteRemove') : t('exam.favoriteAdd')}
           >
             <Icon name="Bulb" className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
-            <span className="text-slate-400 text-xs">Vaqt</span>
+            <span className="text-slate-400 text-xs">{t('tarix.time')}</span>
             <span className="font-mono font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
           </div>
           <div className="hidden sm:block text-xs text-slate-400">
@@ -609,7 +620,7 @@ export default function BiletTicketPage() {
             >
               <span className="flex items-center">
                 <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
-                Izohni {showExplanation ? 'yashirish' : "ko'rish"}
+                {showExplanation ? t('exam.hideExplanation') : t('exam.viewExplanation')}
               </span>
             </button>
           </div>
@@ -618,7 +629,7 @@ export default function BiletTicketPage() {
           <div className="relative w-full h-full">
             <Image
               src={currentQuestion.image && currentQuestion.image.trim() !== '' ? currentQuestion.image : '/imgage/background.jpg'}
-              alt="Savol rasmi"
+              alt={t('tarix.questionImage')}
               fill
               className="object-contain"
               priority
@@ -626,7 +637,7 @@ export default function BiletTicketPage() {
             />
             {showExplanation && currentQuestion.explanation && (
               <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl z-10">
-                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Tushuntirish</h4>
+                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">{t('exam.explanation')}</h4>
                 <p className="!text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
               </div>
             )}

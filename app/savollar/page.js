@@ -6,12 +6,14 @@ import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
+import { useLanguage } from '@/context/LanguageContext'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
 export default function SavollarPage() {
+  const { lang } = useLanguage()
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -53,7 +55,7 @@ export default function SavollarPage() {
     setLoading(true)
     setError(null)
     try {
-      const params = new URLSearchParams({ page: String(page), limit: '20', sort, lang: 'uzl' })
+      const params = new URLSearchParams({ page: String(page), limit: '20', sort, lang: lang || 'uzl' })
       if (debouncedSearch.trim()) params.append('search', debouncedSearch.trim())
       if (hasImage !== 'all') params.append('hasImage', hasImage)
 
@@ -80,7 +82,7 @@ export default function SavollarPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, sort, hasImage, debouncedSearch, transformQuestion])
+  }, [page, sort, hasImage, debouncedSearch, lang, transformQuestion])
 
   useEffect(() => {
     fetchQuestions()

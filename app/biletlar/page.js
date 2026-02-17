@@ -9,6 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
+import { useI18n } from '@/lib/i18n'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -17,6 +18,7 @@ const defaultStats = { totalTickets: 61, totalBiletQuestions: 610 }
 
 export default function BiletlarPage() {
   const router = useRouter()
+  const t = useI18n()
   const [progress, setProgress] = useState(defaultProgress)
   const [stats, setStats] = useState(defaultStats)
   const [loading, setLoading] = useState(true)
@@ -85,7 +87,7 @@ export default function BiletlarPage() {
   if (loading) {
     return (
       <div className="biletlar-page min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 flex items-center justify-center">
-        <div className="text-slate-500 dark:text-slate-400">Yuklanmoqda...</div>
+        <div className="text-slate-500 dark:text-slate-400">{t('common.loading')}</div>
       </div>
     )
   }
@@ -95,7 +97,7 @@ export default function BiletlarPage() {
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen">
-        <QoidalarHeader title="Biletlar bo'yicha mashq" />
+        <QoidalarHeader title={t('bilet.header.title')} />
 
         <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-10 pb-20">
           {/* Stats */}
@@ -103,7 +105,7 @@ export default function BiletlarPage() {
             <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-cyan-500/5">
               <div className="text-3xl md:text-4xl font-extrabold text-cyan-500 mb-1">{ozlashtirishPercent}%</div>
               <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
-                O&apos;zlashtirish
+                {t('bilet.stats.mastery')}
               </div>
             </div>
             <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-emerald-500/5">
@@ -114,7 +116,7 @@ export default function BiletlarPage() {
                 </span>
               </div>
               <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
-                To&apos;g&apos;ri javob
+                {t('bilet.stats.correct')}
               </div>
             </div>
             <div className="glass-card p-6 md:p-8 rounded-2xl text-center shadow-xl shadow-blue-500/5">
@@ -125,7 +127,7 @@ export default function BiletlarPage() {
                 </span>
               </div>
               <div className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm uppercase tracking-widest">
-                Tugallangan
+                {t('bilet.stats.completed')}
               </div>
             </div>
           </section>
@@ -133,10 +135,10 @@ export default function BiletlarPage() {
           {/* Biletlar ro'yxati */}
           <section>
             <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">
-              Har bir bilet bo&apos;yicha tayyorlanish
+              {t('bilet.section.title')}
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">
-              Vaqt cheklovi yo&apos;q. Har bir javob uchun batafsil tushuntirish beriladi.
+              {t('bilet.section.desc')}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
@@ -175,7 +177,7 @@ export default function BiletlarPage() {
                         disabled
                         className="w-full py-3 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 font-bold text-sm cursor-not-allowed"
                       >
-                        Qulflangan
+                        {t('bilet.locked')}
                       </button>
                     </div>
                   )
@@ -199,7 +201,7 @@ export default function BiletlarPage() {
                             />
                           </div>
                           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                            {percent}% • {result.count} urinish
+                            {percent}% • {result.count} {t('bilet.progress.attempts')}
                           </div>
                         </div>
                       )}
@@ -211,7 +213,7 @@ export default function BiletlarPage() {
                         : 'bg-cyan-500 !text-white hover:opacity-90'
                         }`}
                     >
-                      {result ? 'Davom etish' : 'Boshlash'}
+                      {result ? t('bilet.cta.continue') : t('bilet.cta.start')}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>

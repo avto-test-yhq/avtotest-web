@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap');
+/* Fontlar: next/font orqali layout.js da yuklanadi (Inter, Outfit, Plus Jakarta Sans) */
 @import url('https://unpkg.com/aos@2.3.1/dist/aos.css');
 
 @tailwind base;

@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
 import UserProfileHeader from '@/components/UserProfileHeader'
 import QoidalarHeader from '@/components/QoidalarHeader'
 
@@ -26,6 +27,7 @@ function getSignImageUrl(imagePath) {
 export default function CategorySignsPage() {
   const router = useRouter()
   const params = useParams()
+  const { lang } = useLanguage()
   const categorySlug = params?.categorySlug || ''
 
   const [categories, setCategories] = useState([])
@@ -36,7 +38,7 @@ export default function CategorySignsPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/signs?lang=uzl`)
+      const res = await fetch(`${API_URL}/api/rules/signs?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       const cats = data.categories || []
@@ -56,7 +58,7 @@ export default function CategorySignsPage() {
     } finally {
       setLoading(false)
     }
-  }, [categorySlug])
+  }, [categorySlug, lang])
 
   useEffect(() => {
     fetchData()

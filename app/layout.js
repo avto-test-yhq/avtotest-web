@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
       <head>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
       </head>
-      <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
+      <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} font-sans selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <ExamSettingsProvider>
           <ThemeProviderWrapper>
