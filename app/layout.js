@@ -1,8 +1,8 @@
 import './globals.css'
 import { Inter, Outfit, Plus_Jakarta_Sans } from 'next/font/google'
-import Script from 'next/script'
 import ThemeProviderWrapper from './ThemeProviderWrapper'
 import { ExamSettingsProvider } from '@/context/ExamSettingsContext'
+import AosInit from '@/components/AosInit'
 
 
 const inter = Inter({
@@ -51,10 +51,7 @@ export default function RootLayout({ children }) {
             {children}
           </ThemeProviderWrapper>
         </ExamSettingsProvider>
-        <Script src="https://unpkg.com/aos@2.3.1/dist/aos.js" strategy="afterInteractive" />
-        <Script id="aos-init" strategy="afterInteractive">
-          {`AOS.init({ duration: 800, once: true, offset: 50 });`}
-        </Script>
+        <AosInit />
       </body>
     </html>
   )

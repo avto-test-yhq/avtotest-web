@@ -13,6 +13,8 @@ import { useExamSettings } from '@/context/ExamSettingsContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
+import ExamResult from '@/components/ExamResult'
+import FeedbackModal from '@/components/FeedbackModal'
 
 
 // Ikonkalar (O'zgarishsiz)
@@ -21,6 +23,7 @@ const Icons = {
   ArrowRight: () => <path d="M5 12h14m-7 7l7-7-7-7" />,
   Bulb: () => <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548 5.478a1 1 0 01-.994.9h-4.286a1 1 0 01-.994-.9L5.5 12z" />,
   Play: () => <path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />,
+  Flag: () => <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />,
   Save: () => <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />,
   Check: () => <path d="M5 13l4 4L19 7" />,
   Close: () => <path d="M6 18L18 6M6 6l12 12" />,
@@ -60,6 +63,7 @@ function ExamContent() {
   const [showExplanation, setShowExplanation] = useState(false)
   const [lang, setLang] = useState(globalLang) // globalLang bilan sinxron (uzl, uzk, ru)
 
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [showFailModal, setShowFailModal] = useState(false)
   const [showTimeUp, setShowTimeUp] = useState(false) // Vaqt tugaganda
   const [reloadTrigger, setReloadTrigger] = useState(0)
@@ -692,25 +696,17 @@ function ExamContent() {
       )
     }
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/10 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t('exam.resultTitle')}</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-4">{t('exam.resultSubtitle')}</p>
-          <div className="text-4xl font-bold text-slate-900 dark:text-white mb-1">{stats.correct}/{questions.length}</div>
-          <p className="text-slate-500 dark:text-slate-400 mb-1">{t('exam.correctAnswer')}</p>
-          <div className={`text-3xl font-bold mb-4 ${finishPercent >= 85 ? 'text-emerald-500 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>{finishPercent}%</div>
-          <p className="text-slate-500 text-sm mb-1">{t('exam.incorrectLabel')}: {stats.incorrect} ta</p>
-          <p className="text-slate-400 text-sm mb-6">{t('exam.timeSpent')}: <span className="text-slate-900 dark:text-white font-semibold">{resultTimeStr}</span></p>
-          <div className="flex flex-col gap-3">
-            <button onClick={restartExam} className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-colors">
-              {t('exam.retryWork')}
-            </button>
-            <Link href="/dashboard" className="inline-flex items-center justify-center w-full py-3 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-900 dark:text-white font-medium border border-slate-200 dark:border-white/10 transition-colors">
-              {t('exam.gotoDashboard')}
-            </Link>
-          </div>
-        </div>
-      </div>
+      <ExamResult
+        questions={questions}
+        answers={answers}
+        stats={stats}
+        timeSpent={elapsedSecondsForResult}
+        mode={mode}
+        onRetry={restartExam}
+        title={t('exam.resultTitle') || 'Natijalar'}
+        subtitle={mode === 'favorites' ? 'Saqlanganlar' : mode === 'mistakes' ? 'Xatolar' : mode === 'real' ? 'Haqiqiy Imtihon' : 'Tasodifiy'}
+        ticketNumber={mode !== 'favorites' && mode !== 'mistakes' && mode !== 'real' ? countParam : null}
+      />
     )
   }
 
@@ -771,7 +767,7 @@ function ExamContent() {
               className="rounded-lg object-contain"
             />
             <div className="hidden sm:flex flex-col leading-tight">
-               <h1 className="font-heading text-base md:text-lg font-bold text-slate-900 dark:text-white">
+              <h1 className="font-heading text-base md:text-lg font-bold text-slate-900 dark:text-white">
                 Pravachi<span className="text-brand-cyan">UZ</span>
               </h1>
               <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400">{t('exam.drivingTest')}</p>
@@ -856,9 +852,18 @@ function ExamContent() {
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-8 h-8 rounded-full bg-white/10 items-center justify-center border border-white/20">
           <span className="text-sm font-bold text-white">?</span>
         </div>
-        <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-5xl mx-auto">
+
+        <h2 className="question-bar-text w-full text-center text-base md:text-xl font-medium text-white leading-relaxed max-w-4xl mx-auto px-10">
           {currentQuestion.question}
         </h2>
+
+        <button
+          onClick={() => setShowFeedbackModal(true)}
+          className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-transparent hover:border-white/20 transition-all cursor-pointer"
+          title={t('feedback.title')}
+        >
+          <Icon name="Flag" className="w-4 h-4" />
+        </button>
       </div>
 
       {/* MAIN CONTENT */}
@@ -1016,6 +1021,14 @@ function ExamContent() {
         </button>
       </footer>
       <ExamSettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        context={{
+          questionId: currentQuestion?.numeric_id || currentQuestion?.id,
+          questionText: currentQuestion?.question
+        }}
+      />
     </div>
   )
 }

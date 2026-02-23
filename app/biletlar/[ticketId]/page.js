@@ -11,6 +11,8 @@ import { useExamSettings } from '@/context/ExamSettingsContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
+import ExamResult from '@/components/ExamResult'
+import FeedbackModal from '@/components/FeedbackModal'
 
 const QUESTIONS_PER_TICKET = 10
 
@@ -20,6 +22,7 @@ const Icons = {
   Bulb: () => <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548 5.478a1 1 0 01-.994.9h-4.286a1 1 0 01-.994-.9L5.5 12z" />,
   Check: () => <path d="M5 13l4 4L19 7" />,
   Close: () => <path d="M6 18L18 6M6 6l12 12" />,
+  Flag: () => <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />,
   Correct: () => <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
   Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
 }
@@ -56,6 +59,7 @@ export default function BiletTicketPage() {
 
   const [questions, setQuestions] = useState([])
   const [lang, setLang] = useState(globalLang) // globalLang bilan sinxron (uzl, uzk, ru)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
@@ -442,40 +446,30 @@ export default function BiletTicketPage() {
 
   const finishPercent = questions.length > 0 ? Math.round((stats.correct / questions.length) * 100) : 0
 
+  const handleNextTicket = () => {
+    // 70 is arbitrary total, usually ticket index increases
+    router.push(`/biletlar/${ticketId + 1}`)
+  }
+
+  const handleRetryTicket = () => {
+    // Refresh current ticket
+    window.location.reload()
+  }
+
   if (isFinished) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white flex flex-col items-center justify-center p-6">
-        <div className="rounded-2xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/5 p-8 max-w-md w-full text-center shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-brand-cyan/20 flex items-center justify-center mx-auto mb-6">
-            <svg className="w-8 h-8 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-1">Bilet #{ticketId} yakunlandi</h2>
-          <p className="text-slate-500 text-sm mb-6">{t('bilet.allAnswered')}</p>
-          <div className="flex items-center justify-center gap-6 mb-6">
-            <div>
-              <div className="text-3xl font-bold text-brand-cyan">{finishPercent}%</div>
-              <p className="text-xs text-slate-500">Natija</p>
-            </div>
-            <div className="w-px h-12 bg-slate-200 dark:bg-white/10" />
-            <div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white">{stats.correct}<span className="text-slate-500 font-normal">/{questions.length}</span></div>
-              <p className="text-xs text-slate-500">To&apos;g&apos;ri javob</p>
-            </div>
-            <div className="w-px h-12 bg-slate-200 dark:bg-white/10" />
-            <div>
-              <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono">{resultTimeStr}</div>
-              <p className="text-xs text-slate-500">{t('tarix.time')}</p>
-            </div>
-          </div>
-          <Link
-            href="/biletlar"
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl bg-brand-cyan/20 hover:bg-brand-cyan/30 text-brand-cyan font-semibold transition-colors"
-          >
-            Biletlar ro&apos;yxatiga qaytish
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
-          </Link>
-        </div>
-      </div>
+      <ExamResult
+        questions={questions}
+        answers={answers}
+        stats={stats}
+        timeSpent={resultElapsedSeconds}
+        mode="bilet"
+        onRetry={handleRetryTicket}
+        onNextTicket={ticketId < 70 ? handleNextTicket : null}
+        title={`Bilet #${ticketId} Natijalari`}
+        subtitle="Biletlar"
+        ticketNumber={ticketId}
+      />
     )
   }
 
@@ -555,9 +549,16 @@ export default function BiletTicketPage() {
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/10 dark:bg-brand-cyan/20 items-center justify-center">
           <span className="text-brand-cyan font-bold">?</span>
         </div>
-        <h2 className="w-full text-center text-base md:text-lg font-medium text-slate-800 dark:text-white leading-relaxed max-w-5xl mx-auto">
+        <h2 className="w-full text-center text-base md:text-lg font-medium text-slate-800 dark:text-white leading-relaxed max-w-4xl mx-auto px-10">
           {currentQuestion.question}
         </h2>
+        <button
+          onClick={() => setShowFeedbackModal(true)}
+          className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-brand-cyan transition-colors"
+          title={t('feedback.title')}
+        >
+          <Icon name="Flag" className="w-4 h-4" />
+        </button>
       </div>
 
       <main className="flex-1 flex overflow-hidden relative">
@@ -682,6 +683,15 @@ export default function BiletTicketPage() {
         </button>
       </footer>
       <ExamSettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+        context={{
+          questionId: currentQuestion?.numeric_id || currentQuestion?.id,
+          ticketId: ticketId,
+          questionText: currentQuestion?.question
+        }}
+      />
     </div>
   )
 }

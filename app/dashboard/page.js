@@ -8,7 +8,9 @@ import { auth } from '@/lib/firebase'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
+import UserProfileHeader from '@/components/UserProfileHeader'
 import WeeklyChart from '@/components/WeeklyChart'
+import FeedbackModal from '@/components/FeedbackModal'
 import { useI18n } from '@/lib/i18n'
 import {
   Car,
@@ -28,6 +30,7 @@ import {
   LogOut,
   ChevronRight,
   Play,
+  MessageSquare,
 } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
@@ -61,6 +64,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('Foydalanuvchi')
   const [examModalOpen, setExamModalOpen] = useState(false)
   const [examModalType, setExamModalType] = useState(null) // 'standard' | 'real'
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [biletlarProgress, setBiletlarProgress] = useState({ completed: 0, totalCorrect: 0, percent: 0 })
   const [favoritesCount, setFavoritesCount] = useState(0)
   const [mistakesCount, setMistakesCount] = useState(0)
@@ -267,7 +271,7 @@ export default function DashboardPage() {
       {/* SIDEBAR – desktop */}
       <aside className="dashboard-sidebar hidden md:flex flex-col flex-shrink-0 z-20">
         <div className="p-6 flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/dashboard" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-white/30 dark:border-slate-800 shadow-lg shadow-primary/20 overflow-hidden flex items-center justify-center">
               <Image
                 src="/imgage/avtotest-logo.png"
@@ -306,9 +310,16 @@ export default function DashboardPage() {
           <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mt-8 mb-2">
             {t('dashboard.system')}
           </p>
-          <Link href="/" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
+          <button
+            onClick={() => setShowFeedbackModal(true)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400 text-left"
+          >
+            <MessageSquare className="w-5 h-5" />
+            <span>{t('feedback.title')}</span>
+          </button>
+          <Link href="/profil" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <SettingsIcon className="w-5 h-5" />
-            <span>{t('dashboard.system.settings')}</span>
+            <span>{t('dashboard.system.settings') || 'Profil Sozlamalari'}</span>
           </Link>
         </nav>
         <div className="p-4 mt-auto">
@@ -333,9 +344,9 @@ export default function DashboardPage() {
               <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <span>{t('dashboard.premium')}</span>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 border-2 border-white dark:border-slate-800">
-              {userName.charAt(0).toUpperCase()}
-            </div>
+
+            {/* NEW DROPDOWN AVATAR COMPONENT */}
+            <UserProfileHeader />
           </div>
         </header>
 
@@ -629,7 +640,7 @@ export default function DashboardPage() {
         <Link href="/mistakes" className="dashboard-nav-link p-2">
           <Medal className="dashboard-nav-icon !size-10" />
         </Link>
-        <Link href="/" className="dashboard-nav-link p-2">
+        <Link href="/profil" className="dashboard-nav-link p-2">
           <SettingsIcon className="dashboard-nav-icon !size-10" />
         </Link>
       </nav>
@@ -699,6 +710,11 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      <FeedbackModal
+        isOpen={showFeedbackModal}
+        onClose={() => setShowFeedbackModal(false)}
+      />
     </div>
   )
 }

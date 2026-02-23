@@ -10,18 +10,18 @@ import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
 import { useI18n } from '@/lib/i18n'
+import { format, isToday, isYesterday, parseISO } from 'date-fns'
+import { uz } from 'date-fns/locale'
 
 const Icon = ({ name, className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     {name === 'ArrowLeft' && <path d="M19 12H5m7 7l-7-7 7-7" />}
     {name === 'Clock' && <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
+    {name === 'ChevronRight' && <path d="M9 5l7 7-7 7" />}
+    {name === 'CheckCircle' && <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />}
+    {name === 'Cancel' && <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />}
   </svg>
 )
-
-function formatDate(dateStr) {
-  const [y, m, d] = dateStr.split('-')
-  return `${d.padStart(2, '0')}.${m.padStart(2, '0')}.${y}`
-}
 
 function formatDuration(seconds) {
   const m = Math.floor(seconds / 60)
@@ -30,30 +30,30 @@ function formatDuration(seconds) {
 }
 
 function getTypeLabel(type, t) {
-  const map = { standart: 'tarix.typeStandart', haqiqiy: 'tarix.typeReal', favorites: 'tarix.typeFavorites', mistakes: 'tarix.typeMistakes', bilet: 'tarix.typeBilet' }
+  const map = { standart: 'tarix.typeStandart', haqiqiy: 'tarix.typeReal', favorites: 'tarix.typeFavorites', mistakes: 'tarix.typeMistakes', bilet: 'Biletlar' }
   return map[type] ? t(map[type]) : type
 }
 
+function getDateLabel(dateStr) {
+  const dateObj = parseISO(dateStr)
+  if (isToday(dateObj)) return 'Bugun'
+  if (isYesterday(dateObj)) return 'Kecha'
+  return format(dateObj, 'dd.MM.yyyy')
+}
+
 function StatusBadge({ status, t }) {
-  if (status === 'otmadi') {
+  if (status === 'otmadi' || status === 'bekor') {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 text-[10px] font-semibold">
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        {t('tarix.statusFailed')}
-      </span>
-    )
-  }
-  if (status === 'bekor') {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-500/20 text-slate-400 text-[10px] font-semibold">
-        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-        {t('tarix.statusCancelled')}
+      <span className="px-3 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider">
+        <Icon name="Cancel" className="w-4 h-4" />
+        {status === 'otmadi' ? t('tarix.statusFailed') : 'Bekor qilindi'}
       </span>
     )
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
-      {t('tarix.statusCompleted')}
+    <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider">
+      <Icon name="CheckCircle" className="w-4 h-4" />
+      Yakunlandi
     </span>
   )
 }
@@ -106,69 +106,61 @@ export default function TarixPage() {
   }, [router, fetchHistory])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#161821] page-bg text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 flex flex-col font-display transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 flex flex-col min-h-screen">
         <QoidalarHeader title={t('tarix.title')} />
 
-        <header className="px-4 lg:px-8 bg-white dark:bg-[#1e2130] header-bg border-b border-slate-200 dark:border-white/5 shrink-0 py-3 flex items-center justify-between transition-colors duration-200">
-          <div className="flex items-center gap-2">
-            <Link href="/statistika" className="hidden md:block px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-xs font-medium text-brand-cyan hover:bg-slate-200 dark:hover:bg-[#35394b] transition-colors">
-              {t('tarix.stats')}
-            </Link>
-            <Link href="/statistika" className="md:hidden p-2 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-brand-cyan hover:bg-slate-200 dark:hover:bg-[#35394b]">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-            </Link>
+        <header className="h-16 lg:h-20 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md z-10 sticky top-0 transition-colors">
+          <div className="flex items-center gap-4">
+            {/* Invisible spacer since sidebar overlaps header text on desktop */}
+            <div className="hidden lg:block"></div>
           </div>
+          <div className="flex items-center gap-4 w-full justify-between lg:justify-end">
+            <div className="relative z-30 ml-4 lg:ml-0 group w-full max-w-[200px] lg:w-auto">
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="appearance-none w-full bg-slate-100 dark:bg-[#1e293b] border-none rounded-xl px-4 py-2 pr-10 focus:ring-2 focus:ring-brand-cyan text-sm font-medium cursor-pointer text-slate-700 dark:text-slate-200 transition-colors"
+                style={{ backgroundImage: "none" }}
+              >
+                <option value="all">{t('tarix.filterAll')}</option>
+                <option value="standart">{t('tarix.typeStandart')}</option>
+                <option value="haqiqiy">{t('tarix.typeReal')}</option>
+                <option value="bilet">Biletlar</option>
+              </select>
+              <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+            </div>
 
-          <div className="flex items-center gap-3 ml-auto">
-            <div className="relative group z-30">
-              <button className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/10 text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1 hover:text-slate-900 dark:hover:text-white transition-colors">
-                {filterType === 'all' ? t('tarix.filterAll') : getTypeLabel(filterType, t)}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden hidden group-hover:block transition-all z-50">
-                {[
-                  { label: t('tarix.filterAll'), value: 'all' },
-                  { label: t('tarix.typeStandart'), value: 'standart' },
-                  { label: t('tarix.typeReal'), value: 'haqiqiy' },
-                  { label: t('tarix.typeBilet'), value: 'bilet' },
-                  { label: t('tarix.typeFavorites'), value: 'favorites' },
-                  { label: t('tarix.typeMistakes'), value: 'mistakes' },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterType(opt.value)}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${filterType === opt.value ? 'text-brand-cyan bg-slate-50 dark:bg-white/5' : 'text-slate-600 dark:text-slate-400'}`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+            <div className="flex-shrink-0">
+              <ThemeToggle size="sm" />
             </div>
           </div>
         </header>
 
-        {/* Tabs */}
-        <div className="flex border-b border-slate-200 dark:border-white/5 bg-white dark:bg-[#1e2130] px-4 transition-colors duration-200">
-          <button
-            onClick={() => setActiveTab('imtihonlar')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'imtihonlar' ? 'border-brand-cyan text-brand-cyan dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-              }`}
-          >
-            {t('tarix.tabExams')}
-          </button>
-          <button
-            onClick={() => setActiveTab('savollar')}
-            className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'savollar' ? 'border-brand-cyan text-brand-cyan dark:text-white' : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
-              }`}
-          >
-            {t('tarix.tabQuestions')}
-          </button>
-        </div>
+        <main className="flex-1 overflow-y-auto w-full max-w-5xl mx-auto p-4 lg:p-8">
+          <div className="flex gap-2 mb-8 bg-slate-100 dark:bg-[#1e293b] p-1 rounded-2xl w-fit transition-colors">
+            <button
+              onClick={() => setActiveTab('imtihonlar')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'imtihonlar'
+                ? 'bg-brand-cyan text-white shadow-lg shadow-brand-cyan/20'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+                }`}
+            >
+              Imtihonlar
+            </button>
+            <button
+              onClick={() => setActiveTab('savollar')}
+              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'savollar'
+                ? 'bg-brand-cyan text-white shadow-lg shadow-brand-cyan/20'
+                : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+                }`}
+            >
+              Savollar
+            </button>
+          </div>
 
-        <main className="flex-1 px-4 py-6 overflow-y-auto w-full max-w-5xl mx-auto">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-slate-400">
               <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-brand-cyan animate-spin" />
@@ -180,53 +172,80 @@ export default function TarixPage() {
                 <Link href="/dashboard" className="text-brand-cyan hover:underline">{t('tarix.gotoDashboard')}</Link>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-10">
                 {filteredAttempts.map(({ date, items }) => (
-                  <div key={date}>
-                    <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 ml-1">{formatDate(date)}</h3>
-                    <div className="space-y-3">
-                      {items.map((item) => (
-                        <Link
-                          key={item.id}
-                          href={`/tarix/${item.id}`}
-                          className="block rounded-xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/5 p-4 hover:border-brand-cyan/30 transition-colors shadow-sm hover:shadow-md"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <StatusBadge status={item.status} t={t} />
-                            <div className="text-right">
-                              <p className="text-sm font-medium text-slate-900 dark:text-white">{getTypeLabel(item.type, t)}</p>
-                              <p className="text-xs text-slate-500">{item.time}</p>
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-xs text-slate-500 mb-1">{t('tarix.ball')}</p>
-                              <p className="text-slate-900 dark:text-white font-semibold">{item.correct} / {item.total}</p>
-                              <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-                                <div
-                                  className="h-full rounded-full bg-blue-500"
-                                  style={{ width: `${item.total > 0 ? (item.correct / item.total) * 100 : 0}%` }}
-                                />
+                  <section key={date} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                      {getDateLabel(date) === 'Bugun' && <span className="w-2 h-2 bg-brand-cyan rounded-full animate-pulse" />}
+                      {getDateLabel(date)}
+                    </h2>
+                    <div className="grid gap-4">
+                      {items.map((item) => {
+                        const isCanceled = item.status === 'otmadi' || item.status === 'bekor';
+                        const percentage = item.total > 0 ? Math.round((item.correct / item.total) * 100) : 0;
+                        const barWidth = isCanceled ? 0 : Math.max(5, percentage);
+
+                        return (
+                          <Link
+                            href={`/tarix/${item.id || item._id}`}
+                            key={item.id || item._id}
+                            className={`bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 transition-all group cursor-pointer ${isCanceled ? 'opacity-60 hover:opacity-100 hover:shadow-xl hover:shadow-rose-500/5' : 'hover:shadow-xl hover:shadow-brand-cyan/5'
+                              }`}
+                          >
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                              <div className="flex-1">
+                                <div className="flex flex-wrap items-center gap-2 mb-4">
+                                  <StatusBadge status={item.status} t={t} />
+                                  <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                    {getTypeLabel(item.type, t)}
+                                  </span>
+                                  <span className="text-sm text-slate-400 ml-auto md:ml-0 font-mono">{item.time}</span>
+                                </div>
+                                <div className="flex items-end gap-2 md:mb-2">
+                                  <div className="flex flex-col w-24 flex-shrink-0">
+                                    <span className="text-xs text-slate-400 font-medium uppercase tracking-tight mb-1">Ball</span>
+                                    <div className="flex items-baseline gap-1 font-mono">
+                                      <span className={`text-4xl font-bold ${isCanceled ? 'text-slate-400 dark:text-slate-500' : 'text-brand-cyan'}`}>
+                                        {isCanceled ? 0 : item.correct}
+                                      </span>
+                                      <span className="text-xl text-slate-400">/ {item.total}</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex-1 ml-2 md:ml-6 mb-3">
+                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                      <div
+                                        className={`h-full rounded-full transition-all duration-1000 ${isCanceled ? 'bg-slate-300 dark:bg-slate-700' : 'bg-brand-cyan'}`}
+                                        style={{ width: `${barWidth}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-between md:justify-end gap-4 md:gap-8 md:px-6 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
+                                <div className="text-right">
+                                  <span className="block text-xs text-slate-400 uppercase font-semibold">Davomiylik</span>
+                                  <div className="flex items-center justify-end gap-2 mt-1">
+                                    <Icon name="Clock" className="text-slate-400 text-lg w-5 h-5" />
+                                    <span className="text-lg md:text-xl font-bold font-mono">{formatDuration(item.durationSeconds)}</span>
+                                  </div>
+                                </div>
+                                <div className={`w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center transition-colors ${isCanceled ? 'group-hover:bg-rose-500 group-hover:text-white' : 'group-hover:bg-brand-cyan group-hover:text-white'
+                                  }`}>
+                                  <Icon name="ChevronRight" className="w-6 h-6 ml-0.5" />
+                                </div>
                               </div>
                             </div>
-                            <div>
-                              <p className="text-xs text-slate-500 mb-1">{t('tarix.duration')}</p>
-                              <p className="text-slate-900 dark:text-white font-semibold flex items-center gap-1">
-                                <Icon name="Clock" className="w-4 h-4 text-slate-400" />
-                                {formatDuration(item.durationSeconds)}
-                              </p>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                          </Link>
+                        )
+                      })}
                     </div>
-                  </div>
+                  </section>
                 ))}
               </div>
             )
           ) : (
             <div className="text-center py-16 text-slate-400">
-              <p>{t('tarix.soon')}</p>
+              <p>Ushbu bo'lim hozircha mavjud emas.</p>
             </div>
           )}
         </main>

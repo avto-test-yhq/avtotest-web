@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ThemeToggle from './ThemeToggle'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useI18n } from '@/lib/i18n'
@@ -10,6 +10,13 @@ import { useI18n } from '@/lib/i18n'
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const t = useI18n()
+  const [logoHref, setLogoHref] = useState('/')
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('isLoggedIn') === 'true') {
+      setLogoHref('/dashboard')
+    }
+  }, [])
 
   return (
     <nav className="fixed top-0 w-full z-50 transition-all duration-300 glass-dark border-b border-white/5">
@@ -18,14 +25,14 @@ export default function Navbar() {
         <div className="flex justify-end items-center h-10 border-b border-white/5">
           <LanguageSwitcher size="sm" />
         </div>
-        
+
         {/* Main Navbar */}
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center cursor-pointer group" data-aos="fade-down">
-            <Image 
-              src="/imgage/avtotest-logo.png" 
-              alt="Logo" 
+          <Link href={logoHref} className="flex items-center cursor-pointer group" data-aos="fade-down">
+            <Image
+              src="/imgage/avtotest-logo.png"
+              alt="Logo"
               width={40}
               height={40}
               className="mr-3 object-contain group-hover:scale-110 transition-transform duration-300"
@@ -62,9 +69,9 @@ export default function Navbar() {
               <span className="hidden sm:inline">Boshlash</span>
               <span className="sm:hidden">Start</span>
             </Link>
-            
+
             {/* Mobile Menu Button */}
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full bg-night-800/50 hover:bg-night-800 border border-white/5 text-slate-400 hover:text-white transition-all"
             >
@@ -81,7 +88,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-white/5 bg-night-900/95 backdrop-blur-xl" id="mobile-menu">
