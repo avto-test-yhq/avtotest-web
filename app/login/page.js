@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
 
 // Firebase importlari
@@ -402,29 +403,38 @@ export default function LoginPage() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle size="sm" />
       </div>
-      <div className="fixed inset-0 bg-night-950 pointer-events-none z-0 page-bg">
+      <div className="fixed inset-0 bg-slate-50 dark:bg-night-950 pointer-events-none z-0 page-bg">
          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10"></div>
-         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/20 rounded-full blur-[128px] animate-pulse"></div>
-         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-purple/20 rounded-full blur-[128px]"></div>
+         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-brand-blue/10 dark:bg-brand-blue/20 rounded-full blur-[128px] animate-pulse"></div>
+         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-brand-purple/10 dark:bg-brand-purple/20 rounded-full blur-[128px]"></div>
       </div>
 
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative z-10 font-sans text-slate-200">
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 relative z-10 font-sans text-slate-900 dark:text-slate-200">
         <div className="w-full max-w-md">
           
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex flex-col items-center cursor-pointer group mb-4">
-              <div className="w-16 h-16 bg-gradient-to-tr from-brand-blue to-brand-cyan rounded-2xl flex items-center justify-center shadow-lg shadow-brand-blue/20 mb-3 group-hover:scale-110 transition-transform">
-                 <span className="text-3xl">🚗</span> 
+              <div className="w-20 h-20 rounded-3xl bg-white/90 dark:bg-night-900/80 border border-slate-200/70 dark:border-white/10 flex items-center justify-center shadow-lg shadow-slate-300/40 dark:shadow-brand-blue/20 mb-3 overflow-hidden transition-transform group-hover:scale-105">
+                <div className="relative w-14 h-14">
+                  <Image
+                    src="/imgage/avtotest-logo.png"
+                    alt="AvtoTest AI"
+                    fill
+                    className="object-contain transition-transform duration-300 group-hover:scale-110"
+                  />
+                </div>
               </div>
-              <span className="font-heading font-bold text-3xl text-white tracking-tight">
+              <span className="font-heading font-bold text-3xl tracking-tight text-slate-900 dark:text-white">
                 AvtoTest <span className="text-brand-cyan">AI</span>
               </span>
             </Link>
-            <h1 className="font-medium text-lg text-slate-300">Haydovchilik guvohnomasi imtihoniga tayyorgarlik</h1>
+            <h1 className="font-medium text-lg text-slate-600 dark:text-slate-300">
+              Haydovchilik guvohnomasi imtihoniga tayyorgarlik
+            </h1>
           </div>
 
-          <div className="glass-card bg-night-900/60 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl relative overflow-hidden">
-            <h2 className="text-xl font-bold text-white mb-6 text-center">
+          <div className="glass-card bg-white/90 dark:bg-night-900/60 backdrop-blur-xl rounded-3xl p-8 border border-slate-200/80 dark:border-white/10 shadow-2xl relative overflow-hidden">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6 text-center">
               {viewMode === 'complete-profile' ? "Ma'lumotlaringiz" : "Tizimga kirish"}
             </h2>
 
@@ -437,13 +447,13 @@ export default function LoginPage() {
             {/* 1. LOGIN: Telefon + Parol → Kirish → yoki → Google → Parolni unutdim */}
             {viewMode === 'login-pass' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">TELEFON RAQAM</label>
-                <div className="flex bg-night-800 rounded-xl border border-white/10 overflow-hidden mb-4 focus-within:border-brand-blue/50 transition-colors">
-                  <span className="py-3.5 pl-4 pr-2 text-slate-400 bg-night-900/50 border-r border-white/5 flex items-center select-none w-[120px]">🇺🇿 +998</span>
-                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-white w-full py-3 px-3 outline-none font-medium placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">TELEFON RAQAM</label>
+                <div className="flex bg-slate-50 dark:bg-night-800 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden mb-4 focus-within:border-brand-blue/50 transition-colors">
+                  <span className="py-3.5 pl-4 pr-2 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-night-900/50 border-r border-slate-200 dark:border-white/5 flex items-center select-none w-[120px]">🇺🇿 +998</span>
+                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-slate-900 dark:text-white w-full py-3 px-3 outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 </div>
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">PAROL</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">PAROL</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={handlePasswordLogin} disabled={loading || phone.replace(/\D/g, '').length < 9 || !password.trim()} className="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-blue/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mb-4">
                   {loading ? 'Kirilmoqda...' : 'Kirish'}
                 </button>
@@ -466,12 +476,12 @@ export default function LoginPage() {
                   )}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('reset-password'); setErrorMsg(''); setOtp(''); setNewPassword(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('reset-password'); setErrorMsg(''); setOtp(''); setNewPassword(''); }} className="text-xs text-brand-cyan hover:text-brand-blue dark:hover:text-white transition-colors">
                     Parolni unutdingizmi?
                   </button>
                 </div>
                 <div className="text-center mt-2">
-                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Email bilan kirish
                   </button>
                 </div>
@@ -481,20 +491,20 @@ export default function LoginPage() {
             {/* LOGIN EMAIL */}
             {viewMode === 'login-email' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">EMAIL</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">PAROL</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">EMAIL</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">PAROL</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={handleEmailLogin} disabled={loading || !email.trim() || !password.trim()} className="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all mb-4">
                   {loading ? 'Kirilmoqda...' : 'Kirish'}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('register'); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('register'); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-brand-blue dark:hover:text-white transition-colors">
                     Hisobingiz yo&apos;qmi? Ro&apos;yxatdan o&apos;ting
                   </button>
                 </div>
                 <div className="text-center mt-2">
-                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Telefon bilan kirish
                   </button>
                 </div>
@@ -504,17 +514,17 @@ export default function LoginPage() {
             {/* REGISTER EMAIL */}
             {viewMode === 'register' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">ISM (ixtiyoriy)</label>
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="To'liq ism" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">EMAIL</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">PAROL (kamida 6 belgi)</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">ISM (ixtiyoriy)</label>
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="To'liq ism" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">EMAIL</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@misol.uz" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">PAROL (kamida 6 belgi)</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Parol" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={handleRegister} disabled={loading || !email.trim() || password.length < 6} className="w-full bg-brand-cyan hover:bg-cyan-600 text-white font-bold py-3.5 rounded-xl transition-all mb-4">
                   {loading ? 'Ro\'yxatdan o\'tilmoqda...' : "Ro'yxatdan o'tish"}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('login-email'); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Hisobingiz bormi? Kirish
                   </button>
                 </div>
@@ -525,16 +535,16 @@ export default function LoginPage() {
             {viewMode === 'reset-password' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <p className="text-slate-400 text-sm text-center mb-4">Parolni tiklash uchun telefon raqamingizga kod yuboriladi.</p>
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">TELEFON RAQAM</label>
-                <div className="flex bg-night-800 rounded-xl border border-white/10 overflow-hidden mb-4">
-                  <span className="py-3.5 pl-4 pr-2 text-slate-400 bg-night-900/50 border-r border-white/5 w-[120px]">+998</span>
-                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-white w-full py-3 px-3 outline-none" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">TELEFON RAQAM</label>
+                <div className="flex bg-slate-50 dark:bg-night-800 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden mb-4">
+                  <span className="py-3.5 pl-4 pr-2 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-night-900/50 border-r border-slate-200 dark:border-white/5 w-[120px]">+998</span>
+                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-slate-900 dark:text-white w-full py-3 px-3 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 </div>
                 <button onClick={sendSmsCode} disabled={loading || phone.replace(/\D/g, '').length < 9} className="w-full bg-brand-blue text-white font-bold py-3.5 rounded-xl mb-4">
                   {loading ? 'Kod yuborilmoqda...' : 'Kod yuborish'}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Ortga
                   </button>
                 </div>
@@ -545,15 +555,15 @@ export default function LoginPage() {
             {viewMode === 'reset-password-code' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <p className="text-slate-400 text-xs mb-2">+998 {phone.replace(/\D/g, '')} raqamiga yuborilgan kod va yangi parolni kiriting.</p>
-                <label className="block text-xs font-bold text-slate-400 mb-2">SMS Kod</label>
-                <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" maxLength={4} disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 text-center text-xl tracking-widest mb-4 font-mono text-white" />
-                <label className="block text-xs font-bold text-slate-400 mb-2">Yangi parol (6+ belgi)</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Yangi parol" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white mb-4" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2">SMS Kod</label>
+                <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="0000" maxLength={4} disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 text-center text-xl tracking-widest mb-4 font-mono text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2">Yangi parol (6+ belgi)</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Yangi parol" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={handleResetPassword} disabled={loading || otp.length < 4 || newPassword.length < 6} className="w-full bg-brand-cyan text-white font-bold py-3.5 rounded-xl mb-4">
                   {loading ? 'Yangilanmoqda...' : 'Parolni yangilash'}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('reset-password'); setOtp(''); setNewPassword(''); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('reset-password'); setOtp(''); setNewPassword(''); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Raqamni o&apos;zgartirish
                   </button>
                 </div>
@@ -578,16 +588,16 @@ export default function LoginPage() {
                   <span className="px-3 text-xs text-slate-500 uppercase">yoki</span>
                   <div className="flex-1 h-px bg-white/10"></div>
                 </div>
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">TELEFON RAQAMINGIZ</label>
-                <div className="flex bg-night-800 rounded-xl border border-white/10 overflow-hidden mb-4 focus-within:border-brand-blue/50 transition-colors">
-                  <span className="py-3.5 pl-4 pr-2 text-slate-400 bg-night-900/50 border-r border-white/5 flex items-center select-none w-[120px]">🇺🇿 +998</span>
-                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-white w-full py-3 px-3 outline-none font-medium placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">TELEFON RAQAMINGIZ</label>
+                <div className="flex bg-slate-50 dark:bg-night-800 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden mb-4 focus-within:border-brand-blue/50 transition-colors">
+                  <span className="py-3.5 pl-4 pr-2 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-night-900/50 border-r border-slate-200 dark:border-white/5 flex items-center select-none w-[120px]">🇺🇿 +998</span>
+                  <input type="tel" value={phone} onChange={handlePhoneChange} placeholder="90 123 45 67" disabled={loading} className="bg-transparent text-slate-900 dark:text-white w-full py-3 px-3 outline-none font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 </div>
                 <button onClick={sendSmsCode} disabled={loading || phone.replace(/\D/g, '').length < 9} className="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-blue/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mb-4">
                   {loading ? 'SMS yuborilmoqda...' : "Ro'yxatdan o'tish"}
                 </button>
                 <div className="text-center">
-                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-400 hover:text-white transition-colors">
+                  <button type="button" onClick={() => { setViewMode('login-pass'); setErrorMsg(''); }} className="text-xs text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                     Ortga (Kirish sahifasiga)
                   </button>
                 </div>
@@ -598,12 +608,12 @@ export default function LoginPage() {
             {viewMode === 'verify-sms' && (
               <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
                 <p className="text-slate-400 text-xs mb-2">+998 {phone} raqamiga kod yuborildi</p>
-                <label className="block text-xs font-bold text-slate-400 mb-2">SMS Kod (4 xonali)</label>
-                <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))} disabled={loading} placeholder="0000" maxLength={4} autoFocus className="w-full bg-night-800 border border-white/10 rounded-xl py-3 text-center text-2xl tracking-[0.4em] mb-4 font-mono text-white outline-none focus:border-brand-cyan/50 transition-all placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2">SMS Kod (4 xonali)</label>
+                <input type="text" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))} disabled={loading} placeholder="0000" maxLength={4} autoFocus className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 text-center text-2xl tracking-[0.4em] mb-4 font-mono text-slate-900 dark:text-white outline-none focus:border-brand-cyan/50 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={verifyOtp} disabled={loading || otp.length < 4} className="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-blue/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mb-4">
                   {loading ? 'Tasdiqlanmoqda...' : 'Tasdiqlash'}
                 </button>
-                <button type="button" onClick={() => { setViewMode('phone-sms'); setOtp(''); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-white transition-colors">
+                <button type="button" onClick={() => { setViewMode('phone-sms'); setOtp(''); setErrorMsg(''); }} className="text-xs text-brand-cyan hover:text-brand-blue dark:hover:text-white transition-colors">
                   Raqamni o&apos;zgartirish
                 </button>
               </div>
@@ -613,12 +623,12 @@ export default function LoginPage() {
             {viewMode === 'complete-profile' && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                 <p className="text-slate-400 text-sm mb-4">Iltimos, ismingiz va yangi parol yarating.</p>
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">ISM</label>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ism" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">FAMILIYA</label>
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Familiya" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-600" />
-                <label className="block text-xs font-bold text-slate-400 mb-2 ml-1">YANGI PAROL</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Kamida 6 ta belgi" disabled={loading} className="w-full bg-night-800 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:border-brand-blue/50 mb-6 placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">ISM</label>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ism" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">FAMILIYA</label>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Familiya" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-4 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-2 ml-1">YANGI PAROL</label>
+                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Kamida 6 ta belgi" disabled={loading} className="w-full bg-slate-50 dark:bg-night-800 border border-slate-200 dark:border-white/10 rounded-xl py-3 px-4 text-slate-900 dark:text-white outline-none focus:border-brand-blue/50 mb-6 placeholder:text-slate-400 dark:placeholder:text-slate-600" />
                 <button onClick={completeProfile} disabled={loading || !firstName.trim() || !lastName.trim() || newPassword.length < 6} className="w-full bg-brand-cyan hover:bg-cyan-600 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-brand-cyan/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                   {loading ? 'Saqlanmoqda...' : 'Saqlash va Kirish'}
                 </button>
@@ -639,7 +649,7 @@ export default function LoginPage() {
                     setOtp('')
                     setErrorMsg('')
                   }}
-                  className="text-brand-cyan font-semibold ml-1 hover:text-white transition-colors"
+                  className="text-brand-cyan font-semibold ml-1 hover:text-brand-blue dark:hover:text-white transition-colors"
                 >
                   {['login-pass', 'login-email'].includes(viewMode) ? "Ro'yxatdan o'tish" : 'Kirish'}
                 </button>

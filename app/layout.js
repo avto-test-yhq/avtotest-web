@@ -43,6 +43,7 @@ export default function RootLayout({ children }) {
     <html lang="uz" className="scroll-smooth">
       <head>
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+        <link rel="icon" href="/imgage/avtotest-logo.png" />
       </head>
       <body className={`${inter.variable} ${outfit.variable} ${plusJakarta.variable} font-sans selection:bg-brand-cyan selection:text-night-950 transition-colors duration-300`}>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

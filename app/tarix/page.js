@@ -30,14 +30,24 @@ function formatDuration(seconds) {
 }
 
 function getTypeLabel(type, t) {
-  const map = { standart: 'tarix.typeStandart', haqiqiy: 'tarix.typeReal', favorites: 'tarix.typeFavorites', mistakes: 'tarix.typeMistakes', bilet: 'Biletlar' }
+  const map = {
+    standart: 'tarix.typeStandart',
+    haqiqiy: 'tarix.typeReal',
+    favorites: 'tarix.typeFavorites',
+    mistakes: 'tarix.typeMistakes',
+    bilet: 'tarix.typeBilet',
+  }
+  if (type.startsWith('bilet (')) {
+    const num = type.match(/\d+/)?.[0] || ''
+    return `${t('tarix.typeBilet')} (${num})`
+  }
   return map[type] ? t(map[type]) : type
 }
 
-function getDateLabel(dateStr) {
+function getDateLabel(dateStr, t) {
   const dateObj = parseISO(dateStr)
-  if (isToday(dateObj)) return 'Bugun'
-  if (isYesterday(dateObj)) return 'Kecha'
+  if (isToday(dateObj)) return t('tarix.today')
+  if (isYesterday(dateObj)) return t('tarix.yesterday')
   return format(dateObj, 'dd.MM.yyyy')
 }
 
@@ -46,14 +56,14 @@ function StatusBadge({ status, t }) {
     return (
       <span className="px-3 py-1 bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider">
         <Icon name="Cancel" className="w-4 h-4" />
-        {status === 'otmadi' ? t('tarix.statusFailed') : 'Bekor qilindi'}
+        {status === 'otmadi' ? t('tarix.statusFailed') : t('tarix.statusCancelled')}
       </span>
     )
   }
   return (
     <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider">
       <Icon name="CheckCircle" className="w-4 h-4" />
-      Yakunlandi
+      {t('tarix.statusCompleted')}
     </span>
   )
 }
@@ -71,6 +81,7 @@ export default function TarixPage() {
   const filteredAttempts = attempts.map(group => {
     const filteredItems = group.items.filter(item => {
       if (filterType === 'all') return true
+      if (filterType === 'bilet' && item.type.startsWith('bilet')) return true;
       return item.type === filterType
     })
     return { ...group, items: filteredItems }
@@ -128,7 +139,7 @@ export default function TarixPage() {
                 <option value="all">{t('tarix.filterAll')}</option>
                 <option value="standart">{t('tarix.typeStandart')}</option>
                 <option value="haqiqiy">{t('tarix.typeReal')}</option>
-                <option value="bilet">Biletlar</option>
+                <option value="bilet">{t('tarix.typeBilet')}</option>
               </select>
               <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
@@ -148,7 +159,7 @@ export default function TarixPage() {
                 : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
                 }`}
             >
-              Imtihonlar
+              {t('tarix.tabExams')}
             </button>
             <button
               onClick={() => setActiveTab('savollar')}
@@ -157,7 +168,7 @@ export default function TarixPage() {
                 : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
                 }`}
             >
-              Savollar
+              {t('tarix.tabQuestions')}
             </button>
           </div>
 
@@ -176,8 +187,10 @@ export default function TarixPage() {
                 {filteredAttempts.map(({ date, items }) => (
                   <section key={date} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                      {getDateLabel(date) === 'Bugun' && <span className="w-2 h-2 bg-brand-cyan rounded-full animate-pulse" />}
-                      {getDateLabel(date)}
+                      {getDateLabel(date, t) === t('tarix.today') && (
+                        <span className="w-2 h-2 bg-brand-cyan rounded-full animate-pulse" />
+                      )}
+                      {getDateLabel(date, t)}
                     </h2>
                     <div className="grid gap-4">
                       {items.map((item) => {
@@ -203,7 +216,9 @@ export default function TarixPage() {
                                 </div>
                                 <div className="flex items-end gap-2 md:mb-2">
                                   <div className="flex flex-col w-24 flex-shrink-0">
-                                    <span className="text-xs text-slate-400 font-medium uppercase tracking-tight mb-1">Ball</span>
+                                    <span className="text-xs text-slate-400 font-medium uppercase tracking-tight mb-1">
+                                      {t('tarix.ball')}
+                                    </span>
                                     <div className="flex items-baseline gap-1 font-mono">
                                       <span className={`text-4xl font-bold ${isCanceled ? 'text-slate-400 dark:text-slate-500' : 'text-brand-cyan'}`}>
                                         {isCanceled ? 0 : item.correct}
@@ -223,7 +238,9 @@ export default function TarixPage() {
                               </div>
                               <div className="flex items-center justify-between md:justify-end gap-4 md:gap-8 md:px-6 md:border-l border-slate-100 dark:border-slate-800 pt-4 md:pt-0 border-t md:border-t-0 mt-2 md:mt-0">
                                 <div className="text-right">
-                                  <span className="block text-xs text-slate-400 uppercase font-semibold">Davomiylik</span>
+                                  <span className="block text-xs text-slate-400 uppercase font-semibold">
+                                    {t('tarix.duration')}
+                                  </span>
                                   <div className="flex items-center justify-end gap-2 mt-1">
                                     <Icon name="Clock" className="text-slate-400 text-lg w-5 h-5" />
                                     <span className="text-lg md:text-xl font-bold font-mono">{formatDuration(item.durationSeconds)}</span>
@@ -245,7 +262,7 @@ export default function TarixPage() {
             )
           ) : (
             <div className="text-center py-16 text-slate-400">
-              <p>Ushbu bo'lim hozircha mavjud emas.</p>
+              <p>{t('tarix.soon')}</p>
             </div>
           )}
         </main>

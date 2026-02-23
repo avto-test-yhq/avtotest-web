@@ -9,7 +9,9 @@ import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
+import ExamSettingsModal from '@/components/ExamSettingsModal'
 import { useI18n } from '@/lib/i18n'
+import { useExamSettings } from '@/context/ExamSettingsContext'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
@@ -19,51 +21,72 @@ const defaultStats = { totalTickets: 61, totalBiletQuestions: 610 }
 export default function BiletlarPage() {
   const router = useRouter()
   const t = useI18n()
+  const { settings, loading: settingsLoading } = useExamSettings()
   const [progress, setProgress] = useState(defaultProgress)
   const [stats, setStats] = useState(defaultStats)
   const [loading, setLoading] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+
+  // Fetch logic extracted so we can call it after settings close
+  const fetchStatsAndProgress = async (uid, qCount) => {
+    try {
+      const [biletRes, masteryRes] = await Promise.all([
+        fetch(`${API_URL}/api/bilet-progress/${uid}?qCount=${qCount || 10}`),
+        fetch(`${API_URL}/api/mastery/${uid}`)
+      ])
+      if (biletRes.ok) {
+        const data = await biletRes.json()
+        setProgress({
+          completedTickets: data.completedTickets || [],
+          ticketResults: data.ticketResults || {},
+          totalCorrectAnswers: data.totalCorrectAnswers || 0
+        })
+      } else {
+        setProgress(defaultProgress)
+      }
+      if (masteryRes.ok) {
+        const m = await masteryRes.json()
+        setStats({
+          totalTickets: m.totalTickets || 61,
+          totalBiletQuestions: m.totalBiletQuestions || 610
+        })
+      } else {
+        setStats(defaultStats)
+      }
+    } catch (e) {
+      console.error('Ma\'lumot yuklashda xatolik:', e)
+      setProgress(defaultProgress)
+      setStats(defaultStats)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
+    if (settingsLoading) return
+
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         router.push('/login')
         return
       }
       setLoading(true)
-      try {
-        const [biletRes, masteryRes] = await Promise.all([
-          fetch(`${API_URL}/api/bilet-progress/${user.uid}`),
-          fetch(`${API_URL}/api/mastery/${user.uid}`)
-        ])
-        if (biletRes.ok) {
-          const data = await biletRes.json()
-          setProgress({
-            completedTickets: data.completedTickets || [],
-            ticketResults: data.ticketResults || {},
-            totalCorrectAnswers: data.totalCorrectAnswers || 0
-          })
-        } else {
-          setProgress(defaultProgress)
-        }
-        if (masteryRes.ok) {
-          const m = await masteryRes.json()
-          setStats({
-            totalTickets: m.totalTickets || 61,
-            totalBiletQuestions: m.totalBiletQuestions || 610
-          })
-        } else {
-          setStats(defaultStats)
-        }
-      } catch (e) {
-        console.error('Ma\'lumot yuklashda xatolik:', e)
-        setProgress(defaultProgress)
-        setStats(defaultStats)
-      } finally {
-        setLoading(false)
-      }
+      const qCount = settings?.questionCount || 10
+      await fetchStatsAndProgress(user.uid, qCount)
     })
     return () => unsub()
-  }, [router])
+  }, [router, settingsLoading, settings?.questionCount])
+
+  // Refetch when settings modal closes
+  useEffect(() => {
+    if (!showSettings && !settingsLoading) {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const qCount = settings?.questionCount || 10
+        fetchStatsAndProgress(currentUser.uid, qCount)
+      }
+    }
+  }, [showSettings, settingsLoading, settings?.questionCount])
 
   const completedCount = progress.completedTickets.length
   const totalCorrect = progress.totalCorrectAnswers
@@ -97,7 +120,18 @@ export default function BiletlarPage() {
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen">
-        <QoidalarHeader title={t('bilet.header.title')} />
+        <QoidalarHeader
+          title={t('bilet.header.title')}
+          beforeDashboard={
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center text-slate-600 dark:text-slate-400"
+              aria-label="Sozlamalar"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
+          }
+        />
 
         <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-10 pb-20">
           {/* Stats */}
@@ -225,6 +259,8 @@ export default function BiletlarPage() {
           </section>
         </main>
       </div>
+
+      <ExamSettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   )
 }

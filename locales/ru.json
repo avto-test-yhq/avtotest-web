@@ -1,5 +1,6 @@
 {
     "common.loading": "Загрузка...",
+    "common.count": "ШТ",
     "nav.dashboard": "Главная",
     "nav.rules": "Правила",
     "nav.tickets": "Билеты",
@@ -7,18 +8,15 @@
     "nav.questions": "Вопросы",
     "nav.login": "Войти",
     "nav.start": "Начать",
-
     "sidebar.rules": "Правила",
     "sidebar.tests": "Тесты",
     "sidebar.dashboard": "Дэшборд",
-
     "dashboard.welcome": "Добро пожаловать",
     "dashboard.premium": "Премиум аккаунт",
     "dashboard.menu": "Меню",
     "dashboard.system": "Система",
     "dashboard.system.settings": "Настройки",
     "dashboard.logout": "Выйти",
-
     "dashboard.stats": "Статистика",
     "dashboard.stats.allReports": "Все отчеты",
     "dashboard.stats.totalQuestions": "Всего вопросов",
@@ -26,32 +24,26 @@
     "dashboard.stats.efficiency": "Эффективность",
     "dashboard.stats.streak": "Серия дней",
     "dashboard.stats.history": "История посещений",
-
     "dashboard.practice": "Практика",
     "dashboard.practice.seeAll": "Посмотреть все",
     "dashboard.practice.byTickets": "По билетам",
     "dashboard.practice.desc": "Решайте каждый билет отдельно и системно закрепляйте знания.",
     "dashboard.practice.progress": "решено",
     "dashboard.practice.continue": "Продолжить",
-
     "dashboard.activity.standard.title": "Стандартный экзамен",
     "dashboard.activity.standard.desc": "10, 20 или 50 вопросов. Можно продолжать даже при ошибках.",
     "dashboard.activity.standard.cta": "Начать",
-
     "dashboard.activity.real.title": "Реальный экзамен",
     "dashboard.activity.real.desc": "20 вопросов. На 3-й ошибке экзамен останавливается.",
     "dashboard.activity.real.cta": "Начать",
-
     "dashboard.activity.mistakes.title": "Работа над ошибками",
     "dashboard.activity.mistakes.desc": "Просмотрите и разберите вопросы, в которых ошибались.",
     "dashboard.activity.mistakes.badge": "Ошибки",
     "dashboard.activity.mistakes.cta": "Очистить ошибки",
-
     "dashboard.activity.favorites.title": "Избранные вопросы",
     "dashboard.activity.favorites.desc": "Подборка сложных вопросов, отмеченных вами.",
     "dashboard.activity.favorites.badge": "Избранное",
     "dashboard.activity.favorites.cta": "Посмотреть",
-
     "dashboard.rules.cardTitle": "Правила",
     "dashboard.rules.all": "Все",
     "dashboard.rules.traffic.title": "ПДД Узбекистана",
@@ -66,7 +58,6 @@
     "dashboard.rules.other.desc": "Видео-уроки и документы",
     "dashboard.rules.note.title": "Примечание",
     "dashboard.rules.note.text": "Правила полностью обновлены по состоянию на 2024 год.",
-
     "rules.page.title": "Сборник правил",
     "rules.page.subtitle": "Выберите раздел для изучения",
     "rules.page.detail": "Подробнее",
@@ -92,10 +83,8 @@
     "rules.documents.desc": "Перечень документов, которые водитель должен иметь при себе.",
     "rules.documents.badge": "СПИСОК",
     "rules.examImportant": "Важно для экзамена",
-
     "weekly.title": "Серия (за неделю)",
     "weekly.subtitle": "Последние 7 дней",
-
     "bilet.header.title": "Практика по билетам",
     "bilet.stats.mastery": "Усвоение",
     "bilet.stats.correct": "Правильных ответов",
@@ -108,16 +97,14 @@
     "bilet.cta.start": "Начать",
     "bilet.allAnswered": "Все вопросы отвечены",
     "bilet.count": "билет",
-
+    "bilet.resultsTitle": "Результаты Билета #{num}",
     "exam.modal.standard.title": "Стандартный экзамен",
     "exam.modal.standard.desc": "Выберите количество вопросов. Экзамен не прерывается при ошибках — отвечайте на все вопросы.",
     "exam.modal.standard.badge": "Вопросов",
-
     "exam.modal.real.title": "Реальный экзамен",
     "exam.modal.real.desc": "20 вопросов. При 3-й ошибке экзамен завершится с результатом «Экзамен не сдан».",
     "exam.modal.real.start": "Начать",
     "exam.modal.cancel": "Отмена",
-
     "exam.viewExplanation": "Показать объяснение",
     "exam.hideExplanation": "Скрыть объяснение",
     "exam.explanation": "Объяснение",
@@ -142,7 +129,7 @@
     "exam.errorsCount": "Ошибки",
     "exam.retryBtn": "Повторить попытку",
     "exam.backToHome": "Вернуться на главную",
-
+    "exam.next": "Следующий",
     "stats.title": "Статистика вопросов",
     "stats.sortDate": "Последняя попытка",
     "stats.sortAttempts": "Чаще всего решаемые",
@@ -150,8 +137,9 @@
     "stats.noData": "Данные не найдены",
     "stats.correctAttempts": "правильно",
     "stats.attemptsLabel": "попыток",
-
     "tarix.title": "История",
+    "tarix.today": "Сегодня",
+    "tarix.yesterday": "Вчера",
     "tarix.stats": "Статистика вопросов",
     "tarix.filterAll": "Все типы",
     "tarix.tabExams": "Экзамены",
@@ -185,7 +173,6 @@
     "tarix.retry": "Повторить",
     "tarix.workMistakes": "Работа над ошибками",
     "tarix.notFound": "Данные не найдены",
-
     "mistakes.title": "Режим ошибок",
     "mistakes.countBadge": "ошибок",
     "mistakes.pageTitle": "Вопросы с ошибками",
@@ -197,7 +184,6 @@
     "mistakes.viewFull": "Подробнее",
     "mistakes.modalTitle": "Вопрос с неправильным ответом",
     "mistakes.explanation": "Объяснение",
-
     "feedback.title": "Оставить отзыв",
     "feedback.questionTitle": "Отзыв по вопросу",
     "feedback.placeholders.suggestion": "Предложение...",

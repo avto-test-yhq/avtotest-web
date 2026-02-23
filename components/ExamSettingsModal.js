@@ -37,7 +37,7 @@ export default function ExamSettingsModal({ isOpen, onClose }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        Sozlamalar
+                        Bilet sozlamalari
                     </h2>
                     <button
                         onClick={onClose}
@@ -54,30 +54,50 @@ export default function ExamSettingsModal({ isOpen, onClose }) {
                     ) : (
                         <>
                             <div className="space-y-4">
-                                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Imtihon</h3>
+                                <h3 className="text-sm font-bold text-brand-cyan">Savollar</h3>
+
+                                <div className="space-y-3 pb-2">
+                                    <label className="text-slate-900 dark:text-white font-bold text-base">Biletdagi savollar soni</label>
+                                    <div className="flex items-center rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-[#161821]">
+                                        {[10, 20, 50, 100, 150].map(count => (
+                                            <button
+                                                key={count}
+                                                onClick={() => setLocalSettings(prev => ({ ...prev, questionCount: count }))}
+                                                className={`flex-1 py-3 text-sm font-bold transition-all border-r last:border-r-0 border-slate-200 dark:border-white/10 flex justify-center items-center gap-2 ${localSettings.questionCount === count
+                                                        ? 'bg-slate-200 dark:bg-[#35394b] text-slate-900 dark:text-white'
+                                                        : 'text-slate-500 hover:bg-slate-200/50 dark:hover:bg-white/5'
+                                                    }`}
+                                            >
+                                                {localSettings.questionCount === count && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>}
+                                                {count}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <ToggleRow
-                                    label="Avtomatik o'tish"
-                                    desc="Javobdan so'ng keyingi savolga o'tish"
-                                    value={localSettings.autoNext}
-                                    onChange={() => handleToggle('autoNext')}
-                                />
-                                <ToggleRow
-                                    label="Izohni ko'rsatish"
-                                    desc="Har bir savolga izohni darhol ochish"
-                                    value={localSettings.showExplanation}
-                                    onChange={() => handleToggle('showExplanation')}
-                                />
-                                <ToggleRow
-                                    label="Variantlarni aralashtirish"
-                                    desc="Javob variantlari o'rnini almashtirish"
+                                    label="Savollarni aralashtirish"
+                                    desc="Har safar savollar tartibini o'zgartirish"
                                     value={localSettings.shuffleOptions}
                                     onChange={() => handleToggle('shuffleOptions')}
                                 />
                                 <ToggleRow
+                                    label="Avtomatik keyingisiga o'tish"
+                                    desc="To'g'ri javobdan keyin avtomatik o'tish"
+                                    value={localSettings.autoNext}
+                                    onChange={() => handleToggle('autoNext')}
+                                />
+                                <ToggleRow
                                     label="To'g'ri javobni ko'rsatish"
-                                    desc="Xato qilganda to'g'ri javobni ko'rsatish"
+                                    desc="Noto'g'ri javobda to'g'ri javobni ko'rsatish"
                                     value={localSettings.showCorrect}
                                     onChange={() => handleToggle('showCorrect')}
+                                />
+                                <ToggleRow
+                                    label="Izohni ko'rsatish"
+                                    desc="Savolni ko'rishda izohni darhol ko'rsatish"
+                                    value={localSettings.showExplanation}
+                                    onChange={() => handleToggle('showExplanation')}
                                 />
                             </div>
 

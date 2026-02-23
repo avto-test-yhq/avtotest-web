@@ -32,23 +32,29 @@ function formatDuration(seconds) {
 }
 
 function getTypeLabel(type, t) {
-    const map = { standart: 'tarix.typeStandart', haqiqiy: 'tarix.typeReal', favorites: 'tarix.typeFavorites', mistakes: 'tarix.typeMistakes', bilet: 'Biletlar' }
+    const map = {
+        standart: 'tarix.typeStandart',
+        haqiqiy: 'tarix.typeReal',
+        favorites: 'tarix.typeFavorites',
+        mistakes: 'tarix.typeMistakes',
+        bilet: 'tarix.typeBilet',
+    }
     return map[type] ? t(map[type]) : type
 }
 
-function StatusBadge({ status }) {
+function StatusBadge({ status, t }) {
     if (status === 'otmadi' || status === 'bekor') {
         return (
             <span className="px-3 py-1 bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-full flex items-center gap-1">
                 <Icon name="Cancel" className="w-4 h-4" />
-                {status === 'otmadi' ? "YIQILDI" : "BEKOR QILINDI"}
+                {status === 'otmadi' ? t('tarix.statusFailed') : t('tarix.statusCancelled')}
             </span>
         )
     }
     return (
         <span className="px-3 py-1 bg-brand-cyan/10 dark:bg-brand-cyan/20 text-brand-cyan text-xs font-bold rounded-full flex items-center gap-1">
             <Icon name="CheckCircle" className="w-4 h-4" />
-            YAKUNLANDI
+            {t('tarix.statusCompleted')}
         </span>
     )
 }
@@ -64,19 +70,19 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
     let iconClass = ''
 
     if (isSkipped) {
-        statusText = "Javobsiz"
+        statusText = t('tarix.skipped')
         statusColor = 'text-slate-500'
         statusBg = 'bg-slate-50 dark:bg-[#1e293b]'
         borderClass = 'border-l-4 border-slate-400'
         iconClass = 'border-slate-400 text-slate-400'
     } else if (isCorrect) {
-        statusText = "✓ To'g'ri"
+        statusText = `✓ ${t('tarix.correct')}`
         statusColor = 'text-emerald-500'
         statusBg = 'bg-white dark:bg-[#1e293b]'
         borderClass = 'border-l-4 border-emerald-500'
         iconClass = 'border-emerald-500 text-emerald-500'
     } else {
-        statusText = "✕ Noto'g'ri"
+        statusText = `✕ ${t('tarix.incorrect')}`
         statusColor = 'text-rose-500'
         statusBg = 'bg-white dark:bg-[#1e293b]'
         borderClass = 'border-l-4 border-rose-500'
@@ -95,7 +101,9 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
                         {index + 1}
                     </div>
                     <div>
-                        <h3 className="font-bold text-slate-900 dark:text-white">Savol #{index + 1}</h3>
+                        <h3 className="font-bold text-slate-900 dark:text-white">
+                            {t('tarix.questionLabel')} #{index + 1}
+                        </h3>
                         <p className={`text-xs font-semibold ${statusColor}`}>{statusText}</p>
                     </div>
                 </div>
@@ -226,7 +234,7 @@ export default function ExamDetailPage() {
     if (!attempt) {
         return (
             <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] flex items-center justify-center text-slate-500">
-                Topilmadi
+                {t('tarix.notFound')}
             </div>
         )
     }
@@ -243,7 +251,7 @@ export default function ExamDetailPage() {
                         <button onClick={() => router.back()} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-600 dark:text-slate-300">
                             <Icon name="ArrowLeft" className="w-6 h-6" />
                         </button>
-                        <h1 className="text-xl font-bold tracking-tight">Imtihon tafsilotlari</h1>
+                        <h1 className="text-xl font-bold tracking-tight">{t('tarix.detailTitle')}</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded uppercase tracking-wider">
@@ -260,13 +268,17 @@ export default function ExamDetailPage() {
                 <div className="lg:col-span-5 space-y-6">
                     <section className="bg-white dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500">
                         <div className="flex justify-between items-start mb-6">
-                            <StatusBadge status={status} />
+                            <StatusBadge status={status} t={t} />
                             <div className="text-right">
-                                <p className="text-xs text-slate-500 uppercase font-bold mb-1">Ball</p>
+                                <p className="text-xs text-slate-500 uppercase font-bold mb-1">
+                                    {t('tarix.ball')}
+                                </p>
                                 <p className={`text-4xl font-black ${isCanceled ? 'text-slate-400' : 'text-brand-cyan'}`}>
                                     {isCanceled ? 0 : correct}
                                     <span className="text-slate-400 text-xl font-medium mx-1">/{total}</span>
-                                    <span className="text-lg text-brand-cyan/70 ml-1">{isCanceled ? '0%' : `${percentage}%`}</span>
+                                    <span className="text-lg text-brand-cyan/70 ml-1">
+                                        {isCanceled ? '0%' : `${percentage}%`}
+                                    </span>
                                 </p>
                             </div>
                         </div>
@@ -278,7 +290,9 @@ export default function ExamDetailPage() {
                                 </div>
                                 <div>
                                     <p className="text-base font-bold text-slate-900 dark:text-white">{stats.correct}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">To'g'ri</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('tarix.correct')}
+                                    </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -287,7 +301,9 @@ export default function ExamDetailPage() {
                                 </div>
                                 <div>
                                     <p className="text-base font-bold text-slate-900 dark:text-white">{stats.incorrect}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Noto'g'ri</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('tarix.incorrect')}
+                                    </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -296,7 +312,9 @@ export default function ExamDetailPage() {
                                 </div>
                                 <div>
                                     <p className="text-base font-bold text-slate-900 dark:text-white">{stats.skipped}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Javobsiz</p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('tarix.skipped')}
+                                    </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -304,15 +322,21 @@ export default function ExamDetailPage() {
                                     <Icon name="Schedule" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white font-mono">{formatDuration(durationSeconds)}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">Vaqt</p>
+                                    <p className="text-base font-bold text-slate-900 dark:text-white font-mono">
+                                        {formatDuration(durationSeconds)}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('tarix.time')}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </section>
 
                     <section className="bg-white dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500 delay-100">
-                        <h2 className="text-sm font-bold mb-5 uppercase tracking-wider text-slate-500">Savollar</h2>
+                        <h2 className="text-sm font-bold mb-5 uppercase tracking-wider text-slate-500">
+                            {t('tarix.questionsTab')}
+                        </h2>
                         <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-5 gap-3">
                             {details.map((item, idx) => {
                                 const isSkipped = item.userAnswer === null || item.userAnswer === undefined
@@ -343,13 +367,13 @@ export default function ExamDetailPage() {
                             className="flex items-center justify-center gap-2 bg-brand-cyan hover:bg-brand-cyan/90 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-brand-cyan/20"
                         >
                             <Icon name="Refresh" className="w-5 h-5" />
-                            Qaytadan
+                            {t('tarix.retry')}
                         </button>
                         <button
                             className="flex items-center justify-center gap-2 bg-white dark:bg-[#1e293b] border-2 border-slate-200 dark:border-slate-700 hover:border-brand-cyan/50 text-slate-700 dark:text-slate-300 font-bold py-4 rounded-2xl transition-all active:scale-95"
                         >
                             <Icon name="ErrorOutline" className="w-5 h-5 text-brand-cyan" />
-                            Xatolarni ({stats.incorrect})
+                            {t('tarix.workMistakes')} ({stats.incorrect})
                         </button>
                     </div>
                 </div>
@@ -358,25 +382,27 @@ export default function ExamDetailPage() {
                 <div className="lg:col-span-7 space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 delay-200">
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-[72px] lg:top-20 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 py-4 backdrop-blur-md">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Javoblarni ko'rish</h2>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                            {t('tarix.viewAnswers')}
+                        </h2>
                         <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
                             <button
                                 onClick={() => setActiveFilter('all')}
                                 className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'all' ? 'bg-brand-cyan text-white shadow-md shadow-brand-cyan/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                             >
-                                Barchasi ({details.length})
+                                {t('tarix.filterAllCount')} ({details.length})
                             </button>
                             <button
                                 onClick={() => setActiveFilter('correct')}
                                 className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'correct' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                             >
-                                To'g'ri ({stats.correct})
+                                {t('tarix.filterCorrect')} ({stats.correct})
                             </button>
                             <button
                                 onClick={() => setActiveFilter('incorrect')}
                                 className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'incorrect' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                             >
-                                Xato ({stats.incorrect})
+                                {t('tarix.filterIncorrect')} ({stats.incorrect})
                             </button>
                         </div>
                     </div>

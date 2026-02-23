@@ -14,7 +14,6 @@ import ExamSettingsModal from '@/components/ExamSettingsModal'
 import ExamResult from '@/components/ExamResult'
 import FeedbackModal from '@/components/FeedbackModal'
 
-const QUESTIONS_PER_TICKET = 10
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -24,7 +23,8 @@ const Icons = {
   Close: () => <path d="M6 18L18 6M6 6l12 12" />,
   Flag: () => <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />,
   Correct: () => <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
-  Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />,
+  Home: () => <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" />
 }
 
 const Icon = ({ name, className = "w-5 h-5" }) => (
@@ -33,12 +33,12 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
   </svg>
 )
 
-async function saveBiletResultToApi(apiUrl, uid, ticketId, correct, total) {
+async function saveBiletResultToApi(apiUrl, uid, ticketId, correct, total, qCount) {
   try {
     const res = await fetch(`${apiUrl}/api/bilet-progress/save`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uid, ticketId, correct, total })
+      body: JSON.stringify({ uid, ticketId, correct, total, qCount })
     })
     if (!res.ok) throw new Error('API xatolik')
   } catch (e) {
@@ -110,8 +110,9 @@ export default function BiletTicketPage() {
       setAnswers({})
       setResultSaved(false)
       try {
-        const startId = (ticketId - 1) * QUESTIONS_PER_TICKET + 1
-        const endId = ticketId * QUESTIONS_PER_TICKET
+        const qCount = settings?.questionCount || 20
+        const startId = (ticketId - 1) * qCount + 1
+        const endId = ticketId * qCount
         const ids = []
         for (let i = startId; i <= endId; i++) ids.push(i)
         const idsString = ids.join(',')
@@ -145,8 +146,9 @@ export default function BiletTicketPage() {
   const idsRef = useRef([])
   useEffect(() => {
     if (questions.length === 0) return
-    const startId = (ticketId - 1) * QUESTIONS_PER_TICKET + 1
-    const endId = ticketId * QUESTIONS_PER_TICKET
+    const qCount = settings?.questionCount || 20
+    const startId = (ticketId - 1) * qCount + 1
+    const endId = ticketId * qCount
     const ids = []
     for (let i = startId; i <= endId; i++) ids.push(i)
     idsRef.current = ids
@@ -311,7 +313,8 @@ export default function BiletTicketPage() {
       const saveResult = async () => {
         try {
           if (currentUser?.uid) {
-            await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length)
+            const qCount = settings?.questionCount || 10
+            await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length, qCount)
             const elapsed = (endTimeRef.current && startTimeRef.current)
               ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
 
@@ -346,6 +349,7 @@ export default function BiletTicketPage() {
                 durationSeconds: elapsed,
                 status: 'tugallangan',
                 ticketId,
+                qCount,
                 details: details
               }),
             })
@@ -455,7 +459,6 @@ export default function BiletTicketPage() {
     // Refresh current ticket
     window.location.reload()
   }
-
   if (isFinished) {
     return (
       <ExamResult
@@ -465,9 +468,9 @@ export default function BiletTicketPage() {
         timeSpent={resultElapsedSeconds}
         mode="bilet"
         onRetry={handleRetryTicket}
-        onNextTicket={ticketId < 70 ? handleNextTicket : null}
-        title={`Bilet #${ticketId} Natijalari`}
-        subtitle="Biletlar"
+        onNextTicket={() => router.push(`/biletlar/${ticketId + 1}`)}
+        title={t('bilet.resultsTitle').replace('{num}', ticketId)}
+        subtitle={t('nav.tickets') || "Biletlar"}
         ticketNumber={ticketId}
       />
     )
@@ -477,13 +480,16 @@ export default function BiletTicketPage() {
     <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white overflow-hidden font-sans">
       <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 shrink-0 z-50">
         <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/biletlar" className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] flex items-center justify-center text-slate-500 dark:text-slate-300 shrink-0">
+          <Link href="/biletlar" className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Biletlar sahifasi">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
+          </Link>
+          <Link href="/dashboard" className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Bosh sahifa">
+            <Icon name="Home" className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-2">
             <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
             <div>
-              <h1 className="text-base font-bold text-slate-900 dark:text-white">Bilet #{ticketId}</h1>
+              <h1 className="text-base font-bold text-slate-900 dark:text-white">{t('tarix.typeBilet') || 'Bilet'} #{ticketId}</h1>
               <p className="text-[11px] text-slate-500">{t('exam.question')} {currentIndex + 1}/{questions.length}</p>
             </div>
           </div>
@@ -537,8 +543,14 @@ export default function BiletTicketPage() {
           </button>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
             <span className="text-slate-400 text-xs">{t('tarix.time')}</span>
-            <span className="font-mono font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
+            <span className="font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
           </div>
+          <button
+            onClick={() => setIsFinished(true)}
+            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+          >
+            {isFinished ? t('exam.results') : t('exam.finish')}
+          </button>
           <div className="hidden sm:block text-xs text-slate-400">
             <span className="font-bold text-slate-900 dark:text-white">{currentIndex + 1}</span>/{questions.length}
           </div>

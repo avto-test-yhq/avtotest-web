@@ -22,7 +22,7 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
             setContact('')
             setStatus(null)
         }
-    }, [isOpen, context])
+    }, [isOpen, context?.questionId]) // Only depend on modal open state and the specific question ID
 
     if (!isOpen) return null
 

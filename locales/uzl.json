@@ -1,5 +1,6 @@
 {
     "common.loading": "Yuklanmoqda...",
+    "common.count": "TA",
     "nav.dashboard": "Bosh sahifa",
     "nav.rules": "Qoidalar",
     "nav.tickets": "Biletlar",
@@ -7,18 +8,15 @@
     "nav.questions": "Savollar",
     "nav.login": "Kirish",
     "nav.start": "Boshlash",
-
     "sidebar.rules": "Qoidalar",
     "sidebar.tests": "Testlar",
     "sidebar.dashboard": "Dashboard",
-
     "dashboard.welcome": "Xush kelibsiz",
     "dashboard.premium": "Premium a'zo",
     "dashboard.menu": "Menyu",
     "dashboard.system": "Tizim",
     "dashboard.system.settings": "Sozlamalar",
     "dashboard.logout": "Chiqish",
-
     "dashboard.stats": "Statistika",
     "dashboard.stats.allReports": "Barcha hisobotlar",
     "dashboard.stats.totalQuestions": "Jami savollar",
@@ -26,32 +24,26 @@
     "dashboard.stats.efficiency": "Samaradorlik",
     "dashboard.stats.streak": "Davomiylik",
     "dashboard.stats.history": "Tashriflar tarixi",
-
     "dashboard.practice": "Mashq qilish",
     "dashboard.practice.seeAll": "Barchasini ko'rish",
     "dashboard.practice.byTickets": "Biletlar bo'yicha",
     "dashboard.practice.desc": "Har bir biletni alohida mashq qiling va bilimingizni tizimli ravishda mustahkamlang.",
     "dashboard.practice.progress": "yechilgan",
     "dashboard.practice.continue": "Davom ettirish",
-
     "dashboard.activity.standard.title": "Standart imtihon",
     "dashboard.activity.standard.desc": "10, 20 yoki 50 ta savol. Xato qilsangiz ham davom ettiring.",
     "dashboard.activity.standard.cta": "Boshlash",
-
     "dashboard.activity.real.title": "Haqiqiy imtihon",
     "dashboard.activity.real.desc": "20 ta savol. 3 ta xato — imtihon to'xtatiladi. Jiddiy sinov!",
     "dashboard.activity.real.cta": "Boshlash",
-
     "dashboard.activity.mistakes.title": "Xatolar bilan ishlash",
     "dashboard.activity.mistakes.desc": "Oldin xato qilgan savollaringizni qayta ko'rib chiqing va o'zlashtiring.",
     "dashboard.activity.mistakes.badge": "Xatolar",
     "dashboard.activity.mistakes.cta": "Xatolarni tozalash",
-
     "dashboard.activity.favorites.title": "Sevimli savollar",
     "dashboard.activity.favorites.desc": "Siz belgilab qo'ygan murakkab savollar jamlanmasi.",
     "dashboard.activity.favorites.badge": "Sevimli",
     "dashboard.activity.favorites.cta": "Ko'rish",
-
     "dashboard.rules.cardTitle": "Qoidalar",
     "dashboard.rules.all": "Hammasi",
     "dashboard.rules.traffic.title": "Yo'l harakati qoidalari",
@@ -66,7 +58,6 @@
     "dashboard.rules.other.desc": "Video darslar va hujjatlar",
     "dashboard.rules.note.title": "Eslatma",
     "dashboard.rules.note.text": "Qoidalar 2024-yildagi so'nggi tahrirlar bilan to'liq yangilangan.",
-
     "rules.page.title": "Qoidalar to'plami",
     "rules.page.subtitle": "O'rganishni istagan bo'limni tanlang",
     "rules.page.detail": "Batafsil",
@@ -92,10 +83,8 @@
     "rules.documents.desc": "Haydovchilar yonida olib yurishi shart bo'lgan hujjatlar ro'yxati.",
     "rules.documents.badge": "RO'YXAT",
     "rules.examImportant": "Imtihon uchun muhim",
-
     "weekly.title": "Davomiylik (hafta bo'yicha)",
     "weekly.subtitle": "Oxirgi 7 kun",
-
     "bilet.header.title": "Biletlar bo'yicha mashq",
     "bilet.stats.mastery": "O'zlashtirish",
     "bilet.stats.correct": "To'g'ri javob",
@@ -108,16 +97,14 @@
     "bilet.cta.start": "Boshlash",
     "bilet.allAnswered": "Barcha savollar javoblangan",
     "bilet.count": "bilet",
-
+    "bilet.resultsTitle": "Bilet #{num} Natijalari",
     "exam.modal.standard.title": "Standart imtihon",
     "exam.modal.standard.desc": "Savollar sonini tanlang. Xato qilsangiz ham imtihon tugamasin — barcha savollarni javoblang.",
     "exam.modal.standard.badge": "Savol",
-
     "exam.modal.real.title": "Haqiqiy imtihon",
     "exam.modal.real.desc": "20 ta savol. 3 ta xato qilsangiz imtihon to'xtaydi va 'Imtihon o'tolmading' chiqadi.",
     "exam.modal.real.start": "Boshlash",
     "exam.modal.cancel": "Bekor qilish",
-
     "exam.viewExplanation": "Izohni ko'rish",
     "exam.hideExplanation": "Izohni yashirish",
     "exam.explanation": "Tushuntirish",
@@ -142,7 +129,7 @@
     "exam.errorsCount": "Xatolar",
     "exam.retryBtn": "Qayta urinish",
     "exam.backToHome": "Bosh sahifaga qaytish",
-
+    "exam.next": "Keyingisi",
     "stats.title": "Savollar Statistikasi",
     "stats.sortDate": "Oxirgi urinish",
     "stats.sortAttempts": "Eng ko'p yechilgan",
@@ -150,8 +137,9 @@
     "stats.noData": "Statistika topilmadi",
     "stats.correctAttempts": "to'g'ri",
     "stats.attemptsLabel": "urinish",
-
     "tarix.title": "Tarix",
+    "tarix.today": "Bugun",
+    "tarix.yesterday": "Kecha",
     "tarix.stats": "Savollar statistikasi",
     "tarix.filterAll": "Barcha turlar",
     "tarix.tabExams": "Imtihonlar",
@@ -185,7 +173,6 @@
     "tarix.retry": "Qaytadan",
     "tarix.workMistakes": "Xatolarni ishlash",
     "tarix.notFound": "Ma'lumot topilmadi",
-
     "mistakes.title": "Xatolar rejimi",
     "mistakes.countBadge": "ta xato",
     "mistakes.pageTitle": "Xatolik qilingan savollar",
@@ -197,7 +184,6 @@
     "mistakes.viewFull": "To'liq ko'rish",
     "mistakes.modalTitle": "Noto'g'ri javob berilgan savol",
     "mistakes.explanation": "Izoh",
-
     "feedback.title": "Fikr bildirish",
     "feedback.questionTitle": "Savol bo'yicha fikr",
     "feedback.placeholders.suggestion": "Taklif...",

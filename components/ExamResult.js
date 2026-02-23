@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n';
 
 export default function ExamResult({
     questions = [],
@@ -11,11 +12,15 @@ export default function ExamResult({
     mode = 'standard',
     onRetry,
     onNextTicket,
-    title = "Natijalar",
-    subtitle = "Imtihon",
+    title,
+    subtitle,
     ticketNumber = null
 }) {
+    const t = useI18n();
     const [filter, setFilter] = useState('all'); // 'all' or 'incorrect'
+
+    const displayTitle = title || t('exam.results');
+    const displaySubtitle = subtitle || t('exam.drivingTest');
 
     // Calculation for progress circle
     const total = questions.length;
@@ -40,17 +45,17 @@ export default function ExamResult({
             <header className="sticky top-0 z-50 bg-slate-50/80 dark:bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/dashboard" className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center">
+                        <Link href={mode === 'bilet' ? '/biletlar' : '/dashboard'} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors flex items-center justify-center">
                             <span className="material-icons-round block">arrow_back</span>
                         </Link>
-                        <h1 className="text-xl font-bold">{title}</h1>
+                        <h1 className="text-xl font-bold">{displayTitle}</h1>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-full">
-                        <span className="text-sm font-medium opacity-70 uppercase tracking-wider">{subtitle}</span>
+                        <span className="text-sm font-medium opacity-70 uppercase tracking-wider">{displaySubtitle}</span>
                         {(ticketNumber || total > 0) && (
                             <>
                                 <span className="w-1 h-1 bg-slate-400 rounded-full"></span>
-                                <span className="text-sm font-semibold">{ticketNumber ? `№ ${ticketNumber}` : `${total} TA`}</span>
+                                <span className="text-sm font-semibold">{ticketNumber ? `№ ${ticketNumber}` : `${total} ${t('common.count') || 'TA'}`}</span>
                             </>
                         )}
                     </div>
@@ -78,35 +83,35 @@ export default function ExamResult({
                             </div>
                         </div>
 
-                        <h2 className="text-lg font-bold mb-8">Statistika</h2>
+                        <h2 className="text-lg font-bold mb-8">{t('stats.title') || 'Statistika'}</h2>
                         <div className="grid grid-cols-2 gap-4 w-full">
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl flex flex-col items-center text-center">
                                 <div className="w-10 h-10 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mb-2">
                                     <span className="material-icons-round text-xl">check_circle</span>
                                 </div>
                                 <span className="text-2xl font-bold text-green-500">{stats.correct}</span>
-                                <span className="text-xs text-slate-500 font-medium">To'g'ri</span>
+                                <span className="text-xs text-slate-500 font-medium">{t('tarix.correct') || "To'g'ri"}</span>
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl flex flex-col items-center text-center">
                                 <div className="w-10 h-10 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center mb-2">
                                     <span className="material-icons-round text-xl">cancel</span>
                                 </div>
                                 <span className="text-2xl font-bold text-red-500">{stats.incorrect}</span>
-                                <span className="text-xs text-slate-500 font-medium">Noto'g'ri</span>
+                                <span className="text-xs text-slate-500 font-medium">{t('tarix.incorrect') || "Noto'g'ri"}</span>
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl flex flex-col items-center text-center">
                                 <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-500 flex items-center justify-center mb-2">
                                     <span className="material-icons-round text-xl">help</span>
                                 </div>
                                 <span className="text-2xl font-bold">{unanswered}</span>
-                                <span className="text-xs text-slate-500 font-medium">Javobsiz</span>
+                                <span className="text-xs text-slate-500 font-medium">{t('tarix.skipped') || "Javobsiz"}</span>
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl flex flex-col items-center text-center">
                                 <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center mb-2">
                                     <span className="material-icons-round text-xl">schedule</span>
                                 </div>
                                 <span className="text-2xl font-bold">{formatTime(timeSpent)}</span>
-                                <span className="text-xs text-slate-500 font-medium">Vaqt</span>
+                                <span className="text-xs text-slate-500 font-medium">{t('tarix.time') || "Vaqt"}</span>
                             </div>
                         </div>
                     </div>
@@ -119,25 +124,25 @@ export default function ExamResult({
                             <span className="material-icons-round text-6xl text-slate-300 dark:text-slate-600 mb-4 block">visibility_off</span>
                             <h2 className="text-xl font-bold mb-2">Batafsil javoblar yashirilgan</h2>
                             <p className="text-slate-500 dark:text-slate-400">
-                                Siz "Haqiqiy imtihon" rejimida test topshirdingiz. Qoidalarga ko'ra, haqiqiy imtihonda test tugagach batafsil to'g'ri va noto'g'ri javoblar ko'rsatilmaydi, faqatgina umumiy natijangiz e'lon qilinadi.
+                                Siz "Haqiqiy imtihon" rejimida test topshirdingiz. Haqiqiy imtihonda test tugagach batafsil to'g'ri va noto'g'ri javoblar ko'rsatilmaydi, faqatgina umumiy natijangiz e'lon qilinadi.
                             </p>
                         </div>
                     ) : (
                         <>
                             <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-xl font-bold">Javoblarni ko'rish</h2>
+                                <h2 className="text-xl font-bold">{t('tarix.viewAnswers') || "Javoblarni ko'rish"}</h2>
                                 <div className="flex gap-2">
                                     <button
                                         onClick={() => setFilter('all')}
                                         className={`px-4 py-2 ${filter === 'all' ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'} text-sm font-semibold rounded-full transition-colors`}
                                     >
-                                        Barchasi ({total})
+                                        {(t('tarix.filterAllCount') || 'Barchasi')} ({total})
                                     </button>
                                     <button
                                         onClick={() => setFilter('incorrect')}
                                         className={`px-4 py-2 ${filter === 'incorrect' ? 'bg-red-500 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300'} text-sm font-semibold rounded-full transition-colors`}
                                     >
-                                        Xato ({stats.incorrect})
+                                        {(t('tarix.filterIncorrect') || 'Xato')} ({stats.incorrect})
                                     </button>
                                 </div>
                             </div>
@@ -159,10 +164,10 @@ export default function ExamResult({
                                                             {qIndex + 1}
                                                         </div>
                                                         <div>
-                                                            <h3 className="font-bold">Savol #{q.numeric_id || q.id}</h3>
+                                                            <h3 className="font-bold">{t('exam.question') || 'Savol'} #{q.numeric_id || q.id}</h3>
                                                             <p className={`text-sm font-medium flex items-center gap-1 ${isCorrect ? 'text-green-500' : isUnanswered ? 'text-slate-500' : 'text-red-500'}`}>
                                                                 <span className="material-icons-round text-base">{isCorrect ? 'check' : isUnanswered ? 'help' : 'close'}</span>
-                                                                {isCorrect ? "To'g'ri" : isUnanswered ? "Javobsiz" : "Noto'g'ri"}
+                                                                {isCorrect ? (t('tarix.correct') || "To'g'ri") : isUnanswered ? (t('tarix.skipped') || "Javobsiz") : (t('tarix.incorrect') || "Noto'g'ri")}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -227,32 +232,39 @@ export default function ExamResult({
                 </div>
             </main>
 
-            {/* Bottom Fixed Action Bar */}
             <div className="fixed bottom-0 left-0 right-0 bg-slate-50/90 dark:bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 p-4 z-50">
-                <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-4">
+                <div className="max-w-7xl mx-auto grid grid-cols-2 md:flex md:flex-row gap-3 sm:gap-4">
+                    <Link
+                        href="/dashboard"
+                        className="flex-1 h-12 sm:h-14 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 transition-all text-slate-800 dark:text-white"
+                    >
+                        <span className="material-icons-round">home</span>
+                        <span className="text-sm sm:text-base">{t('nav.dashboard') || 'Dashboard'}</span>
+                    </Link>
                     <button
                         onClick={onRetry}
-                        className="flex-1 h-12 sm:h-14 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all text-slate-800 dark:text-white"
+                        className="flex-1 h-12 sm:h-14 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 transition-all text-slate-800 dark:text-white"
                     >
                         <span className="material-icons-round">refresh</span>
-                        Qaytadan boshlash
+                        <span className="text-sm sm:text-base">{t('exam.retryWork') || 'Qaytadan'}</span>
                     </button>
-                    {onNextTicket ? (
+                    {mode === 'bilet' && (
+                        <Link
+                            href="/biletlar"
+                            className={`flex-1 h-12 sm:h-14 ${onNextTicket ? 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white' : 'bg-primary hover:bg-blue-600 active:bg-blue-700 text-white shadow-lg shadow-primary/20'} rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 transition-all`}
+                        >
+                            <span className="material-icons-round">view_module</span>
+                            <span className="text-sm sm:text-base">{t('nav.tickets') || 'Biletlar'}</span>
+                        </Link>
+                    )}
+                    {onNextTicket && (
                         <button
                             onClick={onNextTicket}
-                            className="flex-1 h-12 sm:h-14 bg-primary hover:bg-blue-600 active:bg-blue-700 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all"
+                            className={`flex-1 h-12 sm:h-14 bg-primary hover:bg-blue-600 active:bg-blue-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2 sm:gap-3 shadow-lg shadow-primary/20 transition-all ${mode !== 'bilet' ? 'col-span-2 md:col-span-1' : ''}`}
                         >
-                            <span>Keyingi bilet</span>
+                            <span className="text-sm sm:text-base">{t('exam.next') || 'Keyingisi'}</span>
                             <span className="material-icons-round">arrow_forward</span>
                         </button>
-                    ) : (
-                        <Link
-                            href="/dashboard"
-                            className="flex-1 h-12 sm:h-14 bg-primary hover:bg-blue-600 active:bg-blue-700 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg shadow-primary/20 transition-all"
-                        >
-                            <span className="material-icons-round">home</span>
-                            Bosh sahifaga
-                        </Link>
                     )}
                 </div>
             </div>
