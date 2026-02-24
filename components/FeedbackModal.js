@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n'
 import { apiFetch } from '@/lib/apiClient'
 
 export default function FeedbackModal({ isOpen, onClose, context = null }) {
-    const { t } = useI18n()
+    const t = useI18n()
     const [type, setType] = useState('suggestion')
     const [message, setMessage] = useState('')
     const [contact, setContact] = useState('')
