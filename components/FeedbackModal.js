@@ -3,16 +3,15 @@
 import { useState, useEffect } from 'react'
 import { auth } from '@/lib/firebase'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 
 export default function FeedbackModal({ isOpen, onClose, context = null }) {
-    const [message, setMessage] = useState('')
+    const { t } = useI18n()
     const [type, setType] = useState('suggestion')
+    const [message, setMessage] = useState('')
     const [contact, setContact] = useState('')
+    const [status, setStatus] = useState(null)
     const [loading, setLoading] = useState(false)
-    const [status, setStatus] = useState(null) // success | error
-    const t = useI18n()
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
     // Automatically set type to question if context exists when opening
     useEffect(() => {
@@ -37,9 +36,8 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
             const user = auth.currentUser
             const uid = user ? user.uid : 'anonymous'
 
-            const res = await fetch(`${API_URL}/api/feedback/send`, {
+            const res = await apiFetch(`/feedback/send`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     uid,
                     message,
