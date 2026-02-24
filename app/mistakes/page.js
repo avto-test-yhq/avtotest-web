@@ -11,6 +11,7 @@ import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -30,7 +31,6 @@ export default function MistakesPage() {
   const router = useRouter()
   const { lang } = useLanguage()
   const t = useI18n()
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -41,7 +41,7 @@ export default function MistakesPage() {
     async (uid) => {
       try {
         setLoading(true)
-        const res = await fetch(`${API_URL}/api/mistakes/${uid}`)
+        const res = await apiFetch(`/mistakes/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -49,14 +49,14 @@ export default function MistakesPage() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=${lang || 'uzl'}&ids=${idsString}`)
+        const testsRes = await apiFetch(`/tests?lang=${lang || 'uzl'}&ids=${idsString}`)
         if (!testsRes.ok) throw new Error('Tests API xatolik')
         const data = await testsRes.json()
         if (Array.isArray(data) && data.length > 0) {
           const transformed = data.map((item) => {
             let imageUrl = ''
             if (item.image && item.image.trim() !== '') {
-              imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+              imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}/uploads/${item.image}`
             }
             return {
               id: item._id || item.id,
@@ -86,7 +86,7 @@ export default function MistakesPage() {
         setLoading(false)
       }
     },
-    [API_URL, lang]
+    [lang]
   )
 
   useEffect(() => {

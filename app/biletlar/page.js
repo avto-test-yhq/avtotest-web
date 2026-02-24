@@ -12,8 +12,7 @@ import QoidalarHeader from '@/components/QoidalarHeader'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
 import { useI18n } from '@/lib/i18n'
 import { useExamSettings } from '@/context/ExamSettingsContext'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+import { apiFetch } from '@/lib/apiClient'
 
 const defaultProgress = { completedTickets: [], ticketResults: {}, totalCorrectAnswers: 0 }
 const defaultStats = { totalTickets: 61, totalBiletQuestions: 610 }
@@ -31,8 +30,8 @@ export default function BiletlarPage() {
   const fetchStatsAndProgress = async (uid, qCount) => {
     try {
       const [biletRes, masteryRes] = await Promise.all([
-        fetch(`${API_URL}/api/bilet-progress/${uid}?qCount=${qCount || 10}`),
-        fetch(`${API_URL}/api/mastery/${uid}`)
+        apiFetch(`/bilet-progress/${uid}?qCount=${qCount || 10}`),
+        apiFetch(`/mastery/${uid}`)
       ])
       if (biletRes.ok) {
         const data = await biletRes.json()

@@ -5,7 +5,7 @@ import { useLanguage } from '@/context/LanguageContext'
 
 const OPTIONS = [
   { code: 'uzl', label: "O'zbek", sub: 'Lotin' },
-  { code: 'uzk', label: "O'zbek", sub: 'Kiril' },
+  { code: 'uzk', label: "Ўзбек", sub: 'Кирилл' },
   { code: 'ru', label: 'Русский', sub: '' },
 ]
 
@@ -48,11 +48,10 @@ export default function LanguageSwitcher({ size = 'md' }) {
                   setLang(opt.code)
                   setOpen(false)
                 }}
-                className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-[11px] ${
-                  active
+                className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-[11px] ${active
                     ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white'
                     : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
-                }`}
+                  }`}
               >
                 <span>{opt.label}</span>
                 {opt.sub && <span className="text-[10px] opacity-80">{opt.sub}</span>}

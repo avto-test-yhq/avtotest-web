@@ -10,6 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import Cropper from 'react-easy-crop'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 import {
     LayoutDashboard,
     User,
@@ -36,8 +37,6 @@ import {
     X,
     Check
 } from 'lucide-react'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
 const VILOYATLAR = [
     "Andijon viloyati",
@@ -125,7 +124,7 @@ export default function ProfilPage() {
                         }
 
                         if (parsed.picture) {
-                            const picUrl = parsed.picture.startsWith('http') ? parsed.picture : `${API_URL}${parsed.picture}`
+                            const picUrl = parsed.picture.startsWith('http') ? parsed.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${parsed.picture}`
                             setAvatar(picUrl)
                             setOriginalAvatar(picUrl)
                         }
@@ -133,7 +132,7 @@ export default function ProfilPage() {
                 }
 
                 // 2. Keyin API dan eng oxirgi ma'lumotni tortamiz (agar kiritilgan bo'lsa)
-                const res = await fetch(`${API_URL}/api/users/profile/${user.uid}`)
+                const res = await apiFetch(`/users/profile/${user.uid}`)
                 if (res.ok) {
                     const data = await res.json()
 
@@ -145,7 +144,7 @@ export default function ProfilPage() {
                     }
 
                     if (data.picture) {
-                        const picUrl = data.picture.startsWith('http') ? data.picture : `${API_URL}${data.picture}`
+                        const picUrl = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${data.picture}`
                         setAvatar(picUrl)
                         setOriginalAvatar(picUrl)
                     }
@@ -269,16 +268,20 @@ export default function ProfilPage() {
             const formData = new FormData()
             formData.append('avatar', file)
 
-            const res = await fetch(`${API_URL}/api/users/upload-avatar/${currentUser.uid}`, {
+            // apiFetch ni rasm uchun ishlatsak (multipart/form-data): Headerlarni avto qoldirish uchun content-type berilmaydi
+            const res = await apiFetch(`/users/upload-avatar/${currentUser.uid}`, {
                 method: 'POST',
                 body: formData,
+                headers: {
+                    'Content-Type': undefined
+                }
             })
 
             const data = await res.json()
 
             if (res.ok) {
                 setMessage({ text: 'Rasm muvaffaqiyatli yuklandi', type: 'success' })
-                const actAvatar = data.picture.startsWith('http') ? data.picture : `${API_URL}${data.picture}`
+                const actAvatar = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${data.picture}`
                 setAvatar(actAvatar)
                 setOriginalAvatar(actAvatar)
 
@@ -319,9 +322,8 @@ export default function ProfilPage() {
         const dobString = (dobDay && dobMonth && dobYear) ? `${dobDay}-${dobMonth}-${dobYear}` : ''
 
         try {
-            const res = await fetch(`${API_URL}/api/users/profile/${currentUser.uid}`, {
+            const res = await apiFetch(`/users/profile/${currentUser.uid}`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     fullName,
                     dob: dobString,

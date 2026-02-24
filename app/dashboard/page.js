@@ -12,6 +12,7 @@ import UserProfileHeader from '@/components/UserProfileHeader'
 import WeeklyChart from '@/components/WeeklyChart'
 import FeedbackModal from '@/components/FeedbackModal'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 import {
   Car,
   Home,
@@ -38,8 +39,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 const fetchBiletlarProgress = async (uid) => {
   try {
     const [biletRes, statsRes] = await Promise.all([
-      fetch(`${API_URL}/api/bilet-progress/${uid}`),
-      fetch(`${API_URL}/api/mastery/stats/app`)
+      apiFetch(`/bilet-progress/${uid}`),
+      apiFetch(`/mastery/stats/app`)
     ])
     if (!biletRes.ok) return { completed: 0, totalCorrect: 0, percent: 0 }
     const p = await biletRes.json()
@@ -115,21 +116,20 @@ export default function DashboardPage() {
         }
 
         // Tashrifni yozish (har safar kirganda)
-        fetch(`${API_URL}/api/activity/record`, {
+        apiFetch(`/activity/record`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ uid: user.uid })
         }).catch(() => { })
 
         // Sevimli savollar, bilet progress, xatolar va samaradorlikni API dan olamiz
         try {
           const [favRes, biletRes, mistakesRes, masteryRes, activityRes, weeklyRes] = await Promise.all([
-            fetch(`${API_URL}/api/favorites/${user.uid}`),
-            fetch(`${API_URL}/api/bilet-progress/${user.uid}`),
-            fetch(`${API_URL}/api/mistakes/${user.uid}`),
-            fetch(`${API_URL}/api/mastery/${user.uid}`),
-            fetch(`${API_URL}/api/activity/${user.uid}`),
-            fetch(`${API_URL}/api/exam-history/weekly/${user.uid}`)
+            apiFetch(`/favorites/${user.uid}`),
+            apiFetch(`/bilet-progress/${user.uid}`),
+            apiFetch(`/mistakes/${user.uid}`),
+            apiFetch(`/mastery/${user.uid}`),
+            apiFetch(`/activity/${user.uid}`),
+            apiFetch(`/exam-history/weekly/${user.uid}`)
           ])
           if (favRes.ok) {
             const { questionIds } = await favRes.json()
@@ -197,8 +197,8 @@ export default function DashboardPage() {
         setBiletlarProgress(data)
         try {
           const [mistakesRes, masteryRes] = await Promise.all([
-            fetch(`${API_URL}/api/mistakes/${user.uid}`),
-            fetch(`${API_URL}/api/mastery/${user.uid}`)
+            apiFetch(`/mistakes/${user.uid}`),
+            apiFetch(`/mastery/${user.uid}`)
           ])
           if (mistakesRes.ok) {
             const { questionIds } = await mistakesRes.json()
@@ -362,7 +362,7 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="glass-card bg-white/60 dark:bg-slate-800/40 p-5 rounded-2xl relative overflow-hidden group border border-white/20 dark:border-slate-700/50">
                 <div className="relative z-10">
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Jami Savollar</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{t('dashboard.stats.totalQuestions') || 'Jami Savollar'}</p>
                   <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.totalQuestions.toLocaleString()}</h2>
                   <p className="text-xs text-green-500 mt-2 font-medium">
                     {t('dashboard.stats.mastered')}: {mastery.masteredCount}
@@ -375,7 +375,9 @@ export default function DashboardPage() {
                   <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
                     {t('dashboard.stats.efficiency')}
                   </p>
-                  <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">{mastery.percent}%</h2>
+                  <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">
+                    {mastery.percent}%
+                  </h2>
                   <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-4 overflow-hidden">
                     <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${Math.min(100, mastery.percent)}%` }} />
                   </div>

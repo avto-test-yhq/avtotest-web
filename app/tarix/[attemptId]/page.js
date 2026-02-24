@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
@@ -171,6 +172,7 @@ export default function ExamDetailPage() {
     const router = useRouter()
     const params = useParams()
     const t = useI18n()
+    const { lang } = useLanguage()
     const attemptId = params?.attemptId
 
     const [attempt, setAttempt] = useState(null)
@@ -200,6 +202,93 @@ export default function ExamDetailPage() {
         })
         return () => unsub()
     }, [attemptId, router])
+
+    // Til o'zgarganda: savol va variant matnlarini yangilash (javoblar va natija saqlanadi)
+    const prevLangRef = useRef(lang)
+    useEffect(() => {
+        if (!attempt) return
+        if (prevLangRef.current === lang) return
+        prevLangRef.current = lang
+
+        const safeLang = ['uzl', 'uzk', 'ru'].includes(lang) ? lang : 'uzl'
+
+        const ids = Array.from(
+            new Set(
+                (attempt.details || [])
+                    .map((d) => d?.questionData?.numeric_id ?? d?.questionData?.id ?? d?.questionData?._id)
+                    .filter(Boolean)
+            )
+        )
+        if (!ids.length) return
+
+        const controller = new AbortController()
+
+        ;(async () => {
+            try {
+                const res = await fetch(
+                    `${API_URL}/api/tests?lang=${safeLang}&ids=${ids.join(',')}`,
+                    { cache: 'no-store', signal: controller.signal }
+                )
+                if (!res.ok) return
+                const data = await res.json()
+                if (!Array.isArray(data) || data.length === 0) return
+
+                const mapById = new Map()
+                data.forEach((item) => {
+                    const key = (item.id ?? item._id)?.toString()
+                    if (key) mapById.set(key, item)
+                })
+
+                setAttempt((prev) => {
+                    if (!prev) return prev
+                    const updatedDetails = (prev.details || []).map((detail) => {
+                        const qId =
+                            detail?.questionData?.numeric_id ??
+                            detail?.questionData?.id ??
+                            detail?.questionData?._id
+                        const key = qId?.toString()
+                        const fromApi = key ? mapById.get(key) : null
+                        if (!fromApi) return detail
+
+                        const apiOptions = Array.isArray(fromApi.options) ? fromApi.options : []
+                        const newOptions = (detail.questionData?.options || []).map((opt, idx) => {
+                            const apiOpt = apiOptions[idx] || {}
+                            const text =
+                                apiOpt.text ||
+                                apiOpt.option ||
+                                apiOpt.answer ||
+                                opt.text ||
+                                opt.option ||
+                                opt.answer
+                            return {
+                                ...opt,
+                                text,
+                                option: text,
+                            }
+                        })
+
+                        return {
+                            ...detail,
+                            questionData: {
+                                ...detail.questionData,
+                                question: fromApi.question || detail.questionData?.question,
+                                explanation: fromApi.explanation ?? detail.questionData?.explanation,
+                                options: newOptions,
+                            },
+                        }
+                    })
+
+                    return { ...prev, details: updatedDetails }
+                })
+            } catch (e) {
+                if (e.name !== 'AbortError') {
+                    console.error('Tarix savollari tilini yangilashda xatolik:', e)
+                }
+            }
+        })()
+
+        return () => controller.abort()
+    }, [attempt, lang])
 
     const stats = useMemo(() => {
         if (!attempt) return { correct: 0, incorrect: 0, skipped: 0 }
@@ -257,6 +346,13 @@ export default function ExamDetailPage() {
                         <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded uppercase tracking-wider">
                             {getTypeLabel(type, t)}
                         </span>
+                        <Link
+                            href="/dashboard"
+                            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors border border-transparent hover:border-slate-300 dark:hover:border-slate-600"
+                        >
+                            <span className="material-icons-round text-sm">dashboard</span>
+                            <span>{t('nav.dashboard')}</span>
+                        </Link>
                         <ThemeToggle size="sm" />
                     </div>
                 </div>

@@ -15,6 +15,7 @@ import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
 import ExamResult from '@/components/ExamResult'
 import FeedbackModal from '@/components/FeedbackModal'
+import { apiFetch } from '@/lib/apiClient'
 
 
 // Ikonkalar (O'zgarishsiz)
@@ -43,8 +44,8 @@ function ExamContent() {
   const searchParams = useSearchParams()
   const countParam = searchParams.get('count') || '20'
   const mode = searchParams.get('mode') || 'standard' // 'standard', 'real' yoki 'favorites'
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001';
 
   const questionCount = useMemo(() => {
     const n = parseInt(countParam, 10)
@@ -90,7 +91,7 @@ function ExamContent() {
   const loadSavedIds = useCallback(
     async (uid) => {
       try {
-        const res = await fetch(`${API_URL}/api/favorites/${uid}`)
+        const res = await apiFetch(`/favorites/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         setSavedIds(Array.isArray(questionIds) ? questionIds : [])
@@ -142,7 +143,7 @@ function ExamContent() {
     const langCode = getLangCode(newLang)
     try {
       const idsString = ids.join(',')
-      const res = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
+      const res = await apiFetch(`/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
       if (!res.ok) return
       const data = await res.json()
       if (!Array.isArray(data) || data.length === 0) return
@@ -197,7 +198,7 @@ function ExamContent() {
           setFavoritesEmpty(true)
           return
         }
-        const favRes = await fetch(`${API_URL}/api/favorites/${currentUser.uid}`)
+        const favRes = await apiFetch(`/favorites/${currentUser.uid}`)
         if (!favRes.ok) throw new Error('API xatolik')
         const { questionIds } = await favRes.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -205,7 +206,7 @@ function ExamContent() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
+        const testsRes = await apiFetch(`/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
         if (!testsRes.ok) throw new Error('API xatolik')
         const rawData = await testsRes.json()
         if (!Array.isArray(rawData) || rawData.length === 0) {
@@ -219,7 +220,7 @@ function ExamContent() {
           setFavoritesEmpty(true)
           return
         }
-        const mistakesRes = await fetch(`${API_URL}/api/mistakes/${currentUser.uid}`)
+        const mistakesRes = await apiFetch(`/mistakes/${currentUser.uid}`)
         if (!mistakesRes.ok) throw new Error('API xatolik')
         const { questionIds } = await mistakesRes.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -227,7 +228,7 @@ function ExamContent() {
           return
         }
         const idsString = questionIds.join(',')
-        const testsRes = await fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
+        const testsRes = await apiFetch(`/tests?lang=${langCode}&ids=${idsString}`, { cache: 'no-store' })
         if (!testsRes.ok) throw new Error('API xatolik')
         const rawData = await testsRes.json()
         if (!Array.isArray(rawData) || rawData.length === 0) {
@@ -237,7 +238,7 @@ function ExamContent() {
         data = [...rawData].sort(() => Math.random() - 0.5)
       } else {
         // Oddiy rejimlar: count bo'yicha yoki avvalgi IDlar bo'yicha
-        let url = `${API_URL}/api/tests?lang=${langCode}`
+        let url = `/tests?lang=${langCode}`
         if (reloadTrigger === 0 && currentIdsRef.current.length > 0) {
           const idsString = currentIdsRef.current.join(',')
           url += `&ids=${idsString}`
@@ -252,7 +253,7 @@ function ExamContent() {
           const idsString = Array.from(randomIds).join(',')
           url += `&ids=${idsString}`
         }
-        const res = await fetch(url, { cache: 'no-store' })
+        const res = await apiFetch(url, { cache: 'no-store' })
         if (!res.ok) throw new Error('API xatolik')
         data = await res.json()
       }
@@ -394,9 +395,8 @@ function ExamContent() {
     )
 
     try {
-      await fetch(`${API_URL}/api/favorites/toggle`, {
+      await apiFetch('/favorites/toggle', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: currentUser.uid,
           questionId: numId,
@@ -445,9 +445,8 @@ function ExamContent() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mistakes/add`, {
+      await apiFetch('/mistakes/add', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -460,9 +459,8 @@ function ExamContent() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mistakes/remove`, {
+      await apiFetch('/mistakes/remove', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -475,9 +473,8 @@ function ExamContent() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mastery/correct`, {
+      await apiFetch('/mastery/correct', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -490,9 +487,8 @@ function ExamContent() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mastery/incorrect`, {
+      await apiFetch('/mastery/incorrect', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -583,9 +579,8 @@ function ExamContent() {
     });
 
     try {
-      const res = await fetch(`${API_URL}/api/exam-history/save`, {
+      const res = await apiFetch('/exam-history/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid,
           type: typeMap[mode] || 'standart',
@@ -776,8 +771,8 @@ function ExamContent() {
 
           <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg">
             {[
-              { label: 'Uzb (lotin)', code: 'uzl' },
-              { label: 'Uzb (kirill)', code: 'uzk' },
+              { label: 'O\'zbek (Lotin)', code: 'uzl' },
+              { label: 'Ўзбек (Кирилл)', code: 'uzk' },
               { label: 'Русский', code: 'ru' }
             ].map((item) => (
               <button

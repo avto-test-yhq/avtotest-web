@@ -13,6 +13,7 @@ import { useI18n } from '@/lib/i18n'
 import ExamSettingsModal from '@/components/ExamSettingsModal'
 import ExamResult from '@/components/ExamResult'
 import FeedbackModal from '@/components/FeedbackModal'
+import { apiFetch } from '@/lib/apiClient'
 
 
 const Icons = {
@@ -33,11 +34,10 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
   </svg>
 )
 
-async function saveBiletResultToApi(apiUrl, uid, ticketId, correct, total, qCount) {
+async function saveBiletResultToApi(uid, ticketId, correct, total, qCount) {
   try {
-    const res = await fetch(`${apiUrl}/api/bilet-progress/save`, {
+    const res = await apiFetch(`/bilet-progress/save`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uid, ticketId, correct, total, qCount })
     })
     if (!res.ok) throw new Error('API xatolik')
@@ -50,7 +50,6 @@ export default function BiletTicketPage() {
   const router = useRouter()
   const params = useParams()
   const ticketId = useMemo(() => parseInt(params?.ticketId, 10) || 1, [params?.ticketId])
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const { settings } = useExamSettings()
   const { lang: globalLang, setLang: setGlobalLang } = useLanguage()
@@ -77,7 +76,7 @@ export default function BiletTicketPage() {
   const transformQuestion = (item) => {
     let imageUrl = ''
     if (item.image && item.image.trim() !== '') {
-      imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+      imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}/uploads/${item.image}`
     }
     return {
       id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,
@@ -117,8 +116,8 @@ export default function BiletTicketPage() {
         for (let i = startId; i <= endId; i++) ids.push(i)
         const idsString = ids.join(',')
         const langCode = getLangCode(lang)
-        const url = `${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`
-        const res = await fetch(url)
+        const url = `/tests?lang=${langCode}&ids=${idsString}`
+        const res = await apiFetch(url)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         if (Array.isArray(data) && data.length > 0) {
@@ -140,7 +139,7 @@ export default function BiletTicketPage() {
       }
     }
     fetchTests()
-  }, [ticketId, API_URL])
+  }, [ticketId])
 
   // Til o'zgarganda: faqat savol matnlarini yangilash (savollar va javoblar o'zgarmaydi)
   const idsRef = useRef([])
@@ -166,7 +165,7 @@ export default function BiletTicketPage() {
     if (ids.length === 0) return
     const idsString = ids.join(',')
     const langCode = getLangCode(lang)
-    fetch(`${API_URL}/api/tests?lang=${langCode}&ids=${idsString}`)
+    apiFetch(`/tests?lang=${langCode}&ids=${idsString}`)
       .then((res) => res.ok ? res.json() : [])
       .then((data) => {
         if (!Array.isArray(data) || data.length === 0) return
@@ -206,7 +205,7 @@ export default function BiletTicketPage() {
   const loadSavedIds = useCallback(
     async (uid) => {
       try {
-        const res = await fetch(`${API_URL}/api/favorites/${uid}`)
+        const res = await apiFetch(`/favorites/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         if (Array.isArray(questionIds)) {
@@ -219,7 +218,7 @@ export default function BiletTicketPage() {
         setSavedIds([])
       }
     },
-    [API_URL]
+    []
   )
 
   useEffect(() => {
@@ -274,9 +273,8 @@ export default function BiletTicketPage() {
     )
 
     try {
-      await fetch(`${API_URL}/api/favorites/toggle`, {
+      await apiFetch(`/favorites/toggle`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: currentUser.uid,
           questionId: numId,
@@ -314,7 +312,7 @@ export default function BiletTicketPage() {
         try {
           if (currentUser?.uid) {
             const qCount = settings?.questionCount || 10
-            await saveBiletResultToApi(API_URL, currentUser.uid, ticketId, stats.correct, questions.length, qCount)
+            await saveBiletResultToApi(currentUser.uid, ticketId, stats.correct, questions.length, qCount)
             const elapsed = (endTimeRef.current && startTimeRef.current)
               ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
 
@@ -338,9 +336,8 @@ export default function BiletTicketPage() {
               };
             });
 
-            const saveRes = await fetch(`${API_URL}/api/exam-history/save`, {
+            const saveRes = await apiFetch(`/exam-history/save`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 uid: currentUser.uid,
                 type: 'bilet',
@@ -363,7 +360,7 @@ export default function BiletTicketPage() {
       }
       saveResult()
     }
-  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved, currentUser?.uid, API_URL])
+  }, [isFinished, questions.length, ticketId, stats.correct, resultSaved, currentUser?.uid])
 
   const getNumericId = (questionId) => {
     const q = questions.find((item) => item.id == questionId || item.numeric_id == questionId)
@@ -375,9 +372,8 @@ export default function BiletTicketPage() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mistakes/add`, {
+      await apiFetch(`/mistakes/add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -390,9 +386,8 @@ export default function BiletTicketPage() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mastery/correct`, {
+      await apiFetch(`/mastery/correct`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {
@@ -405,9 +400,8 @@ export default function BiletTicketPage() {
     const numericId = getNumericId(questionId)
     if (numericId == null) return
     try {
-      await fetch(`${API_URL}/api/mastery/incorrect`, {
+      await apiFetch(`/mastery/incorrect`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
       })
     } catch (e) {

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
+import { apiFetch } from '@/lib/apiClient'
 
 const Icon = ({ name, className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -29,7 +30,6 @@ function formatShortDate(dateStr) {
 
 export default function TashriflarPage() {
   const router = useRouter()
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [daily, setDaily] = useState([])
   const [weekly, setWeekly] = useState([])
@@ -41,7 +41,7 @@ export default function TashriflarPage() {
     async (uid) => {
       try {
         setLoading(true)
-        const res = await fetch(`${API_URL}/api/activity/${uid}`)
+        const res = await apiFetch(`/activity/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         setDaily(data.daily || [])
@@ -58,7 +58,7 @@ export default function TashriflarPage() {
         setLoading(false)
       }
     },
-    [API_URL]
+    []
   )
 
   useEffect(() => {

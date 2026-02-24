@@ -10,6 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
 import { useLanguage } from '@/context/LanguageContext'
+import { apiFetch } from '@/lib/apiClient'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -28,7 +29,6 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
 export default function FavoritesPage() {
   const router = useRouter()
   const { lang } = useLanguage()
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -38,7 +38,7 @@ export default function FavoritesPage() {
   const fetchFavorites = useCallback(async (uid) => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/favorites/${uid}?t=${Date.now()}`, { cache: 'no-store' })
+      const res = await apiFetch(`/favorites/${uid}?t=${Date.now()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('API xatolik')
       const { questionIds } = await res.json()
       if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -46,7 +46,7 @@ export default function FavoritesPage() {
         return
       }
       const idsString = questionIds.join(',')
-      const testsRes = await fetch(`${API_URL}/api/tests?lang=${lang || 'uzl'}&ids=${idsString}`)
+      const testsRes = await apiFetch(`/tests?lang=${lang || 'uzl'}&ids=${idsString}`)
       if (!testsRes.ok) throw new Error('Tests API xatolik')
       const data = await testsRes.json()
       if (!Array.isArray(data) || data.length === 0) {
@@ -56,7 +56,7 @@ export default function FavoritesPage() {
       const transformed = data.map((item) => {
         let imageUrl = ''
         if (item.image && item.image.trim() !== '') {
-          imageUrl = item.image.startsWith('http') ? item.image : `${API_URL}/uploads/${item.image}`
+          imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}/uploads/${item.image}`
         }
         return {
           id: item._id || item.id,
@@ -77,7 +77,7 @@ export default function FavoritesPage() {
     } finally {
       setLoading(false)
     }
-  }, [API_URL, lang])
+  }, [lang])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -101,9 +101,8 @@ export default function FavoritesPage() {
     setQuestions((prev) => prev.filter((q) => Number(q.numeric_id ?? q.id) !== numId))
 
     try {
-      await fetch(`${API_URL}/api/favorites/toggle`, {
+      await apiFetch(`/favorites/toggle`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           uid: user.uid,
           questionId: numId,

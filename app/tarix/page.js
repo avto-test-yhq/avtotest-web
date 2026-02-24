@@ -12,6 +12,7 @@ import QoidalarHeader from '@/components/QoidalarHeader'
 import { useI18n } from '@/lib/i18n'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
 import { uz } from 'date-fns/locale'
+import { apiFetch } from '@/lib/apiClient'
 
 const Icon = ({ name, className = 'w-5 h-5' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,7 +72,6 @@ function StatusBadge({ status, t }) {
 export default function TarixPage() {
   const router = useRouter()
   const t = useI18n()
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
   const [activeTab, setActiveTab] = useState('imtihonlar')
   const [attempts, setAttempts] = useState([])
@@ -91,7 +91,7 @@ export default function TarixPage() {
     async (uid) => {
       try {
         setLoading(true)
-        const res = await fetch(`${API_URL}/api/exam-history/history/${uid}`)
+        const res = await apiFetch(`/exam-history/history/${uid}`)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         setAttempts(data.attempts || [])
@@ -102,7 +102,7 @@ export default function TarixPage() {
         setLoading(false)
       }
     },
-    [API_URL]
+    []
   )
 
   useEffect(() => {

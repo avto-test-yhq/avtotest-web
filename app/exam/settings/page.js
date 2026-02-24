@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 const DEFAULT_SETTINGS = {
-  questionCount: 20,
+  questionCount: 10,
   showCorrect: true,
   showExplanation: true,
   autoNext: true,
@@ -44,7 +44,7 @@ export default function ExamSettingsPage() {
     } catch {
       // ignore
     }
-    const count = settings.questionCount || 20
+    const count = settings.questionCount || 10
     router.push(`/exam?mode=standard&count=${count}`)
   }
 

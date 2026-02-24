@@ -7,11 +7,11 @@ import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 
 export default function StatistikaPage() {
     const router = useRouter()
     const t = useI18n()
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
 
     const [stats, setStats] = useState([])
     const [loading, setLoading] = useState(true)
@@ -21,7 +21,7 @@ export default function StatistikaPage() {
     const fetchStats = async (uid) => {
         setLoading(true)
         try {
-            const res = await fetch(`${API_URL}/api/stats/questions/${uid}?sort=${sort}&order=${order}`)
+            const res = await apiFetch(`/stats/questions/${uid}?sort=${sort}&order=${order}`)
             if (res.ok) {
                 const data = await res.json()
                 setStats(data)
