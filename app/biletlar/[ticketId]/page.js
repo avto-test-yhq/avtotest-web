@@ -51,7 +51,7 @@ export default function BiletTicketPage() {
   const params = useParams()
   const ticketId = useMemo(() => parseInt(params?.ticketId, 10) || 1, [params?.ticketId])
 
-  const { settings } = useExamSettings()
+  const { settings, loading: settingsLoading } = useExamSettings()
   const { lang: globalLang, setLang: setGlobalLang } = useLanguage()
   const t = useI18n()
   const [showSettingsModal, setShowSettingsModal] = useState(false)
@@ -105,11 +105,13 @@ export default function BiletTicketPage() {
 
   // Bilet yuklash (ticketId yoki lang o'zgaganda)
   useEffect(() => {
+    if (settingsLoading) return;
+
     const fetchTests = async () => {
       setAnswers({})
       setResultSaved(false)
       try {
-        const qCount = settings?.questionCount || 20
+        const qCount = settings?.questionCount || 10
         const startId = (ticketId - 1) * qCount + 1
         const endId = ticketId * qCount
         const ids = []
@@ -139,13 +141,13 @@ export default function BiletTicketPage() {
       }
     }
     fetchTests()
-  }, [ticketId])
+  }, [ticketId, settingsLoading, settings?.questionCount])
 
   // Til o'zgarganda: faqat savol matnlarini yangilash (savollar va javoblar o'zgarmaydi)
   const idsRef = useRef([])
   useEffect(() => {
     if (questions.length === 0) return
-    const qCount = settings?.questionCount || 20
+    const qCount = settings?.questionCount || 10
     const startId = (ticketId - 1) * qCount + 1
     const endId = ticketId * qCount
     const ids = []
@@ -316,25 +318,28 @@ export default function BiletTicketPage() {
             const elapsed = (endTimeRef.current && startTimeRef.current)
               ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
 
-            // Prepare details
-            const details = questions.map(q => {
-              const qId = q.numeric_id || q.id;
-              const userAnswer = answers[q.id];
-              const isCorrect = userAnswer === undefined ? false : q.options[userAnswer]?.is_correct;
-              const correctAnswer = q.options.findIndex(o => o.is_correct);
+            const answeredCount = Object.keys(answers).length;
+            // Shunchaki o'tkazib yuborilgan (javobsiz) testlarni details ro'yxatidan olib tashlaymiz
+            const details = questions
+              .filter(q => answers[q.id] !== undefined)
+              .map(q => {
+                const qId = q.numeric_id || q.id;
+                const userAnswer = answers[q.id];
+                const isCorrect = q.options[userAnswer]?.is_correct;
+                const correctAnswer = q.options.findIndex(o => o.is_correct);
 
-              return {
-                questionId: qId,
-                userAnswer: userAnswer,
-                correctAnswer: correctAnswer,
-                isCorrect: isCorrect,
-                questionData: {
-                  question: q.question,
-                  options: q.options,
-                  media: { name: q.image ? q.image.split('/').pop() : null }
-                }
-              };
-            });
+                return {
+                  questionId: qId,
+                  userAnswer: userAnswer,
+                  correctAnswer: correctAnswer,
+                  isCorrect: isCorrect,
+                  questionData: {
+                    question: q.question,
+                    options: q.options,
+                    media: { name: q.image ? q.image.split('/').pop() : null }
+                  }
+                };
+              });
 
             const saveRes = await apiFetch(`/exam-history/save`, {
               method: 'POST',
@@ -342,7 +347,7 @@ export default function BiletTicketPage() {
                 uid: currentUser.uid,
                 type: 'bilet',
                 correct: stats.correct,
-                total: questions.length,
+                total: answeredCount, // <- FAqat javob berilganlari
                 durationSeconds: elapsed,
                 status: 'tugallangan',
                 ticketId,

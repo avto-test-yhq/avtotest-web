@@ -26,7 +26,8 @@ export default function ExamResult({
     const total = questions.length;
     const answeredCount = Object.keys(answers).length;
     const unanswered = Math.max(0, total - answeredCount);
-    const percent = total > 0 ? Math.round((stats.correct / total) * 100) : 0;
+    // Foiz faqat ishlangan testlar sonidan hisoblanadi (agar umuman ishlanmagan bo'lsa 0)
+    const percent = answeredCount > 0 ? Math.round((stats.correct / answeredCount) * 100) : 0;
 
     // Circle properties
     const strokeDasharray = 263.89; // 2 * PI * 42 = ~263.89
@@ -79,7 +80,7 @@ export default function ExamResult({
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
                                 <span className="text-4xl font-extrabold">{percent}%</span>
-                                <span className="text-slate-500 dark:text-slate-400 font-semibold mt-1">{stats.correct} / {total}</span>
+                                <span className="text-slate-500 dark:text-slate-400 font-semibold mt-1">{stats.correct} / {answeredCount > 0 ? answeredCount : total}</span>
                             </div>
                         </div>
 

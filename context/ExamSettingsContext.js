@@ -9,7 +9,7 @@ const defaultSettings = {
     showCorrect: true,
     showExplanation: false,
     shuffleOptions: false,
-    questionCount: 20
+    questionCount: 10
 }
 
 const ExamSettingsContext = createContext({

@@ -552,31 +552,33 @@ function ExamContent() {
   const saveExamAttempt = useCallback(async (status) => {
     const uid = currentUser?.uid || auth.currentUser?.uid
     if (!uid || examAttemptSavedRef.current) return
-    const total = questions.length
-    if (total === 0) return
+    const answeredCount = Object.keys(answers).length
+    if (answeredCount === 0) return
     const elapsed = (endTimeRef.current && startTimeRef.current)
       ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
     const typeMap = { standard: 'standart', real: 'haqiqiy', favorites: 'favorites', mistakes: 'mistakes' }
 
-    // Prepare details
-    const details = questions.map(q => {
-      const qId = q.numeric_id || q.id;
-      const userAnswer = answers[q.id]; // answers uses original ID (string/number mixed from API)
-      const isCorrect = userAnswer === undefined ? false : q.options[userAnswer]?.is_correct;
-      const correctAnswer = q.options.findIndex(o => o.is_correct);
+    // Shunchaki o'tkazib yuborilgan (javobsiz) testlarni details ro'yxatidan olib tashlaymiz
+    const details = questions
+      .filter(q => answers[q.id] !== undefined)
+      .map(q => {
+        const qId = q.numeric_id || q.id;
+        const userAnswer = answers[q.id]; // answers uses original ID (string/number mixed from API)
+        const isCorrect = q.options[userAnswer]?.is_correct;
+        const correctAnswer = q.options.findIndex(o => o.is_correct);
 
-      return {
-        questionId: qId,
-        userAnswer: userAnswer,
-        correctAnswer: correctAnswer,
-        isCorrect: isCorrect,
-        questionData: {
-          question: q.question,
-          options: q.options,
-          media: { name: q.image ? q.image.split('/').pop() : null } // simplified media
-        }
-      };
-    });
+        return {
+          questionId: qId,
+          userAnswer: userAnswer,
+          correctAnswer: correctAnswer,
+          isCorrect: isCorrect,
+          questionData: {
+            question: q.question,
+            options: q.options,
+            media: { name: q.image ? q.image.split('/').pop() : null } // simplified media
+          }
+        };
+      });
 
     try {
       const res = await apiFetch('/exam-history/save', {
@@ -585,7 +587,7 @@ function ExamContent() {
           uid,
           type: typeMap[mode] || 'standart',
           correct: stats.correct,
-          total,
+          total: answeredCount,
           durationSeconds: elapsed,
           status,
           details: details
