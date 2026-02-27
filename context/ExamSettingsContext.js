@@ -9,7 +9,8 @@ const defaultSettings = {
     showCorrect: true,
     showExplanation: false,
     shuffleOptions: false,
-    questionCount: 10
+    questionCount: 10,
+    promoUnlocked: false, // Promo kod orqali barcha biletlarni ochish
 }
 
 const ExamSettingsContext = createContext({
@@ -25,7 +26,7 @@ export function ExamSettingsProvider({ children }) {
     const [loading, setLoading] = useState(true)
     const [user, setUser] = useState(null)
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
     // 1. Load initial settings from localStorage on mount
     useEffect(() => {

@@ -124,7 +124,7 @@ export default function ProfilPage() {
                         }
 
                         if (parsed.picture) {
-                            const picUrl = parsed.picture.startsWith('http') ? parsed.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${parsed.picture}`
+                            const picUrl = parsed.picture.startsWith('http') ? parsed.picture : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}${parsed.picture}`
                             setAvatar(picUrl)
                             setOriginalAvatar(picUrl)
                         }
@@ -144,7 +144,7 @@ export default function ProfilPage() {
                     }
 
                     if (data.picture) {
-                        const picUrl = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${data.picture}`
+                        const picUrl = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}${data.picture}`
                         setAvatar(picUrl)
                         setOriginalAvatar(picUrl)
                     }
@@ -281,7 +281,7 @@ export default function ProfilPage() {
 
             if (res.ok) {
                 setMessage({ text: 'Rasm muvaffaqiyatli yuklandi', type: 'success' })
-                const actAvatar = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}${data.picture}`
+                const actAvatar = data.picture.startsWith('http') ? data.picture : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}${data.picture}`
                 setAvatar(actAvatar)
                 setOriginalAvatar(actAvatar)
 

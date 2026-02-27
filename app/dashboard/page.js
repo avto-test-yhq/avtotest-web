@@ -34,7 +34,7 @@ import {
   MessageSquare,
 } from 'lucide-react'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 const fetchBiletlarProgress = async (uid) => {
   try {

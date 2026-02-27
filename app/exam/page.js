@@ -44,7 +44,7 @@ function ExamContent() {
   const searchParams = useSearchParams()
   const countParam = searchParams.get('count') || '20'
   const mode = searchParams.get('mode') || 'standard' // 'standard', 'real' yoki 'favorites'
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 
   const questionCount = useMemo(() => {

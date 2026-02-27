@@ -6,7 +6,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { useI18n } from '@/lib/i18n'
 import { useLanguage } from '@/context/LanguageContext'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 const DAY_LABELS = {
   uzl: ['Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha', 'Ya'],

@@ -101,6 +101,40 @@ export default function ExamSettingsModal({ isOpen, onClose }) {
                                 />
                             </div>
 
+                            {/* Promo kod */}
+                            <div className="pt-4 border-t border-slate-200 dark:border-white/5 space-y-3">
+                                <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Promo kod</h3>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Promo kod"
+                                        onClick={e => e.stopPropagation()}
+                                        onChange={(e) =>
+                                            setLocalSettings(prev => ({ ...prev, promoInput: e.target.value }))
+                                        }
+                                        className="flex-1 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#161821] px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-brand-cyan"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            const code = (localSettings.promoInput || '').trim().toUpperCase()
+                                            if (code === 'JAVA') {
+                                                setLocalSettings(prev => ({ ...prev, promoUnlocked: true }))
+                                            }
+                                        }}
+                                        className="rounded-lg bg-emerald-500 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-400"
+                                    >
+                                        Tasdiqlash
+                                    </button>
+                                </div>
+                                {localSettings.promoUnlocked && (
+                                    <p className="text-[11px] text-emerald-500 dark:text-emerald-400">
+                                        Promo aktiv: barcha biletlar ochiq.
+                                    </p>
+                                )}
+                            </div>
+
                             <div className="pt-4 border-t border-slate-200 dark:border-white/5 space-y-4">
                                 <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Aloqa va Ilova</h3>
                                 <div className="grid grid-cols-2 gap-3">

@@ -12,14 +12,13 @@ const nextConfig = {
         hostname: 'upload.wikimedia.org',
       },
       {
-        protocol: 'http',
-        hostname: '170.168.60.161',
-        port: '5001',
+        protocol: 'https',
+        hostname: 'api.pravachi.uz',
         pathname: '/**',
       },
       {
-        protocol: 'http',
-        hostname: '170.168.60.161',
+        protocol: 'https',
+        hostname: 'api.pravachi.uz',
         pathname: '/rules/**',
       },
       {

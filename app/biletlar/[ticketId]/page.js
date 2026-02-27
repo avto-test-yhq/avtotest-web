@@ -76,7 +76,7 @@ export default function BiletTicketPage() {
   const transformQuestion = (item) => {
     let imageUrl = ''
     if (item.image && item.image.trim() !== '') {
-      imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}/uploads/${item.image}`
+      imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}/uploads/${item.image}`
     }
     return {
       id: (typeof item.id === 'number' ? item.id : item._id) || item.id || item._id,

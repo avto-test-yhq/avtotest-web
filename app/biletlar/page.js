@@ -92,9 +92,10 @@ export default function BiletlarPage() {
   const totalTickets = stats.totalTickets
   const totalBiletQuestions = stats.totalBiletQuestions
   const ozlashtirishPercent = totalBiletQuestions > 0 ? Math.round((totalCorrect / totalBiletQuestions) * 100) : 0
-  const unlockedCount = Math.min(completedCount + 1, totalTickets)
+  const promoUnlocked = settings?.promoUnlocked === true
+  const unlockedCount = promoUnlocked ? totalTickets : Math.min(completedCount + 1, totalTickets)
 
-  const isUnlocked = (ticketNum) => ticketNum <= unlockedCount
+  const isUnlocked = (ticketNum) => promoUnlocked || ticketNum <= unlockedCount
 
   // ticketResults: { 5: [ { correct, total, percent }, ... ] } yoki eski format { 5: { correct, total, percent } }
   const ticketResult = (ticketNum) => {

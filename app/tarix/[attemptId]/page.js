@@ -10,7 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 const Icon = ({ name, className = 'w-5 h-5' }) => (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

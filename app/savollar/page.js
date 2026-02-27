@@ -10,7 +10,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 export default function SavollarPage() {
   const { lang } = useLanguage()

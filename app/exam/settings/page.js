@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   showExplanation: true,
   autoNext: true,
   shuffleOptions: true,
+  promoUnlocked: false,
 }
 
 const QUESTION_OPTIONS = [10, 20, 50, 100, 500]
@@ -18,6 +19,8 @@ export default function ExamSettingsPage() {
   const router = useRouter()
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [loaded, setLoaded] = useState(false)
+  const [promoInput, setPromoInput] = useState('')
+  const [promoMessage, setPromoMessage] = useState<string | null>(null)
 
   useEffect(() => {
     try {
@@ -50,6 +53,17 @@ export default function ExamSettingsPage() {
 
   const handleBack = () => {
     router.back()
+  }
+
+  const handleApplyPromo = () => {
+    const code = promoInput.trim().toUpperCase()
+    if (!code) return
+    if (code === 'JAVA') {
+      setSettings((prev) => ({ ...prev, promoUnlocked: true }))
+      setPromoMessage("Promo kod faollashtirildi. Barcha biletlar ochiq.")
+    } else {
+      setPromoMessage("Promo kod noto'g'ri.")
+    }
   }
 
   if (!loaded) {
@@ -143,6 +157,37 @@ export default function ExamSettingsPage() {
             value={settings.shuffleOptions}
             onChange={(v) => update({ shuffleOptions: v })}
           />
+        </section>
+
+        {/* Promo kod */}
+        <section className="space-y-3">
+          <p className="text-xs font-semibold text-cyan-500 uppercase tracking-widest">Promo kod</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={promoInput}
+              onChange={(e) => setPromoInput(e.target.value)}
+              placeholder="Promo kodni kiriting"
+              className="flex-1 rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+            />
+            <button
+              type="button"
+              onClick={handleApplyPromo}
+              className="rounded-xl bg-emerald-500 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-400"
+            >
+              Tasdiqlash
+            </button>
+          </div>
+          {settings.promoUnlocked && (
+            <p className="text-[11px] text-emerald-400">
+              Promo aktiv: Barcha biletlar ochiq holatda.
+            </p>
+          )}
+          {promoMessage && !settings.promoUnlocked && (
+            <p className="text-[11px] text-rose-400">
+              {promoMessage}
+            </p>
+          )}
         </section>
 
         <p className="text-[11px] text-slate-500 dark:text-slate-500">

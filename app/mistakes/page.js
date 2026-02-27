@@ -56,7 +56,7 @@ export default function MistakesPage() {
           const transformed = data.map((item) => {
             let imageUrl = ''
             if (item.image && item.image.trim() !== '') {
-              imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'http://170.168.60.161:5001'}/uploads/${item.image}`
+              imageUrl = item.image.startsWith('http') ? item.image : `${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}/uploads/${item.image}`
             }
             return {
               id: item._id || item.id,
