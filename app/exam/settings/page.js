@@ -20,7 +20,7 @@ export default function ExamSettingsPage() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [loaded, setLoaded] = useState(false)
   const [promoInput, setPromoInput] = useState('')
-  const [promoMessage, setPromoMessage] = useState<string | null>(null)
+  const [promoMessage, setPromoMessage] = useState(null)
 
   useEffect(() => {
     try {
@@ -113,11 +113,10 @@ export default function ExamSettingsPage() {
                   key={n}
                   type="button"
                   onClick={() => update({ questionCount: n })}
-                  className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${
-                    active
+                  className={`flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${active
                       ? 'bg-sky-500 text-white shadow-sm'
                       : 'text-slate-400 hover:text-slate-100 hover:bg-slate-800/80'
-                  }`}
+                    }`}
                 >
                   {n}
                 </button>
@@ -222,14 +221,12 @@ function ToggleRow({ label, description, value, onChange }) {
       <button
         type="button"
         onClick={() => onChange(!value)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-          value ? 'bg-sky-500' : 'bg-slate-600'
-        }`}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${value ? 'bg-sky-500' : 'bg-slate-600'
+          }`}
       >
         <span
-          className={`inline-block h-5 w-5 rounded-full bg-white transform transition-transform ${
-            value ? 'translate-x-5' : 'translate-x-1'
-          }`}
+          className={`inline-block h-5 w-5 rounded-full bg-white transform transition-transform ${value ? 'translate-x-5' : 'translate-x-1'
+            }`}
         />
       </button>
     </div>
