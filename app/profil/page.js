@@ -132,7 +132,7 @@ export default function ProfilPage() {
                 }
 
                 // 2. Keyin API dan eng oxirgi ma'lumotni tortamiz (agar kiritilgan bo'lsa)
-                const res = await apiFetch(`/users/profile/${user.uid}`)
+                const res = await apiFetch(`/users/profile`)
                 if (res.ok) {
                     const data = await res.json()
 
@@ -269,7 +269,7 @@ export default function ProfilPage() {
             formData.append('avatar', file)
 
             // apiFetch ni rasm uchun ishlatsak (multipart/form-data): Headerlarni avto qoldirish uchun content-type berilmaydi
-            const res = await apiFetch(`/users/upload-avatar/${currentUser.uid}`, {
+            const res = await apiFetch(`/users/upload-avatar`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -322,7 +322,7 @@ export default function ProfilPage() {
         const dobString = (dobDay && dobMonth && dobYear) ? `${dobDay}-${dobMonth}-${dobYear}` : ''
 
         try {
-            const res = await apiFetch(`/users/profile/${currentUser.uid}`, {
+            const res = await apiFetch(`/users/profile`, {
                 method: 'PUT',
                 body: JSON.stringify({
                     fullName,

@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
+import { apiFetch } from '@/lib/apiClient'
 
 const defaultSettings = {
     autoNext: true,
@@ -48,7 +49,7 @@ export function ExamSettingsProvider({ children }) {
             setUser(currentUser)
             if (currentUser) {
                 try {
-                    const res = await fetch(`${API_URL}/api/users/settings/${currentUser.uid}`)
+                    const res = await apiFetch(`/users/settings`)
                     if (res.ok) {
                         const serverSettings = await res.json()
                         // Merge server settings with current (server takes precedence if valid)
@@ -81,9 +82,8 @@ export function ExamSettingsProvider({ children }) {
         // Save to Backend if logged in
         if (user) {
             try {
-                await fetch(`${API_URL}/api/users/settings/${user.uid}`, {
+                await apiFetch(`/users/settings`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newSettings)
                 })
             } catch (e) {

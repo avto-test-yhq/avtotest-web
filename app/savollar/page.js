@@ -96,7 +96,7 @@ export default function SavollarPage() {
     const unsub = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user || null)
       if (user) {
-        fetch(`${API_URL}/api/favorites/${user.uid}`)
+        fetch(`${API_URL}/api/favorites/`)
           .then((r) => r.ok ? r.json() : {})
           .then((d) => setSavedIds(Array.isArray(d?.questionIds) ? d.questionIds : []))
           .catch(() => setSavedIds([]))
@@ -116,7 +116,7 @@ export default function SavollarPage() {
       const res = await fetch(`${API_URL}/api/favorites/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numId }),
+        body: JSON.stringify({ questionId: numId }),
       })
       const data = await res.json()
       if (data?.status === 'added') setSavedIds((prev) => [...prev, numId])

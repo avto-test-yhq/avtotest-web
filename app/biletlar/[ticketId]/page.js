@@ -38,7 +38,7 @@ async function saveBiletResultToApi(uid, ticketId, correct, total, qCount) {
   try {
     const res = await apiFetch(`/bilet-progress/save`, {
       method: 'POST',
-      body: JSON.stringify({ uid, ticketId, correct, total, qCount })
+      body: JSON.stringify({ ticketId, correct, total, qCount })
     })
     if (!res.ok) throw new Error('API xatolik')
   } catch (e) {
@@ -207,7 +207,7 @@ export default function BiletTicketPage() {
   const loadSavedIds = useCallback(
     async (uid) => {
       try {
-        const res = await apiFetch(`/favorites/${uid}`)
+        const res = await apiFetch(`/favorites/`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         if (Array.isArray(questionIds)) {
@@ -278,7 +278,6 @@ export default function BiletTicketPage() {
       await apiFetch(`/favorites/toggle`, {
         method: 'POST',
         body: JSON.stringify({
-          uid: currentUser.uid,
           questionId: numId,
         }),
       })
@@ -314,7 +313,7 @@ export default function BiletTicketPage() {
         try {
           if (currentUser?.uid) {
             const qCount = settings?.questionCount || 10
-            await saveBiletResultToApi(currentUser.uid, ticketId, stats.correct, questions.length, qCount)
+            await saveBiletResultToApi(ticketId, stats.correct, questions.length, qCount)
             const elapsed = (endTimeRef.current && startTimeRef.current)
               ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
 
@@ -344,7 +343,6 @@ export default function BiletTicketPage() {
             const saveRes = await apiFetch(`/exam-history/save`, {
               method: 'POST',
               body: JSON.stringify({
-                uid: currentUser.uid,
                 type: 'bilet',
                 correct: stats.correct,
                 total: answeredCount, // <- FAqat javob berilganlari
@@ -379,7 +377,7 @@ export default function BiletTicketPage() {
     try {
       await apiFetch(`/mistakes/add`, {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Xatoni saqlashda xatolik:', e)
@@ -393,7 +391,7 @@ export default function BiletTicketPage() {
     try {
       await apiFetch(`/mastery/correct`, {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Mastery saqlashda xatolik:', e)
@@ -407,7 +405,7 @@ export default function BiletTicketPage() {
     try {
       await apiFetch(`/mastery/incorrect`, {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Mastery yangilashda xatolik:', e)

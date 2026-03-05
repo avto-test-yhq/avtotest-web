@@ -27,11 +27,11 @@ export default function BiletlarPage() {
   const [showSettings, setShowSettings] = useState(false)
 
   // Fetch logic extracted so we can call it after settings close
-  const fetchStatsAndProgress = async (uid, qCount) => {
+  const fetchStatsAndProgress = async (qCount) => {
     try {
       const [biletRes, masteryRes] = await Promise.all([
-        apiFetch(`/bilet-progress/${uid}?qCount=${qCount || 10}`),
-        apiFetch(`/mastery/${uid}`)
+        apiFetch(`/bilet-progress/?qCount=${qCount || 10}`),
+        apiFetch(`/mastery/`)
       ])
       if (biletRes.ok) {
         const data = await biletRes.json()
@@ -71,7 +71,7 @@ export default function BiletlarPage() {
       }
       setLoading(true)
       const qCount = settings?.questionCount || 10
-      await fetchStatsAndProgress(user.uid, qCount)
+      await fetchStatsAndProgress(qCount)
     })
     return () => unsub()
   }, [router, settingsLoading, settings?.questionCount])
@@ -82,7 +82,7 @@ export default function BiletlarPage() {
       const currentUser = auth.currentUser;
       if (currentUser) {
         const qCount = settings?.questionCount || 10
-        fetchStatsAndProgress(currentUser.uid, qCount)
+        fetchStatsAndProgress(qCount)
       }
     }
   }, [showSettings, settingsLoading, settings?.questionCount])

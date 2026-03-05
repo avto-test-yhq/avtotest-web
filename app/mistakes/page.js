@@ -38,10 +38,10 @@ export default function MistakesPage() {
   const [selectedQuestion, setSelectedQuestion] = useState(null)
 
   const fetchMistakes = useCallback(
-    async (uid) => {
+    async () => {
       try {
         setLoading(true)
-        const res = await apiFetch(`/mistakes/${uid}`)
+        const res = await apiFetch(`/mistakes/`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -93,7 +93,7 @@ export default function MistakesPage() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
-        await fetchMistakes(currentUser.uid)
+        await fetchMistakes()
       } else {
         router.push('/login')
       }

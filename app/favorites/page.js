@@ -35,10 +35,10 @@ export default function FavoritesPage() {
   const [user, setUser] = useState(null)
   const [selectedQuestion, setSelectedQuestion] = useState(null)
 
-  const fetchFavorites = useCallback(async (uid) => {
+  const fetchFavorites = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await apiFetch(`/favorites/${uid}?t=${Date.now()}`, { cache: 'no-store' })
+      const res = await apiFetch(`/favorites/?t=${Date.now()}`, { cache: 'no-store' })
       if (!res.ok) throw new Error('API xatolik')
       const { questionIds } = await res.json()
       if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -83,7 +83,7 @@ export default function FavoritesPage() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser)
-        await fetchFavorites(currentUser.uid)
+        await fetchFavorites()
       } else {
         router.push('/login')
       }
@@ -110,7 +110,7 @@ export default function FavoritesPage() {
       })
     } catch (e) {
       console.error("Sevimlilardan o'chirishda xatolik:", e)
-      fetchFavorites(user.uid) // Xato bo'lsa qaytarib yuklaymiz
+      fetchFavorites() // Xato bo'lsa qaytarib yuklaymiz
     }
   }
 

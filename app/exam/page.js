@@ -91,7 +91,7 @@ function ExamContent() {
   const loadSavedIds = useCallback(
     async (uid) => {
       try {
-        const res = await apiFetch(`/favorites/${uid}`)
+        const res = await apiFetch(`/favorites/`)
         if (!res.ok) throw new Error('API xatolik')
         const { questionIds } = await res.json()
         setSavedIds(Array.isArray(questionIds) ? questionIds : [])
@@ -198,7 +198,7 @@ function ExamContent() {
           setFavoritesEmpty(true)
           return
         }
-        const favRes = await apiFetch(`/favorites/${currentUser.uid}`)
+        const favRes = await apiFetch(`/favorites/`)
         if (!favRes.ok) throw new Error('API xatolik')
         const { questionIds } = await favRes.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -220,7 +220,7 @@ function ExamContent() {
           setFavoritesEmpty(true)
           return
         }
-        const mistakesRes = await apiFetch(`/mistakes/${currentUser.uid}`)
+        const mistakesRes = await apiFetch(`/mistakes/`)
         if (!mistakesRes.ok) throw new Error('API xatolik')
         const { questionIds } = await mistakesRes.json()
         if (!Array.isArray(questionIds) || questionIds.length === 0) {
@@ -398,7 +398,6 @@ function ExamContent() {
       await apiFetch('/favorites/toggle', {
         method: 'POST',
         body: JSON.stringify({
-          uid: currentUser.uid,
           questionId: numId,
         }),
       })
@@ -447,7 +446,7 @@ function ExamContent() {
     try {
       await apiFetch('/mistakes/add', {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Xatoni saqlashda xatolik:', e)
@@ -461,7 +460,7 @@ function ExamContent() {
     try {
       await apiFetch('/mistakes/remove', {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Xatolardan olib tashlashda xatolik:', e)
@@ -475,7 +474,7 @@ function ExamContent() {
     try {
       await apiFetch('/mastery/correct', {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Mastery saqlashda xatolik:', e)
@@ -489,7 +488,7 @@ function ExamContent() {
     try {
       await apiFetch('/mastery/incorrect', {
         method: 'POST',
-        body: JSON.stringify({ uid: currentUser.uid, questionId: numericId })
+        body: JSON.stringify({ questionId: numericId })
       })
     } catch (e) {
       console.error('Mastery yangilashda xatolik:', e)
@@ -584,7 +583,6 @@ function ExamContent() {
       const res = await apiFetch('/exam-history/save', {
         method: 'POST',
         body: JSON.stringify({
-          uid,
           type: typeMap[mode] || 'standart',
           correct: stats.correct,
           total: answeredCount,

@@ -18,10 +18,10 @@ export default function StatistikaPage() {
     const [sort, setSort] = useState('date') // date, attempts, accuracy
     const [order, setOrder] = useState('desc')
 
-    const fetchStats = async (uid) => {
+    const fetchStats = async () => {
         setLoading(true)
         try {
-            const res = await apiFetch(`/stats/questions/${uid}?sort=${sort}&order=${order}`)
+            const res = await apiFetch(`/stats/questions?sort=${sort}&order=${order}`)
             if (res.ok) {
                 const data = await res.json()
                 setStats(data)
@@ -36,7 +36,7 @@ export default function StatistikaPage() {
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (user) => {
             if (user) {
-                fetchStats(user.uid)
+                fetchStats()
             } else {
                 router.push('/login')
             }

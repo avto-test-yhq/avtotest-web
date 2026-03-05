@@ -38,10 +38,10 @@ export default function TashriflarPage() {
   const [loading, setLoading] = useState(true)
 
   const fetchActivity = useCallback(
-    async (uid) => {
+    async () => {
       try {
         setLoading(true)
-        const res = await apiFetch(`/activity/${uid}`)
+        const res = await apiFetch(`/activity/`)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         setDaily(data.daily || [])
@@ -64,7 +64,7 @@ export default function TashriflarPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        fetchActivity(user.uid)
+        fetchActivity()
       } else {
         router.push('/login')
       }

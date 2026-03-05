@@ -36,10 +36,10 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
-const fetchBiletlarProgress = async (uid) => {
+const fetchBiletlarProgress = async () => {
   try {
     const [biletRes, statsRes] = await Promise.all([
-      apiFetch(`/bilet-progress/${uid}`),
+      apiFetch(`/bilet-progress/`),
       apiFetch(`/mastery/stats/app`)
     ])
     if (!biletRes.ok) return { completed: 0, totalCorrect: 0, percent: 0 }
@@ -118,18 +118,18 @@ export default function DashboardPage() {
         // Tashrifni yozish (har safar kirganda)
         apiFetch(`/activity/record`, {
           method: 'POST',
-          body: JSON.stringify({ uid: user.uid })
+          body: JSON.stringify({})
         }).catch(() => { })
 
         // Sevimli savollar, bilet progress, xatolar va samaradorlikni API dan olamiz
         try {
           const [favRes, biletRes, mistakesRes, masteryRes, activityRes, weeklyRes] = await Promise.all([
-            apiFetch(`/favorites/${user.uid}`),
-            apiFetch(`/bilet-progress/${user.uid}`),
-            apiFetch(`/mistakes/${user.uid}`),
-            apiFetch(`/mastery/${user.uid}`),
-            apiFetch(`/activity/${user.uid}`),
-            apiFetch(`/exam-history/weekly/${user.uid}`)
+            apiFetch(`/favorites/`),
+            apiFetch(`/bilet-progress/`),
+            apiFetch(`/mistakes/`),
+            apiFetch(`/mastery/`),
+            apiFetch(`/activity/`),
+            apiFetch(`/exam-history/weekly/`)
           ])
           if (favRes.ok) {
             const { questionIds } = await favRes.json()
@@ -193,12 +193,12 @@ export default function DashboardPage() {
     const refreshData = async () => {
       const user = auth.currentUser
       if (user?.uid) {
-        const data = await fetchBiletlarProgress(user.uid)
+        const data = await fetchBiletlarProgress()
         setBiletlarProgress(data)
         try {
           const [mistakesRes, masteryRes] = await Promise.all([
-            apiFetch(`/mistakes/${user.uid}`),
-            apiFetch(`/mastery/${user.uid}`)
+            apiFetch(`/mistakes/`),
+            apiFetch(`/mastery/`)
           ])
           if (mistakesRes.ok) {
             const { questionIds } = await mistakesRes.json()

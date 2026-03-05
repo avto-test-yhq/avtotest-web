@@ -88,10 +88,10 @@ export default function TarixPage() {
   }).filter(group => group.items.length > 0)
 
   const fetchHistory = useCallback(
-    async (uid) => {
+    async () => {
       try {
         setLoading(true)
-        const res = await apiFetch(`/exam-history/history/${uid}`)
+        const res = await apiFetch(`/exam-history/history/`)
         if (!res.ok) throw new Error('API xatolik')
         const data = await res.json()
         setAttempts(data.attempts || [])
@@ -108,7 +108,7 @@ export default function TarixPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        fetchHistory(user.uid)
+        fetchHistory()
       } else {
         router.push('/login')
       }

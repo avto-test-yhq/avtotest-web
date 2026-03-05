@@ -42,7 +42,7 @@ export default function WeeklyChart({ data: propData }) {
       if (!user?.uid) return
       setLoading(true)
       try {
-        const res = await fetch(`${API_URL}/api/exam-history/weekly/${user.uid}`)
+        const res = await fetch(`${API_URL}/api/exam-history/weekly/`)
         const json = await res.json()
         if (json?.daily && Array.isArray(json.daily)) {
           setFetchedData(json.daily)

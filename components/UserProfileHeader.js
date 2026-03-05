@@ -39,7 +39,7 @@ export default function UserProfileHeader() {
             const unsubscribe = auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     try {
-                        const res = await fetch(`${API_URL}/api/users/profile/${user.uid}`)
+                        const res = await fetch(`${API_URL}/api/users/profile/`)
                         if (res.ok) {
                             const data = await res.json()
                             setUserData({
