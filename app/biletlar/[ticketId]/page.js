@@ -492,8 +492,8 @@ export default function BiletTicketPage() {
           </div>
           <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
             {[
-              { label: 'Uzb (lotin)', code: 'uzl' },
-              { label: 'Uzb (kirill)', code: 'uzk' },
+              { label: "O'zbek (Lotin)", code: 'uzl' },
+              { label: 'Ўзбек (Кирилл)', code: 'uzk' },
               { label: 'Русский', code: 'ru' }
             ].map((item) => (
               <button

@@ -5,6 +5,7 @@ import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useI18n } from '@/lib/i18n'
 import { useLanguage } from '@/context/LanguageContext'
+import { apiFetch } from '@/lib/apiClient'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
@@ -42,7 +43,7 @@ export default function WeeklyChart({ data: propData }) {
       if (!user?.uid) return
       setLoading(true)
       try {
-        const res = await fetch(`${API_URL}/api/exam-history/weekly/`)
+        const res = await apiFetch(`/exam-history/weekly/`)
         const json = await res.json()
         if (json?.daily && Array.isArray(json.daily)) {
           setFetchedData(json.daily)

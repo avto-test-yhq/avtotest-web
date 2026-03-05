@@ -6,6 +6,7 @@ import { signOut } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Settings, LogOut, User } from 'lucide-react'
+import { apiFetch } from '@/lib/apiClient'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
@@ -39,7 +40,7 @@ export default function UserProfileHeader() {
             const unsubscribe = auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     try {
-                        const res = await fetch(`${API_URL}/api/users/profile/`)
+                        const res = await apiFetch(`/users/profile/`)
                         if (res.ok) {
                             const data = await res.json()
                             setUserData({

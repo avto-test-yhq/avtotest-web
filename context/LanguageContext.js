@@ -9,7 +9,7 @@ const DEFAULT_LANG = 'uzl'
 
 const LanguageContext = createContext({
   lang: DEFAULT_LANG,
-  setLang: () => {},
+  setLang: () => { },
 })
 
 export function LanguageProvider({ children }) {
@@ -53,8 +53,8 @@ export function useLanguage() {
 }
 
 export function getLanguageLabel(code) {
-  if (code === 'uzk') return "O'zbek (kiril)"
-  if (code === 'ru') return 'Русский'
-  return "O'zbek (lotin)"
+  if (code === 'uzl') return "O'zbek (Lotin)"
+  if (code === 'uzk') return "Ўзбек (Кирилл)"
+  if (code === 'ru') return "Русский"
+  return "O'zbek (Lotin)"
 }
-

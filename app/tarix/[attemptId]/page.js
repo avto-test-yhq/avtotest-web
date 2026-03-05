@@ -9,6 +9,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
+import { apiFetch } from '@/lib/apiClient'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
@@ -186,7 +187,7 @@ export default function ExamDetailPage() {
         const unsub = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    const res = await fetch(`${API_URL}/api/exam-history/attempt/${attemptId}`)
+                    const res = await apiFetch(`/exam-history/attempt/${attemptId}`)
                     if (res.ok) {
                         const data = await res.json()
                         setAttempt(data)
@@ -223,69 +224,69 @@ export default function ExamDetailPage() {
 
         const controller = new AbortController()
 
-        ;(async () => {
-            try {
-                const res = await fetch(
-                    `${API_URL}/api/tests?lang=${safeLang}&ids=${ids.join(',')}`,
-                    { cache: 'no-store', signal: controller.signal }
-                )
-                if (!res.ok) return
-                const data = await res.json()
-                if (!Array.isArray(data) || data.length === 0) return
+            ; (async () => {
+                try {
+                    const res = await fetch(
+                        `${API_URL}/api/tests?lang=${safeLang}&ids=${ids.join(',')}`,
+                        { cache: 'no-store', signal: controller.signal }
+                    )
+                    if (!res.ok) return
+                    const data = await res.json()
+                    if (!Array.isArray(data) || data.length === 0) return
 
-                const mapById = new Map()
-                data.forEach((item) => {
-                    const key = (item.id ?? item._id)?.toString()
-                    if (key) mapById.set(key, item)
-                })
+                    const mapById = new Map()
+                    data.forEach((item) => {
+                        const key = (item.id ?? item._id)?.toString()
+                        if (key) mapById.set(key, item)
+                    })
 
-                setAttempt((prev) => {
-                    if (!prev) return prev
-                    const updatedDetails = (prev.details || []).map((detail) => {
-                        const qId =
-                            detail?.questionData?.numeric_id ??
-                            detail?.questionData?.id ??
-                            detail?.questionData?._id
-                        const key = qId?.toString()
-                        const fromApi = key ? mapById.get(key) : null
-                        if (!fromApi) return detail
+                    setAttempt((prev) => {
+                        if (!prev) return prev
+                        const updatedDetails = (prev.details || []).map((detail) => {
+                            const qId =
+                                detail?.questionData?.numeric_id ??
+                                detail?.questionData?.id ??
+                                detail?.questionData?._id
+                            const key = qId?.toString()
+                            const fromApi = key ? mapById.get(key) : null
+                            if (!fromApi) return detail
 
-                        const apiOptions = Array.isArray(fromApi.options) ? fromApi.options : []
-                        const newOptions = (detail.questionData?.options || []).map((opt, idx) => {
-                            const apiOpt = apiOptions[idx] || {}
-                            const text =
-                                apiOpt.text ||
-                                apiOpt.option ||
-                                apiOpt.answer ||
-                                opt.text ||
-                                opt.option ||
-                                opt.answer
+                            const apiOptions = Array.isArray(fromApi.options) ? fromApi.options : []
+                            const newOptions = (detail.questionData?.options || []).map((opt, idx) => {
+                                const apiOpt = apiOptions[idx] || {}
+                                const text =
+                                    apiOpt.text ||
+                                    apiOpt.option ||
+                                    apiOpt.answer ||
+                                    opt.text ||
+                                    opt.option ||
+                                    opt.answer
+                                return {
+                                    ...opt,
+                                    text,
+                                    option: text,
+                                }
+                            })
+
                             return {
-                                ...opt,
-                                text,
-                                option: text,
+                                ...detail,
+                                questionData: {
+                                    ...detail.questionData,
+                                    question: fromApi.question || detail.questionData?.question,
+                                    explanation: fromApi.explanation ?? detail.questionData?.explanation,
+                                    options: newOptions,
+                                },
                             }
                         })
 
-                        return {
-                            ...detail,
-                            questionData: {
-                                ...detail.questionData,
-                                question: fromApi.question || detail.questionData?.question,
-                                explanation: fromApi.explanation ?? detail.questionData?.explanation,
-                                options: newOptions,
-                            },
-                        }
+                        return { ...prev, details: updatedDetails }
                     })
-
-                    return { ...prev, details: updatedDetails }
-                })
-            } catch (e) {
-                if (e.name !== 'AbortError') {
-                    console.error('Tarix savollari tilini yangilashda xatolik:', e)
+                } catch (e) {
+                    if (e.name !== 'AbortError') {
+                        console.error('Tarix savollari tilini yangilashda xatolik:', e)
+                    }
                 }
-            }
-        })()
+            })()
 
         return () => controller.abort()
     }, [attempt, lang])
