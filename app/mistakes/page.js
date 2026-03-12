@@ -12,6 +12,8 @@ import QoidalarHeader from '@/components/QoidalarHeader'
 import { useLanguage } from '@/context/LanguageContext'
 import { useI18n } from '@/lib/i18n'
 import { apiFetch } from '@/lib/apiClient'
+import QuickPinchZoom, { make3dTransformValue } from 'react-quick-pinch-zoom'
+import { useRef } from 'react'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -36,6 +38,16 @@ export default function MistakesPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [selectedQuestion, setSelectedQuestion] = useState(null)
+  const [zoomedImage, setZoomedImage] = useState(null)
+
+  const imageRef = useRef(null)
+  const onUpdate = useCallback(({ x, y, scale }) => {
+    const { current: img } = imageRef
+    if (img) {
+      const value = make3dTransformValue({ x, y, scale })
+      img.style.setProperty('transform', value)
+    }
+  }, [])
 
   const fetchMistakes = useCallback(
     async () => {
@@ -109,7 +121,7 @@ export default function MistakesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#161821] page-bg text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-[#161c24] md:bg-slate-50 md:dark:bg-[#161821] page-bg text-white md:text-slate-900 md:dark:text-white flex flex-col font-sans transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
@@ -126,8 +138,8 @@ export default function MistakesPage() {
 
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">{t('mistakes.pageTitle')}</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-white">{t('mistakes.pageTitle')}</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
@@ -139,21 +151,21 @@ export default function MistakesPage() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16 text-slate-400">
+              <div className="flex items-center justify-center py-16 text-[#9AA4B2]">
                 {t('common.loading')}
               </div>
             ) : !count ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full bg-white dark:bg-[#1e2130] border border-dashed border-slate-300 dark:border-white/10 flex items-center justify-center mb-4">
-                  <Icon name="Wrong" className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                <div className="w-16 h-16 rounded-[20px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-white/10 flex items-center justify-center mb-5">
+                  <Icon name="Wrong" className="w-8 h-8 text-[#9AA4B2] md:text-slate-400 md:dark:text-slate-500" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">{t('mistakes.emptyTitle')}</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 max-w-sm">
+                <h3 className="text-lg font-bold mb-2 text-white">{t('mistakes.emptyTitle')}</h3>
+                <p className="text-sm text-[#9AA4B2] mb-6 max-w-sm">
                   {t('mistakes.emptyDesc')}
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-blue-500/30"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-[#313C50] hover:bg-[#3b475c] text-white text-sm font-bold transition-colors"
                 >
                   {t('mistakes.gotoDashboard')}
                 </Link>
@@ -164,9 +176,9 @@ export default function MistakesPage() {
                   <div
                     key={q.id || idx}
                     onClick={() => setSelectedQuestion(q)}
-                    className="group rounded-2xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg hover:shadow-rose-900/20 transition-all cursor-pointer overflow-hidden flex flex-col"
+                    className="group rounded-[24px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-[#313C50] md:border-slate-200 md:dark:border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col"
                   >
-                    <div className="relative w-full h-32 md:h-36 bg-slate-100 dark:bg-black/40">
+                    <div className="relative w-full h-32 md:h-36 bg-[#161c24] md:bg-slate-100 md:dark:bg-black/40">
                       <Image
                         src={q.image || '/imgage/background.jpg'}
                         alt="Savol rasmi"
@@ -175,15 +187,15 @@ export default function MistakesPage() {
                         unoptimized={q.image?.startsWith?.('http')}
                       />
 
-                      <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-rose-600/90 text-white text-[10px] font-semibold shadow-sm">
+                      <div className="absolute top-3 left-3 inline-flex items-center justify-center px-3 py-1 rounded-[8px] bg-rose-600/90 backdrop-blur-md text-white text-[11px] font-bold shadow-sm">
                         {t('mistakes.errorLabel')} #{idx + 1}
                       </div>
                     </div>
-                    <div className="p-4 flex flex-col gap-2 flex-1">
-                      <p className="text-sm md:text-[15px] text-slate-700 dark:text-slate-100 leading-relaxed line-clamp-3 font-medium">
-                        {q.question}
+                    <div className="p-5 flex flex-col gap-3 flex-1">
+                      <p className="text-[15px] text-white md:text-slate-700 md:dark:text-slate-100 leading-relaxed font-medium">
+                        {q.question.length > 80 ? q.question.substring(0, 80) + '...' : q.question}
                       </p>
-                      <div className="mt-auto pt-2 flex items-center justify-end text-[11px] text-slate-400 dark:text-slate-500 font-medium group-hover:text-rose-500 transition-colors">
+                      <div className="mt-auto pt-4 flex items-center justify-end text-[13px] font-bold text-[#9AA4B2] group-hover:text-rose-500 transition-colors">
                         <span>{t('mistakes.viewFull')}</span>
                       </div>
                     </div>
@@ -215,7 +227,10 @@ export default function MistakesPage() {
 
               <div className="flex-1 overflow-y-auto">
                 {selectedQuestion.image && (
-                  <div className="relative w-full h-64 md:h-80 bg-slate-50 dark:bg-black border-b border-slate-100 dark:border-white/5">
+                  <div 
+                    className="relative w-full h-64 md:h-80 bg-slate-50 dark:bg-black border-b border-slate-100 dark:border-white/5 cursor-pointer"
+                    onClick={() => setZoomedImage(selectedQuestion.image)}
+                  >
                     <Image
                       src={selectedQuestion.image}
                       alt="Savol rasmi"
@@ -287,6 +302,35 @@ export default function MistakesPage() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* IMAGE ZOOM MODAL */}
+        {zoomedImage && (
+          <div 
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300"
+          >
+            <button 
+              onClick={() => setZoomedImage(null)}
+              className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer z-[210]"
+              title="Yopish"
+            >
+              <Icon name="Close" className="w-6 h-6" />
+            </button>
+
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <QuickPinchZoom onUpdate={onUpdate} tapZoomFactor={2} doubleTapZoomOutOnMaxScale>
+                 <div ref={imageRef} className="relative w-[90vw] h-[90vh] md:w-[80vw] md:h-[80vh]">
+                   <Image
+                     src={zoomedImage}
+                     alt="Zoomed Question Image"
+                     fill
+                     className="object-contain pointer-events-none"
+                     unoptimized={zoomedImage?.startsWith?.('http')}
+                   />
+                 </div>
+              </QuickPinchZoom>
             </div>
           </div>
         )}

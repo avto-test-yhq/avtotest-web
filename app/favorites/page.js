@@ -11,6 +11,8 @@ import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
 import { useLanguage } from '@/context/LanguageContext'
 import { apiFetch } from '@/lib/apiClient'
+import QuickPinchZoom, { make3dTransformValue } from 'react-quick-pinch-zoom'
+import { useRef } from 'react'
 
 const Icons = {
   ArrowLeft: () => <path d="M19 12H5m7 7l-7-7 7-7" />,
@@ -34,6 +36,16 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [selectedQuestion, setSelectedQuestion] = useState(null)
+  const [zoomedImage, setZoomedImage] = useState(null)
+
+  const imageRef = useRef(null)
+  const onUpdate = useCallback(({ x, y, scale }) => {
+    const { current: img } = imageRef
+    if (img) {
+      const value = make3dTransformValue({ x, y, scale })
+      img.style.setProperty('transform', value)
+    }
+  }, [])
 
   const fetchFavorites = useCallback(async () => {
     try {
@@ -120,7 +132,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#161821] page-bg text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-[#161c24] md:bg-slate-50 md:dark:bg-[#161821] page-bg text-white md:text-slate-900 md:dark:text-white flex flex-col font-sans transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
@@ -128,12 +140,12 @@ export default function FavoritesPage() {
 
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">Saqlangan savollar ro&apos;yxati</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-white">Saqlangan savollar ro&apos;yxati</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold shadow-lg shadow-blue-900/20 transition-all hover:shadow-blue-900/40"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-[14px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all"
               >
                 <Icon name="Star" className="w-4 h-4" />
                 Mashqni boshlash
@@ -141,21 +153,21 @@ export default function FavoritesPage() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16 text-slate-400">
+              <div className="flex items-center justify-center py-16 text-[#9AA4B2]">
                 Yuklanmoqda...
               </div>
             ) : !count ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-full bg-white dark:bg-[#1e2130] border border-dashed border-slate-300 dark:border-white/10 flex items-center justify-center mb-4">
-                  <Icon name="Star" className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+                <div className="w-16 h-16 rounded-[20px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-white/10 flex items-center justify-center mb-5">
+                  <Icon name="Star" className="w-8 h-8 text-[#9AA4B2] md:text-slate-400 md:dark:text-slate-500" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900 dark:text-white">Hozircha sevimli savollar yo&apos;q</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 max-w-sm">
+                <h3 className="text-lg font-bold mb-2 text-white">Hozircha sevimli savollar yo&apos;q</h3>
+                <p className="text-sm text-[#9AA4B2] mb-6 max-w-sm">
                   Imtihon yoki biletlar sahifasida savollar yonidagi belgi orqali ularni sevimlilarga saqlab oling va bu yerda mashq qiling.
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors shadow-lg shadow-blue-500/30"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-[#313C50] hover:bg-[#3b475c] text-white text-sm font-bold transition-colors"
                 >
                   Dashboardga qaytish
                 </Link>
@@ -166,9 +178,9 @@ export default function FavoritesPage() {
                   <div
                     key={q.id || idx}
                     onClick={() => setSelectedQuestion(q)}
-                    className="group rounded-2xl bg-white dark:bg-[#1e2130] border border-slate-200 dark:border-white/10 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-900/10 dark:hover:shadow-blue-900/30 transition-all cursor-pointer overflow-hidden flex flex-col"
+                    className="group rounded-[24px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-[#313C50] md:border-slate-200 md:dark:border-white/10 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-pointer overflow-hidden flex flex-col"
                   >
-                    <div className="relative w-full h-32 md:h-36 bg-slate-100 dark:bg-black/40">
+                    <div className="relative w-full h-32 md:h-36 bg-[#161c24] md:bg-slate-100 md:dark:bg-black/40">
                       <Image
                         src={q.image || '/imgage/background.jpg'}
                         alt="Savol rasmi"
@@ -177,22 +189,22 @@ export default function FavoritesPage() {
                         unoptimized={q.image?.startsWith?.('http')}
                       />
 
-                      <div className="absolute top-2 left-2 inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-blue-600/90 text-white text-[10px] font-semibold shadow-sm">
+                      <div className="absolute top-3 left-3 inline-flex items-center justify-center px-3 py-1 rounded-[8px] bg-blue-600/90 backdrop-blur-md text-white text-[11px] font-bold shadow-sm">
                         #{idx + 1}
                       </div>
                     </div>
-                    <div className="p-4 flex flex-col gap-2 flex-1">
-                      <p className="text-sm md:text-[15px] text-slate-700 dark:text-slate-100 leading-relaxed line-clamp-3 font-medium">
-                        {q.question}
+                    <div className="p-5 flex flex-col gap-3 flex-1">
+                      <p className="text-[15px] text-white md:text-slate-700 md:dark:text-slate-100 leading-relaxed font-medium">
+                        {q.question.length > 80 ? q.question.substring(0, 80) + '...' : q.question}
                       </p>
-                      <div className="mt-auto pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                        <span className="group-hover:text-blue-500 transition-colors">To&apos;liq ko&apos;rish</span>
+                      <div className="mt-auto pt-4 flex items-center justify-between text-[13px] font-bold">
+                        <span className="text-blue-500 transition-colors">Yechish</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             removeFromFavorites(q.numeric_id ?? q.id)
                           }}
-                          className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-[#252836] hover:bg-red-50 dark:hover:bg-red-500/20 border border-slate-200 dark:border-white/10 hover:border-red-200 dark:hover:border-red-500/30 text-slate-500 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                          className="px-3 py-2 rounded-[12px] bg-[#313C50] hover:bg-red-500/20 text-[#9AA4B2] hover:text-red-400 transition-colors"
                         >
                           O&apos;chirish
                         </button>
@@ -227,7 +239,10 @@ export default function FavoritesPage() {
               <div className="flex-1 overflow-y-auto custom-scrollbar">
                 {selectedQuestion.image && (
                   <div className="relative w-full bg-slate-50 dark:bg-black flex items-center justify-center border-b border-slate-200 dark:border-white/5">
-                    <div className="relative w-full h-[300px] sm:h-[400px] md:h-[550px]">
+                    <div 
+                      className="relative w-full h-[300px] sm:h-[400px] md:h-[550px] cursor-pointer"
+                      onClick={() => setZoomedImage(selectedQuestion.image)}
+                    >
                       <Image
                         src={selectedQuestion.image}
                         alt="Savol rasmi"
@@ -300,6 +315,35 @@ export default function FavoritesPage() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* IMAGE ZOOM MODAL */}
+        {zoomedImage && (
+          <div 
+            className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300"
+          >
+            <button 
+              onClick={() => setZoomedImage(null)}
+              className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer z-[210]"
+              title="Yopish"
+            >
+              <Icon name="Close" className="w-6 h-6" />
+            </button>
+
+            <div className="w-full h-full flex items-center justify-center p-4">
+              <QuickPinchZoom onUpdate={onUpdate} tapZoomFactor={2} doubleTapZoomOutOnMaxScale>
+                 <div ref={imageRef} className="relative w-[90vw] h-[90vh] md:w-[80vw] md:h-[80vh]">
+                   <Image
+                     src={zoomedImage}
+                     alt="Zoomed Question Image"
+                     fill
+                     className="object-contain pointer-events-none"
+                     unoptimized={zoomedImage?.startsWith?.('http')}
+                   />
+                 </div>
+              </QuickPinchZoom>
             </div>
           </div>
         )}

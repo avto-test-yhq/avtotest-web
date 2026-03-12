@@ -16,6 +16,7 @@ import ExamSettingsModal from '@/components/ExamSettingsModal'
 import ExamResult from '@/components/ExamResult'
 import FeedbackModal from '@/components/FeedbackModal'
 import { apiFetch } from '@/lib/apiClient'
+import QuickPinchZoom, { make3dTransformValue } from 'react-quick-pinch-zoom'
 
 
 // Ikonkalar (O'zgarishsiz)
@@ -76,6 +77,15 @@ function ExamContent() {
   const [currentUser, setCurrentUser] = useState(null)
   const [loadError, setLoadError] = useState(null) // Yuklash xatosi
   const [isLoading, setIsLoading] = useState(true)
+
+  const imageRef = useRef(null)
+  const onUpdate = useCallback(({ x, y, scale }) => {
+    const { current: img } = imageRef
+    if (img) {
+      const value = make3dTransformValue({ x, y, scale })
+      img.style.setProperty('transform', value)
+    }
+  }, [])
 
   const currentIdsRef = useRef([])
   const scrollRef = useRef(null)
@@ -1279,24 +1289,28 @@ function ExamContent() {
     {/* IMAGE ZOOM MODAL */}
     {zoomedImage && (
       <div 
-        className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in duration-300"
-        onClick={() => setZoomedImage(null)}
+        className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex items-center justify-center animate-in fade-in duration-300"
       >
-        <div className="relative w-full max-w-5xl aspect-square md:aspect-video" onClick={e => e.stopPropagation()}>
-          <Image
-            src={zoomedImage}
-            alt="Zoomed Question Image"
-            fill
-            className="object-contain"
-            unoptimized={zoomedImage.startsWith('http')}
-          />
-          <button 
-            onClick={() => setZoomedImage(null)}
-            className="absolute -top-12 right-0 md:-right-12 md:top-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer"
-            title="Yopish"
-          >
-            <Icon name="Close" className="w-6 h-6" />
-          </button>
+        <button 
+          onClick={() => setZoomedImage(null)}
+          className="absolute top-4 right-4 md:top-8 md:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer z-[210]"
+          title="Yopish"
+        >
+          <Icon name="Close" className="w-6 h-6" />
+        </button>
+
+        <div className="w-full h-full flex items-center justify-center p-4">
+          <QuickPinchZoom onUpdate={onUpdate} tapZoomFactor={2} doubleTapZoomOutOnMaxScale>
+             <div ref={imageRef} className="relative w-[90vw] h-[90vh] md:w-[80vw] md:h-[80vh]">
+               <Image
+                 src={zoomedImage}
+                 alt="Zoomed Question Image"
+                 fill
+                 className="object-contain pointer-events-none"
+                 unoptimized={zoomedImage.startsWith('http')}
+               />
+             </div>
+          </QuickPinchZoom>
         </div>
       </div>
     )}
