@@ -25,7 +25,8 @@ const Icons = {
   Flag: () => <path strokeLinecap="round" strokeLinejoin="round" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />,
   Correct: () => <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />,
   Wrong: () => <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />,
-  Home: () => <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" />
+  Home: () => <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" strokeLinecap="round" strokeLinejoin="round" />,
+  Bookmark: () => <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
 }
 
 const Icon = ({ name, className = "w-5 h-5" }) => (
@@ -63,6 +64,7 @@ export default function BiletTicketPage() {
   const [answers, setAnswers] = useState({})
   const [isFinished, setIsFinished] = useState(false)
   const [showExplanation, setShowExplanation] = useState(false)
+  const [zoomedImage, setZoomedImage] = useState(null)
   const [resultSaved, setResultSaved] = useState(false)
   const [timerTick, setTimerTick] = useState(0)
   const [savedIds, setSavedIds] = useState([])
@@ -474,223 +476,447 @@ export default function BiletTicketPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white overflow-hidden font-sans">
-      <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 shrink-0 z-50">
-        <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/biletlar" className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Biletlar sahifasi">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
-          </Link>
-          <Link href="/dashboard" className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Bosh sahifa">
-            <Icon name="Home" className="w-5 h-5" />
-          </Link>
-          <div className="flex items-center gap-2">
-            <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
-            <div>
-              <h1 className="text-base font-bold text-slate-900 dark:text-white">{t('tarix.typeBilet') || 'Bilet'} #{ticketId}</h1>
-              <p className="text-[11px] text-slate-500">{t('exam.question')} {currentIndex + 1}/{questions.length}</p>
-            </div>
-          </div>
-          <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
-            {[
-              { label: "O'zbek (Lotin)", code: 'uzl' },
-              { label: 'Ўзбек (Кирилл)', code: 'uzk' },
-              { label: 'Русский', code: 'ru' }
-            ].map((item) => (
-              <button
-                key={item.code}
-                onClick={() => handleSetLang(item.code)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.code
-                  ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-          <ThemeToggle size="sm" className="hidden md:flex" />
-          <button
-            onClick={() => setShowSettingsModal(true)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          </button>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="hidden sm:flex items-center space-x-3 bg-slate-100 dark:bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
-            <div className="flex items-center text-emerald-500 dark:text-emerald-400 text-sm font-bold space-x-1">
-              <Icon name="Correct" className="w-4 h-4" />
-              <span>{stats.correct}</span>
-            </div>
-            <div className="w-px h-4 bg-slate-300 dark:bg-white/10" />
-            <div className="flex items-center text-rose-500 dark:text-rose-400 text-sm font-bold space-x-1">
-              <Icon name="Wrong" className="w-4 h-4" />
-              <span>{stats.incorrect}</span>
-            </div>
-          </div>
-          <button
-            onClick={toggleCurrentFavorite}
-            className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
-              ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
-              : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-amber-400'
-              }`}
-            title={isCurrentFavorite ? t('exam.favoriteRemove') : t('exam.favoriteAdd')}
-          >
-            <Icon name="Bulb" className="w-4 h-4" />
-          </button>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
-            <span className="text-slate-400 text-xs">{t('tarix.time')}</span>
-            <span className="font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
-          </div>
-          <button
-            onClick={() => setIsFinished(true)}
-            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
-          >
-            {isFinished ? t('exam.results') : t('exam.finish')}
-          </button>
-          <div className="hidden sm:block text-xs text-slate-400">
-            <span className="font-bold text-slate-900 dark:text-white">{currentIndex + 1}</span>/{questions.length}
-          </div>
-        </div>
-      </header>
-
-      <div className="bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 px-6 py-5 shrink-0 z-40 relative flex items-center min-h-[80px]">
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/10 dark:bg-brand-cyan/20 items-center justify-center">
-          <span className="text-brand-cyan font-bold">?</span>
-        </div>
-        <h2 className="w-full text-center text-base md:text-lg font-medium text-slate-800 dark:text-white leading-relaxed max-w-4xl mx-auto px-10">
-          {currentQuestion.question}
-        </h2>
-        <button
-          onClick={() => setShowFeedbackModal(true)}
-          className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-brand-cyan transition-colors"
-          title={t('feedback.title')}
-        >
-          <Icon name="Flag" className="w-4 h-4" />
-        </button>
-      </div>
-
-      <main className="flex-1 flex overflow-hidden relative">
-        <aside className="w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-[#1e2130] flex flex-col border-r border-slate-200 dark:border-white/5 overflow-y-auto p-5 shrink-0 z-30">
-          <div className="space-y-3 flex-1">
-            {currentQuestion.options.map((opt, idx) => {
-              const selected = answers[currentQuestion.id] === idx
-              const isCorrect = opt.is_correct
-              const hasAnswer = typeof answers[currentQuestion.id] === 'number'
-              let containerClass = "group relative w-full text-left p-0 rounded-xl border transition-all duration-200 overflow-hidden flex items-stretch min-h-[56px] "
-              let labelClass = "w-14 flex items-center justify-center text-base font-bold border-r "
-              let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
-              if (hasAnswer || isFinished) {
-                const showCorrectAnswer = settings?.showCorrect !== false
-                if (isCorrect && (selected || showCorrectAnswer)) {
-                  containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/40"
-                  labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
-                  textClass += "text-emerald-800 dark:text-emerald-100"
-                } else if (selected && !isCorrect) {
-                  containerClass += "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/40"
-                  labelClass += "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30"
-                  textClass += "text-rose-800 dark:text-rose-100"
-                } else {
-                  containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-100 dark:border-white/5 opacity-60"
-                  labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5"
-                  textClass += "text-slate-400"
-                }
-              } else {
-                if (selected) {
-                  containerClass += "bg-brand-cyan/10 dark:bg-brand-cyan/20 border-brand-cyan/50"
-                  labelClass += "bg-brand-cyan/20 dark:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/40"
-                  textClass += "text-slate-900 dark:text-white"
-                } else {
-                  containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 hover:border-brand-cyan/30 hover:bg-slate-100 dark:hover:bg-[#35394b]"
-                  labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/5 group-hover:text-brand-cyan"
-                  textClass += "text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
-                }
-              }
-              const isDisabled = hasAnswer || isFinished
-              return (
-                <button
-                  key={idx}
-                  onClick={() => selectAnswer(currentQuestion.id, idx)}
-                  disabled={isDisabled}
-                  className={`${containerClass} ${isDisabled ? 'cursor-default' : 'cursor-pointer active:scale-[0.99]'}`}
-                >
-                  <div className={labelClass}>F{idx + 1}</div>
-                  <div className={textClass}>
-                    <span className="flex-1">{opt.option}</span>
-                    {hasAnswer && isCorrect && (selected || settings?.showCorrect !== false) && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
-                    {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-          <div className="mt-6 space-y-3 pt-4 border-t border-slate-200 dark:border-white/5">
-            <button
-              onClick={() => setShowExplanation(!showExplanation)}
-              className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all ${showExplanation ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40' : 'bg-amber-50 dark:bg-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40'}`}
-            >
-              <span className="flex items-center">
-                <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
-                {showExplanation ? t('exam.hideExplanation') : t('exam.viewExplanation')}
-              </span>
+    <>
+      {/* ---------- MOBILE VIEW ---------- */}
+      <div className="md:hidden h-screen flex flex-col bg-[#161c24] text-white font-display overflow-hidden">
+        {/* Header */}
+        <header className="flex items-center justify-between py-3 px-4 shrink-0 bg-[#1e2333] border-b border-[#2d3748]">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="text-white hover:opacity-70 transition-opacity">
+              <Icon name="ArrowLeft" className="w-5 h-5" />
             </button>
+            <h1 className="text-[17px] font-bold text-white leading-tight">Ticket {ticketId}</h1>
           </div>
-        </aside>
-        <section className="flex-1 bg-slate-50 dark:bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
-          <div className="relative w-full h-full">
-            <Image
-              src={currentQuestion.image && currentQuestion.image.trim() !== '' ? currentQuestion.image : '/imgage/background.jpg'}
-              alt={t('tarix.questionImage')}
-              fill
-              className="object-contain"
-              priority
-              unoptimized={currentQuestion.image?.startsWith?.('http')}
-            />
-            {showExplanation && currentQuestion.explanation && (
-              <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl z-10">
-                <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">{t('exam.explanation')}</h4>
-                <p className="!text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
-              </div>
-            )}
+          <div className="flex items-center gap-3">
+            <button onClick={() => setShowFeedbackModal(true)} className="text-slate-400 hover:text-white transition-colors">
+              <Icon name="Flag" className="w-[18px] h-[18px]" />
+            </button>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#2a2d3e]">
+              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <span className="font-medium text-sm text-slate-200">{formatTime(timerTick)}</span>
+            </div>
           </div>
-        </section>
-      </main>
+        </header>
 
-      <footer className="h-20 bg-white dark:bg-[#1e2130] border-t border-slate-200 dark:border-white/5 shrink-0 flex items-center px-4 relative z-50">
-        <button
-          onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
-          disabled={currentIndex === 0}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
-        >
-          <Icon name="ArrowLeft" className="w-6 h-6" />
-        </button>
-        <div ref={scrollRef} className="flex-1 flex items-center gap-2 overflow-x-auto px-2 mx-2 no-scrollbar scroll-smooth h-full py-4">
+        {/* Timeline */}
+        <div className="bg-[#1e2333] border-b border-[#2d3748] px-4 py-3 shrink-0 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth" ref={scrollRef}>
           {questions.map((q, idx) => {
-            const answerIdx = answers[q.id]
-            const isAnswered = typeof answerIdx === 'number'
-            const isCurrent = idx === currentIndex
-            const isCorrect = isAnswered && q.options[answerIdx]?.is_correct
-            let btnClass = "min-w-[44px] h-11 rounded-xl text-base font-bold flex items-center justify-center border transition-all duration-300 "
-            if (isCurrent) btnClass += "bg-brand-cyan border-brand-cyan text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] scale-110 z-10 ring-2 ring-brand-cyan/50"
-            else if (isAnswered) {
-              if (isCorrect) btnClass += "bg-emerald-600 border-emerald-500 text-white"
-              else btnClass += "bg-rose-600 border-rose-500 text-white"
-            } else btnClass += "bg-slate-100 dark:bg-[#161821] border-slate-200 dark:border-[#2a2d3e] text-slate-500 hover:bg-slate-200 dark:hover:bg-[#2a2d3e] hover:text-slate-700 dark:hover:text-slate-300"
+            const answerIdx = answers[q.id];
+            const isAnswered = typeof answerIdx === 'number';
+            const isCurrent = idx === currentIndex;
+            const isCorrect = isAnswered && q.options[answerIdx]?.is_correct;
+
+            let btnClass = "min-w-[40px] h-[40px] rounded-[10px] text-[15px] font-bold flex items-center justify-center shrink-0 transition-all ";
+
+            if (isCurrent) {
+              btnClass += "bg-[#2563eb] text-white";
+            } else if (isAnswered) {
+              if (isCorrect) {
+                btnClass += "bg-green-500 text-white";
+              } else {
+                btnClass += "bg-red-500 text-white";
+              }
+            } else {
+              btnClass += "bg-[#212836] text-[#94a3b8]";
+            }
+
             return (
-              <button key={q.id} onClick={() => setCurrentIndex(idx)} className={btnClass}>
+              <button
+                key={q.id}
+                onClick={() => setCurrentIndex(idx)}
+                className={btnClass}
+              >
                 {idx + 1}
               </button>
             )
           })}
         </div>
-        <button
-          onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
-          disabled={currentIndex === questions.length - 1}
-          className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
+
+        <main className="flex-1 overflow-y-auto no-scrollbar pb-6 bg-[#111827]">
+          {/* Question Card */}
+          <div className="bg-[#1e2532] shadow-sm flex flex-col">
+            {currentQuestion.image && currentQuestion.image.trim() !== '' && (
+              <div 
+                className="relative w-full aspect-[4/3] bg-[#161c24] shrink-0 cursor-pointer"
+                onClick={() => setZoomedImage(currentQuestion.image)}
+              >
+                <Image 
+                  src={currentQuestion.image} 
+                  alt="Question Image" 
+                  fill 
+                  className="object-cover" 
+                  priority 
+                  unoptimized={currentQuestion.image?.startsWith('http')} 
+                />
+                <button className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                </button>
+              </div>
+            )}
+            <div className="p-4 flex items-start justify-between gap-4">
+              <h2 className="text-[16px] font-medium text-white leading-[1.5] w-full">
+                {currentQuestion.question}
+              </h2>
+              <button 
+                onClick={toggleCurrentFavorite}
+                className={`shrink-0 mt-0.5 transition-colors ${isCurrentFavorite ? 'text-amber-500' : 'text-slate-400'}`}
+              >
+                <Icon name="Bookmark" className="w-[20px] h-[20px]" />
+              </button>
+            </div>
+          </div>
+
+          {/* Options */}
+          <div className="px-4 mt-4 flex flex-col gap-3">
+            {currentQuestion.options.map((opt, idx) => {
+              const selected = answers[currentQuestion.id] === idx;
+              const isCorrect = opt.is_correct;
+              const hasAnswer = typeof answers[currentQuestion.id] === 'number';
+
+              let containerClass = "w-full bg-[#1e2532] border border-[#2d3748] rounded-[14px] flex items-stretch overflow-hidden transition-all ";
+              let prefixClass = "w-[46px] flex items-center justify-center shrink-0 border-r border-[#2d3748] font-bold text-[14px] ";
+              let textClass = "flex-1 py-3 px-3 text-left text-[14px] leading-[1.3] flex items-center justify-between ";
+
+              if (hasAnswer || isFinished) {
+                const showCorrectAnswer = settings?.showCorrect !== false;
+                if (isCorrect && (selected || showCorrectAnswer)) {
+                  containerClass += "bg-green-500/10 border-green-500/40";
+                  prefixClass += "bg-green-500/20 text-green-500";
+                  textClass += "text-green-400";
+                } else if (selected && !isCorrect) {
+                  containerClass += "bg-red-500/10 border-red-500/40";
+                  prefixClass += "bg-red-500/20 text-red-500";
+                  textClass += "text-red-400";
+                } else {
+                  containerClass += "opacity-60";
+                  prefixClass += "bg-[#1e2333] text-slate-400";
+                  textClass += "text-slate-400";
+                }
+              } else {
+                if (selected) {
+                  containerClass += "bg-blue-600/20 border-blue-500";
+                  prefixClass += "bg-blue-600/30 text-blue-400";
+                  textClass += "text-white font-medium";
+                } else {
+                  prefixClass += "bg-[#1e2838] text-[#94a3b8]";
+                  textClass += "text-[#e2e8f0]";
+                }
+              }
+
+              const isDisabled = hasAnswer || isFinished;
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => selectAnswer(currentQuestion.id, idx)}
+                  disabled={isDisabled}
+                  className={`${containerClass} ${isDisabled ? 'cursor-default' : 'active:scale-[0.98]'}`}
+                >
+                  <div className={prefixClass}>F{idx + 1}</div>
+                  <div className={textClass}>
+                    <span>{opt.option}</span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Explanation Area */}
+          <div className="px-4 mt-5 relative">
+            {!showExplanation ? (
+              <button
+                onClick={() => setShowExplanation(true)}
+                className="w-full py-[14px] rounded-[14px] flex items-center justify-center gap-2 font-bold text-[14px] transition-all bg-[#1e2532] text-[#60a5fa] border border-[#2d3748] active:scale-[0.98]"
+              >
+                <Icon name="Bulb" className="w-[18px] h-[18px]" />
+                Izohni ko'rsatish
+              </button>
+            ) : (
+                <div className="bg-[#2563eb] rounded-[16px] p-5 animate-in slide-in-from-bottom-5 duration-300">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-full border border-white/50 flex items-center justify-center">
+                            <span className="text-white text-[10px] font-bold">i</span>
+                        </div>
+                        <h4 className="text-white text-[16px] font-bold">To'g'ri javob izohi</h4>
+                        <button onClick={() => setShowExplanation(false)} className="ml-auto opacity-50"><Icon name="Close" className="w-[18px] h-[18px] text-white" /></button>
+                    </div>
+                    {currentQuestion.explanation ? (
+                        <p className="text-white text-[14px] font-medium leading-relaxed">
+                            {currentQuestion.explanation}
+                        </p>
+                    ) : (
+                         <p className="text-white text-[14px] font-medium leading-relaxed">Izoh mavjud emas.</p>
+                    )}
+                </div>
+            )}
+            
+            {/* Auto trigger finish when all answered */}
+            {allAnswered && !isFinished && (
+               <div className="mt-4">
+                 <button
+                   onClick={() => setIsFinished(true)}
+                   className="w-full py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all shadow-lg active:scale-[0.98]"
+                 >
+                   Natijani ko'rish
+                 </button>
+               </div>
+            )}
+          </div>
+        </main>
+      </div>
+      {/* ---------- DESKTOP VIEW ---------- */}
+      <div className="hidden md:flex h-screen flex-col bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white overflow-hidden font-sans">
+
+        <header className="h-16 flex items-center justify-between px-4 lg:px-8 bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 shrink-0 z-50">
+          <div className="flex items-center gap-4 md:gap-6">
+            <Link href="/biletlar" className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Biletlar sahifasi">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m7 7l-7-7 7-7" /></svg>
+            </Link>
+            <Link href="/dashboard" className="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] hover:bg-slate-200 dark:hover:bg-[#35394b] text-slate-500 dark:text-slate-300 shrink-0 shadow-sm transition-all" title="Bosh sahifa">
+              <Icon name="Home" className="w-5 h-5" />
+            </Link>
+            <div className="flex items-center gap-2">
+              <Image src="/imgage/avtotest-logo.png" alt="Logo" width={32} height={32} className="rounded-lg object-contain" />
+              <div>
+                <h1 className="text-base font-bold text-slate-900 dark:text-white">{t('tarix.typeBilet') || 'Bilet'} #{ticketId}</h1>
+                <p className="text-[11px] text-slate-500">{t('exam.question')} {currentIndex + 1}/{questions.length}</p>
+              </div>
+            </div>
+            <div className="hidden md:flex bg-slate-100 dark:bg-[#2a2d3e] p-1.5 rounded-lg shrink-0">
+              {[
+                { label: "O'zbek (Lotin)", code: 'uzl' },
+                { label: 'Ўзбек (Кирилл)', code: 'uzk' },
+                { label: 'Русский', code: 'ru' }
+              ].map((item) => (
+                <button
+                  key={item.code}
+                  onClick={() => handleSetLang(item.code)}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${lang === item.code
+                    ? 'bg-white dark:bg-[#3e4255] text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <ThemeToggle size="sm" className="hidden md:flex" />
+            <button
+              onClick={() => setShowSettingsModal(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:flex items-center space-x-3 bg-slate-100 dark:bg-[#2a2d3e] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/5">
+              <div className="flex items-center text-emerald-500 dark:text-emerald-400 text-sm font-bold space-x-1">
+                <Icon name="Correct" className="w-4 h-4" />
+                <span>{stats.correct}</span>
+              </div>
+              <div className="w-px h-4 bg-slate-300 dark:bg-white/10" />
+              <div className="flex items-center text-rose-500 dark:text-rose-400 text-sm font-bold space-x-1">
+                <Icon name="Wrong" className="w-4 h-4" />
+                <span>{stats.incorrect}</span>
+              </div>
+            </div>
+            <button
+              onClick={toggleCurrentFavorite}
+              className={`hidden sm:flex items-center justify-center w-9 h-9 rounded-lg border transition-colors ${isCurrentFavorite
+                ? 'bg-amber-100 dark:bg-amber-500/20 border-amber-300 dark:border-amber-400 text-amber-600 dark:text-amber-300'
+                : 'bg-slate-100 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-amber-400'
+                }`}
+              title={isCurrentFavorite ? t('exam.favoriteRemove') : t('exam.favoriteAdd')}
+            >
+              <Icon name="Bulb" className="w-4 h-4" />
+            </button>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/5">
+              <span className="text-slate-400 text-xs">{t('tarix.time')}</span>
+              <span className="font-bold text-base text-slate-900 dark:text-white">{formatTime(timerTick)}</span>
+            </div>
+            <button
+              onClick={() => setIsFinished(true)}
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-500 !text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors shadow-lg shadow-blue-900/20"
+            >
+              {isFinished ? t('exam.results') : t('exam.finish')}
+            </button>
+            <div className="hidden sm:block text-xs text-slate-400">
+              <span className="font-bold text-slate-900 dark:text-white">{currentIndex + 1}</span>/{questions.length}
+            </div>
+          </div>
+        </header>
+
+        <div className="bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 px-6 py-5 shrink-0 z-40 relative flex items-center min-h-[80px]">
+          <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden lg:flex w-9 h-9 rounded-xl bg-brand-cyan/10 dark:bg-brand-cyan/20 items-center justify-center">
+            <span className="text-brand-cyan font-bold">?</span>
+          </div>
+          <h2 className="w-full text-center text-base md:text-lg font-medium text-slate-800 dark:text-white leading-relaxed max-w-4xl mx-auto px-10">
+            {currentQuestion.question}
+          </h2>
+          <button
+            onClick={() => setShowFeedbackModal(true)}
+            className="absolute right-6 top-1/2 -translate-y-1/2 flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-brand-cyan transition-colors"
+            title={t('feedback.title')}
+          >
+            <Icon name="Flag" className="w-4 h-4" />
+          </button>
+        </div>
+
+        <main className="flex-1 flex overflow-hidden relative">
+          <aside className="w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-[#1e2130] flex flex-col border-r border-slate-200 dark:border-white/5 overflow-y-auto p-5 shrink-0 z-30">
+            <div className="space-y-3 flex-1">
+              {currentQuestion.options.map((opt, idx) => {
+                const selected = answers[currentQuestion.id] === idx
+                const isCorrect = opt.is_correct
+                const hasAnswer = typeof answers[currentQuestion.id] === 'number'
+                let containerClass = "group relative w-full text-left p-0 rounded-xl border transition-all duration-200 overflow-hidden flex items-stretch min-h-[56px] "
+                let labelClass = "w-14 flex items-center justify-center text-base font-bold border-r "
+                let textClass = "flex-1 px-5 py-3 text-base leading-snug flex items-center "
+                if (hasAnswer || isFinished) {
+                  const showCorrectAnswer = settings?.showCorrect !== false
+                  if (isCorrect && (selected || showCorrectAnswer)) {
+                    containerClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/40"
+                    labelClass += "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30"
+                    textClass += "text-emerald-800 dark:text-emerald-100"
+                  } else if (selected && !isCorrect) {
+                    containerClass += "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/40"
+                    labelClass += "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/30"
+                    textClass += "text-rose-800 dark:text-rose-100"
+                  } else {
+                    containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-100 dark:border-white/5 opacity-60"
+                    labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-400 dark:text-slate-500 border-slate-200 dark:border-white/5"
+                    textClass += "text-slate-400"
+                  }
+                } else {
+                  if (selected) {
+                    containerClass += "bg-brand-cyan/10 dark:bg-brand-cyan/20 border-brand-cyan/50"
+                    labelClass += "bg-brand-cyan/20 dark:bg-brand-cyan/30 text-brand-cyan border-brand-cyan/40"
+                    textClass += "text-slate-900 dark:text-white"
+                  } else {
+                    containerClass += "bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 hover:border-brand-cyan/30 hover:bg-slate-100 dark:hover:bg-[#35394b]"
+                    labelClass += "bg-slate-100 dark:bg-[#35394b] text-slate-500 dark:text-slate-400 border-slate-200 dark:border-white/5 group-hover:text-brand-cyan"
+                    textClass += "text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white"
+                  }
+                }
+                const isDisabled = hasAnswer || isFinished
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => selectAnswer(currentQuestion.id, idx)}
+                    disabled={isDisabled}
+                    className={`${containerClass} ${isDisabled ? 'cursor-default' : 'cursor-pointer active:scale-[0.99]'}`}
+                  >
+                    <div className={labelClass}>F{idx + 1}</div>
+                    <div className={textClass}>
+                      <span className="flex-1">{opt.option}</span>
+                      {hasAnswer && isCorrect && (selected || settings?.showCorrect !== false) && <Icon name="Check" className="w-5 h-5 text-emerald-500 dark:text-emerald-400 ml-2 shrink-0" />}
+                      {hasAnswer && selected && !isCorrect && <Icon name="Close" className="w-5 h-5 text-rose-500 dark:text-rose-400 ml-2 shrink-0" />}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="mt-6 space-y-3 pt-4 border-t border-slate-200 dark:border-white/5">
+              <button
+                onClick={() => setShowExplanation(!showExplanation)}
+                className={`w-full py-3.5 rounded-xl flex items-center justify-between px-5 font-semibold text-sm transition-all ${showExplanation ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40' : 'bg-amber-50 dark:bg-amber-500/20 hover:bg-amber-100 dark:hover:bg-amber-500/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/40'}`}
+              >
+                <span className="flex items-center">
+                  <Icon name="Bulb" className="mr-2.5 w-5 h-5" />
+                  {showExplanation ? t('exam.hideExplanation') : t('exam.viewExplanation')}
+                </span>
+              </button>
+            </div>
+          </aside>
+          <section className="flex-1 bg-slate-50 dark:bg-black/40 relative flex items-center justify-center p-6 lg:p-10">
+            <div 
+              className={`relative w-full h-full ${currentQuestion.image && currentQuestion.image.trim() !== '' ? 'cursor-pointer' : ''}`}
+              onClick={() => {
+                if (currentQuestion.image && currentQuestion.image.trim() !== '') {
+                  setZoomedImage(currentQuestion.image)
+                }
+              }}
+            >
+              <Image
+                src={currentQuestion.image && currentQuestion.image.trim() !== '' ? currentQuestion.image : '/imgage/background.jpg'}
+                alt={t('tarix.questionImage')}
+                fill
+                className="object-contain"
+                priority
+                unoptimized={currentQuestion.image?.startsWith?.('http')}
+              />
+              {showExplanation && currentQuestion.explanation && (
+                <div className="question-explanation absolute bottom-0 left-0 right-0 mx-auto max-w-2xl bg-white/95 dark:bg-[#161821]/95 backdrop-blur-md text-slate-800 dark:text-white p-6 rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl z-10">
+                  <h4 className="text-amber-500 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">{t('exam.explanation')}</h4>
+                  <p className="!text-base leading-relaxed text-slate-700 dark:text-slate-200">{currentQuestion.explanation}</p>
+                </div>
+              )}
+            </div>
+          </section>
+        </main>
+
+        <footer className="h-20 bg-white dark:bg-[#1e2130] border-t border-slate-200 dark:border-white/5 shrink-0 flex items-center px-4 relative z-50">
+          <button
+            onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+            disabled={currentIndex === 0}
+            className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors mr-4"
+          >
+            <Icon name="ArrowLeft" className="w-6 h-6" />
+          </button>
+          <div ref={scrollRef} className="flex-1 flex items-center gap-2 overflow-x-auto px-2 mx-2 no-scrollbar scroll-smooth h-full py-4">
+            {questions.map((q, idx) => {
+              const answerIdx = answers[q.id]
+              const isAnswered = typeof answerIdx === 'number'
+              const isCurrent = idx === currentIndex
+              const isCorrect = isAnswered && q.options[answerIdx]?.is_correct
+              let btnClass = "min-w-[44px] h-11 rounded-xl text-base font-bold flex items-center justify-center border transition-all duration-300 "
+              if (isCurrent) btnClass += "bg-brand-cyan border-brand-cyan text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] scale-110 z-10 ring-2 ring-brand-cyan/50"
+              else if (isAnswered) {
+                if (isCorrect) btnClass += "bg-emerald-600 border-emerald-500 text-white"
+                else btnClass += "bg-rose-600 border-rose-500 text-white"
+              } else btnClass += "bg-slate-100 dark:bg-[#161821] border-slate-200 dark:border-[#2a2d3e] text-slate-500 hover:bg-slate-200 dark:hover:bg-[#2a2d3e] hover:text-slate-700 dark:hover:text-slate-300"
+              return (
+                <button key={q.id} onClick={() => setCurrentIndex(idx)} className={btnClass}>
+                  {idx + 1}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
+            disabled={currentIndex === questions.length - 1}
+            className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-[#2a2d3e] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-[#35394b] disabled:opacity-30 transition-colors ml-4"
+          >
+            <Icon name="ArrowRight" className="w-6 h-6" />
+          </button>
+        </footer>
+      </div>
+
+      {/* IMAGE ZOOM MODAL */}
+      {zoomedImage && (
+        <div 
+          className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in duration-300"
+          onClick={() => setZoomedImage(null)}
         >
-          <Icon name="ArrowRight" className="w-6 h-6" />
-        </button>
-      </footer>
+          <div className="relative w-full max-w-5xl aspect-square md:aspect-video" onClick={e => e.stopPropagation()}>
+            <Image
+              src={zoomedImage}
+              alt="Zoomed Question Image"
+              fill
+              className="object-contain"
+              unoptimized={zoomedImage?.startsWith?.('http')}
+            />
+            <button 
+              onClick={() => setZoomedImage(null)}
+              className="absolute -top-12 right-0 md:-right-12 md:top-0 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 transition-all cursor-pointer"
+              title="Yopish"
+            >
+              <Icon name="Close" className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <ExamSettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
       <FeedbackModal
         isOpen={showFeedbackModal}
@@ -701,7 +927,7 @@ export default function BiletTicketPage() {
           questionText: currentQuestion?.question
         }}
       />
-    </div>
+    </>
   )
 }
 
