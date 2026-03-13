@@ -117,13 +117,13 @@ export default function TarixPage() {
   }, [router, fetchHistory])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 flex flex-col font-display transition-colors duration-200">
+    <div className="min-h-screen bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 flex flex-col font-display transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 flex flex-col min-h-screen">
         <QoidalarHeader title={t('tarix.title')} />
 
-        <header className="h-16 lg:h-20 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md z-10 sticky top-0 transition-colors">
+        <header className="h-16 lg:h-20 border-b border-[#313C50] md:border-slate-200 md:dark:border-slate-800 flex items-center justify-between px-4 lg:px-8 bg-[#161c24]/90 md:bg-white/80 md:dark:bg-[#0f172a]/80 backdrop-blur-md z-10 sticky top-0 transition-colors">
           <div className="flex items-center gap-4">
             {/* Invisible spacer since sidebar overlaps header text on desktop */}
             <div className="hidden lg:block"></div>
@@ -133,7 +133,7 @@ export default function TarixPage() {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="appearance-none w-full bg-slate-100 dark:bg-[#1e293b] border-none rounded-xl px-4 py-2 pr-10 focus:ring-2 focus:ring-brand-cyan text-sm font-medium cursor-pointer text-slate-700 dark:text-slate-200 transition-colors"
+                className="appearance-none w-full bg-[#212936] md:bg-slate-100 md:dark:bg-[#1e293b] border border-[#313C50] md:border-none rounded-[16px] px-4 py-2 pr-10 focus:ring-2 focus:ring-blue-500 text-sm font-bold cursor-pointer text-white md:text-slate-700 md:dark:text-slate-200 transition-colors"
                 style={{ backgroundImage: "none" }}
               >
                 <option value="all">{t('tarix.filterAll')}</option>
@@ -141,7 +141,7 @@ export default function TarixPage() {
                 <option value="haqiqiy">{t('tarix.typeReal')}</option>
                 <option value="bilet">{t('tarix.typeBilet')}</option>
               </select>
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+              <svg className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#9AA4B2] w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
 
             <div className="flex-shrink-0">
@@ -151,21 +151,21 @@ export default function TarixPage() {
         </header>
 
         <main className="flex-1 overflow-y-auto w-full max-w-5xl mx-auto p-4 lg:p-8">
-          <div className="flex gap-2 mb-8 bg-slate-100 dark:bg-[#1e293b] p-1 rounded-2xl w-fit transition-colors">
+          <div className="flex gap-2 mb-8 bg-[#212936] md:bg-slate-100 md:dark:bg-[#1e293b] p-1.5 rounded-[18px] w-fit transition-colors border border-[#313C50] md:border-none">
             <button
               onClick={() => setActiveTab('imtihonlar')}
-              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'imtihonlar'
-                ? 'bg-brand-cyan text-white shadow-lg shadow-brand-cyan/20'
-                : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+              className={`px-6 py-2.5 rounded-[14px] text-sm font-bold transition-all ${activeTab === 'imtihonlar'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                : 'text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-white md:hover:bg-white md:dark:hover:bg-slate-700'
                 }`}
             >
               {t('tarix.tabExams')}
             </button>
             <button
               onClick={() => setActiveTab('savollar')}
-              className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === 'savollar'
-                ? 'bg-brand-cyan text-white shadow-lg shadow-brand-cyan/20'
-                : 'text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700'
+              className={`px-6 py-2.5 rounded-[14px] text-sm font-bold transition-all ${activeTab === 'savollar'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                : 'text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-white md:hover:bg-white md:dark:hover:bg-slate-700'
                 }`}
             >
               {t('tarix.tabQuestions')}
@@ -202,7 +202,7 @@ export default function TarixPage() {
                           <Link
                             href={`/tarix/${item.id || item._id}`}
                             key={item.id || item._id}
-                            className={`bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 transition-all group cursor-pointer ${isCanceled ? 'opacity-60 hover:opacity-100 hover:shadow-xl hover:shadow-rose-500/5' : 'hover:shadow-xl hover:shadow-brand-cyan/5'
+                            className={`bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-200 md:dark:border-slate-800 rounded-[24px] p-6 transition-all group cursor-pointer ${isCanceled ? 'opacity-60 grayscale-[0.3] hover:opacity-100 hover:grayscale-0' : 'hover:border-blue-500/50 hover:shadow-lg shadow-black/20'
                               }`}
                           >
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -227,9 +227,9 @@ export default function TarixPage() {
                                     </div>
                                   </div>
                                   <div className="flex-1 ml-2 md:ml-6 mb-3">
-                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-2 w-full bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 rounded-full overflow-hidden">
                                       <div
-                                        className={`h-full rounded-full transition-all duration-1000 ${isCanceled ? 'bg-slate-300 dark:bg-slate-700' : 'bg-brand-cyan'}`}
+                                        className={`h-full rounded-full transition-all duration-1000 ${isCanceled ? 'bg-[#313C50] md:bg-slate-300 md:dark:bg-slate-700' : 'bg-blue-500'}`}
                                         style={{ width: `${barWidth}%` }}
                                       />
                                     </div>
@@ -246,9 +246,9 @@ export default function TarixPage() {
                                     <span className="text-lg md:text-xl font-bold font-mono">{formatDuration(item.durationSeconds)}</span>
                                   </div>
                                 </div>
-                                <div className={`w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center transition-colors ${isCanceled ? 'group-hover:bg-rose-500 group-hover:text-white' : 'group-hover:bg-brand-cyan group-hover:text-white'
+                                <div className={`w-10 h-10 rounded-full bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 flex items-center justify-center transition-colors border border-[#313C50] md:border-none ${isCanceled ? 'group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500' : 'group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600'
                                   }`}>
-                                  <Icon name="ChevronRight" className="w-6 h-6 ml-0.5" />
+                                  <Icon name="ChevronRight" className="w-6 h-6 ml-0.5 text-[#9AA4B2] group-hover:text-white dark:text-slate-400 md:dark:group-hover:text-white" />
                                 </div>
                               </div>
                             </div>
@@ -261,7 +261,7 @@ export default function TarixPage() {
               </div>
             )
           ) : (
-            <div className="text-center py-16 text-slate-400">
+            <div className="text-center py-16 text-[#9AA4B2]">
               <p>{t('tarix.soon')}</p>
             </div>
           )}

@@ -129,13 +129,13 @@ export default function SavollarPage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#161821] text-slate-900 dark:text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-[#161c24] md:bg-slate-50 md:dark:bg-[#161821] text-white md:text-slate-900 md:dark:text-white font-sans flex flex-col">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
         <QoidalarHeader title="Savollar" />
 
-        <div className="bg-white dark:bg-[#1e2130] border-b border-slate-200 dark:border-white/5 p-4 sticky top-16 z-40">
+        <div className="bg-[#161c24] md:bg-white md:dark:bg-[#1e2130] border-b border-[#313C50] md:border-slate-200 md:dark:border-white/5 p-4 sticky top-16 z-40">
           <div className="max-w-4xl mx-auto space-y-4">
             <div className="relative">
               <input
@@ -143,7 +143,7 @@ export default function SavollarPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Savol raqami yoki matnini kiriting"
-                className="w-full bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/10 rounded-xl pl-11 pr-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-brand-cyan/50 focus:bg-white dark:focus:bg-[#2a2d3e] transition-colors"
+                className="w-full bg-[#212936] md:bg-slate-100 md:dark:bg-[#2a2d3e] border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] pl-11 pr-4 py-3.5 text-white placeholder-[#9AA4B2] focus:outline-none focus:border-blue-500 transition-colors"
               />
               <svg className="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </div>
@@ -157,9 +157,9 @@ export default function SavollarPage() {
                 <button
                   key={value}
                   onClick={() => setHasImage(value)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${hasImage === value
-                    ? 'bg-brand-blue text-white'
-                    : 'bg-slate-100 dark:bg-[#2a2d3e] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/10'
+                  className={`px-4 py-2 rounded-[14px] text-sm font-bold transition-all ${hasImage === value
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                    : 'bg-[#212936] text-[#9AA4B2] border border-[#313C50]'
                     }`}
                 >
                   {label}
@@ -168,7 +168,7 @@ export default function SavollarPage() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="ml-auto bg-slate-100 dark:bg-[#2a2d3e] border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-500 dark:text-slate-400 focus:outline-none"
+                className="ml-auto bg-[#212936] md:bg-slate-100 md:dark:bg-[#2a2d3e] border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[14px] px-3 py-2 text-xs font-bold text-[#9AA4B2] focus:outline-none"
               >
                 <option value="asc">ID ↑</option>
                 <option value="desc">ID ↓</option>
@@ -179,11 +179,11 @@ export default function SavollarPage() {
 
         <main className="flex-1 px-4 py-6 max-w-4xl mx-auto w-full">
           {error && (
-            <div className="mb-4 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-sm">{error}</div>
+            <div className="mb-4 p-4 rounded-[16px] bg-red-500/10 border border-red-500/30 text-red-500 text-sm">{error}</div>
           )}
 
-          <div className="mb-4 text-slate-500 dark:text-slate-400 text-sm">
-            Jami: <span className="font-bold text-slate-900 dark:text-white">{totalCount}</span> ta savol
+          <div className="mb-4 text-[#9AA4B2] text-sm font-medium pl-1">
+            Jami: <span className="font-bold text-white">{totalCount}</span> ta savol
           </div>
 
           {loading ? (
@@ -199,27 +199,27 @@ export default function SavollarPage() {
                 const isSaved = savedIds.includes(Number(qId))
 
                 return (
-                  <div key={qId} className="bg-white dark:bg-[#1e2130] rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden shadow-sm">
+                  <div key={qId} className="bg-[#212936] md:bg-white md:dark:bg-[#1e2130] rounded-[24px] border border-[#313C50] md:border-slate-200 md:dark:border-white/5 overflow-hidden shadow-sm">
                     <div className="p-5">
                       <div className="flex items-center justify-between mb-4">
-                        <span className="bg-brand-cyan/10 dark:bg-brand-cyan/20 text-brand-cyan px-3 py-1.5 rounded-lg text-xs font-bold">
+                        <span className="bg-blue-500/20 text-blue-500 px-3 py-1.5 rounded-xl text-[13px] font-bold">
                           Savol #{qId}
                         </span>
                         <button
                           onClick={() => toggleFavorite(qId)}
-                          className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+                          className="p-2 w-10 h-10 flex items-center justify-center rounded-full bg-[#161c24] border border-[#313C50] text-[#9AA4B2] hover:bg-[#313C50] transition-colors"
                           aria-label={isSaved ? "O'chirish" : "Saqlash"}
                         >
-                          <svg className={`w-5 h-5 ${isSaved ? 'fill-amber-500 text-amber-500' : 'text-slate-400'}`} viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+                          <svg className={`w-5 h-5 ${isSaved ? 'fill-amber-500 text-amber-500' : 'text-[#9AA4B2]'}`} viewBox="0 0 24 24" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
                             <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                           </svg>
                         </button>
                       </div>
 
-                      <p className="text-base md:text-lg font-medium text-slate-800 dark:text-white mb-4 leading-relaxed">{q.question}</p>
+                      <p className="text-[16px] md:text-lg font-medium text-white md:text-slate-800 md:dark:text-white mb-5 leading-relaxed">{q.question}</p>
 
                       {q.image && (
-                        <div className="relative w-full h-48 md:h-56 rounded-xl overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200 dark:border-white/5 mb-4">
+                        <div className="relative w-full h-48 md:h-56 rounded-[16px] overflow-hidden bg-black/40 border border-[#313C50] mb-5">
                           <Image
                             src={q.image}
                             alt="Savol rasmi"
@@ -235,12 +235,12 @@ export default function SavollarPage() {
                           return (
                             <div
                               key={idx}
-                              className={`p-3 rounded-xl border flex items-center gap-3 ${opt.is_correct
-                                ? 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-200 dark:border-emerald-500/40 text-emerald-800 dark:text-emerald-100'
-                                : 'bg-slate-50 dark:bg-[#2a2d3e] border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400'
+                              className={`p-3.5 rounded-[16px] border flex items-center gap-3 ${opt.is_correct
+                                ? 'bg-green-500/20 border-green-500/50 text-green-400'
+                                : 'bg-[#161c24] border-[#313C50] text-[#9AA4B2]'
                                 }`}
                             >
-                              <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 ${opt.is_correct ? 'bg-emerald-100 dark:bg-emerald-600/50 text-emerald-700 dark:text-emerald-50' : 'bg-slate-200 dark:bg-[#35394b] text-slate-500 dark:text-slate-400'
+                              <span className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${opt.is_correct ? 'bg-green-500 text-white' : 'bg-[#313C50] text-[#9AA4B2]'
                                 }`}>
                                 F{idx + 1}
                               </span>

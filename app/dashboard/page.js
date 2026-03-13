@@ -32,6 +32,10 @@ import {
   ChevronRight,
   Play,
   MessageSquare,
+  Target,
+  Bookmark,
+  Lightbulb,
+  Infinity,
 } from 'lucide-react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
@@ -267,7 +271,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="dashboard-page dashboard-bg min-h-screen flex font-display text-slate-800 dark:text-slate-100 overflow-hidden">
+    <div className="dashboard-page md:dashboard-bg bg-[#161c24] min-h-screen flex font-display text-slate-800 dark:text-slate-100 md:text-inherit overflow-x-hidden">
       {/* SIDEBAR – desktop */}
       <aside className="dashboard-sidebar hidden md:flex flex-col flex-shrink-0 z-20">
         <div className="p-6 flex items-center gap-3">
@@ -331,7 +335,7 @@ export default function DashboardPage() {
       </aside>
 
       <main className="dashboard-main-content">
-        <header className="dashboard-sticky-header p-6 flex items-center justify-between">
+        <header className="dashboard-sticky-header p-6 hidden md:flex items-center justify-between">
           <h1 className="text-xl font-semibold text-slate-800 dark:text-white">
             {t('dashboard.welcome')}, {userName} 👋
           </h1>
@@ -350,8 +354,119 @@ export default function DashboardPage() {
           </div>
         </header>
 
-        <div className="p-6 md:p-8 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8">
-          <div className="flex-1 space-y-8">
+        {/* Mobile Header */}
+        <div className="md:hidden flex items-center justify-center pt-6 pb-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-[10px] bg-white flex items-center justify-center shadow-md">
+                <Image src="/imgage/avtotest-logo.png" alt="Logo" width={24} height={24} className="object-contain" />
+            </div>
+            <span className="text-xl font-bold text-white tracking-tight">
+              Pravachi<span className="text-blue-500">UZ</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="p-4 md:p-8 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8">
+          {/* MOBILE CONTENT ONLY */}
+          <div className="md:hidden flex flex-col w-full pb-24 gap-5">
+            {/* Stats Cards */}
+            <div className="bg-[#212936] rounded-[24px] p-5 flex items-center justify-between shadow-sm border border-[#313C50]">
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-xl flex items-center justify-center mb-2">
+                  <HelpCircle className="w-5 h-5" />
+                </div>
+                <div className="text-lg font-bold text-white leading-none mb-1">
+                  {mastery.totalQuestions}
+                </div>
+                <div className="text-[10px] text-[#9AA4B2] font-semibold uppercase tracking-wider">Savollar</div>
+              </div>
+              <div className="w-[1px] h-10 bg-[#313C50]"></div>
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-10 h-10 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center mb-2">
+                  <Target className="w-5 h-5" />
+                </div>
+                <div className="text-lg font-bold text-white leading-none mb-1">
+                  {mastery.percent}%
+                </div>
+                <div className="text-[10px] text-[#9AA4B2] font-semibold uppercase tracking-wider">Samaradorlik</div>
+              </div>
+              <div className="w-[1px] h-10 bg-[#313C50]"></div>
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-10 h-10 bg-yellow-500/10 text-yellow-500 rounded-xl flex items-center justify-center mb-2">
+                  <Flame className="w-5 h-5" />
+                </div>
+                <div className="text-lg font-bold text-white leading-none mb-1">
+                  {activityDays} kun
+                </div>
+                <div className="text-[10px] text-[#9AA4B2] font-semibold uppercase tracking-wider">Davomiylik</div>
+              </div>
+            </div>
+
+            {/* Mashq turlari */}
+            <div>
+              <h3 className="text-[16px] font-bold text-white mb-3 px-1">Mashq turlari</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Link href="/biletlar" className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <BookOpen className="w-5 h-5 text-blue-500 stroke-[2]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Biletlar</span>
+                </Link>
+
+                <button onClick={() => { setExamModalType('real'); setExamModalOpen(true); }} className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <Timer className="w-5 h-5 text-orange-500 stroke-[2]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Haqiqiy imtihon</span>
+                </button>
+
+                <button onClick={() => { setExamModalType('standard'); setExamModalOpen(true); }} className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group">
+                  <div className="w-10 h-10 bg-slate-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <ClipboardCheck className="w-5 h-5 text-slate-400 stroke-[2]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Standart imtihon</span>
+                </button>
+
+                <Link href="/favorites" className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group">
+                  <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <Bookmark className="w-5 h-5 text-amber-500 stroke-[2]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Sevimlilar</span>
+                </Link>
+
+                <Link href="/mistakes" className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group col-span-2">
+                  <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <Lightbulb className="w-5 h-5 text-red-500 stroke-[2]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Xatolarim ustida ishlash</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* BU HAFTA Chart */}
+            <div className="bg-[#212936] rounded-[24px] p-5 border border-[#313C50] shadow-sm relative overflow-hidden">
+              <div className="flex justify-between items-start mb-2 relative z-10">
+                <div>
+                  <div className="text-[10px] font-bold text-[#9AA4B2] uppercase tracking-widest mb-1">BU HAFTA</div>
+                  <div className="flex items-end gap-1">
+                    <span className="text-3xl font-bold text-white leading-none">{weeklyStats.javob}</span>
+                    <span className="text-[10px] font-bold text-[#9AA4B2] uppercase tracking-widest mb-1">JAVOB</span>
+                  </div>
+                </div>
+                <Link href="/tarix" className="px-3 py-1.5 bg-[#313C50] rounded-full text-[10px] font-bold text-white flex items-center gap-1 uppercase tracking-wider">
+                  TO'LIQ TARIX <ChevronRight className="w-3 h-3" />
+                </Link>
+              </div>
+
+              <div className="-mx-6 -mb-6 h-[250px] opacity-90">
+                <WeeklyChart data={weeklyStats.daily} />
+              </div>
+            </div>
+
+          </div>
+          {/* END MOBILE CONTENT ONLY */}
+
+          <div className="hidden md:flex flex-1 flex-col space-y-8">
             {/* 3 ta stat karta + Barcha hisobotlar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
               <h2 className="text-lg font-bold text-slate-800 dark:text-white">{t('dashboard.stats')}</h2>
@@ -620,30 +735,26 @@ export default function DashboardPage() {
             </div>
 
             {/* Davomiylik – haftalik faollik (yechilgan savollar soniga asoslangan) */}
-            <WeeklyChart data={weeklyStats.daily} />
+            <div className="hidden md:block">
+              <WeeklyChart data={weeklyStats.daily} />
+            </div>
           </aside>
         </div>
       </main>
 
       {/* Pastki nav – faqat mobil/planşet */}
-      <nav className="dashboard-nav glass-card fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-6 lg:gap-8 lg:hidden">
-        <Link href="/dashboard" className="p-2 text-primary hover:scale-110">
-          <Home className="dashboard-nav-icon !size-10" />
+      <nav className="fixed bottom-0 left-0 w-full bg-[#212936]/95 backdrop-blur-xl border-t border-[#313C50] z-50 flex items-center justify-around py-2 pb-safe md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.4)]">
+        <Link href="/dashboard" className="p-2 text-blue-500 flex flex-col items-center gap-1 scale-110 pb-1 border-b-2 border-blue-500">
+          <Home className="w-[22px] h-[22px]" />
         </Link>
-        <Link href="/qoidalar" className="dashboard-nav-link p-2">
-          <BookOpen className="dashboard-nav-icon !size-10" />
+        <Link href="/biletlar" className="p-2 text-[#9AA4B2] hover:text-white transition-colors flex flex-col items-center gap-1 active:scale-95">
+          <ClipboardCheck className="w-[22px] h-[22px]" />
         </Link>
-        <Link href="/biletlar" className="dashboard-nav-link p-2">
-          <ClipboardCheck className="dashboard-nav-icon !size-10" />
+        <Link href="/savollar" className="p-2 text-[#9AA4B2] hover:text-white transition-colors flex flex-col items-center gap-1 active:scale-95">
+          <Search className="w-[22px] h-[22px]" />
         </Link>
-        <Link href="/savollar" className="dashboard-nav-link p-2">
-          <Search className="dashboard-nav-icon !size-10" />
-        </Link>
-        <Link href="/mistakes" className="dashboard-nav-link p-2">
-          <Medal className="dashboard-nav-icon !size-10" />
-        </Link>
-        <Link href="/profil" className="dashboard-nav-link p-2">
-          <SettingsIcon className="dashboard-nav-icon !size-10" />
+        <Link href="/profil" className="p-2 text-[#9AA4B2] hover:text-white transition-colors flex flex-col items-center gap-1 active:scale-95">
+          <SettingsIcon className="w-[22px] h-[22px]" />
         </Link>
       </nav>
 
@@ -652,31 +763,34 @@ export default function DashboardPage() {
 
       {/* MODAL - Standart yoki Haqiqiy imtihon */}
       {examModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-[#1e293b] rounded-3xl p-8 w-full max-w-md border border-slate-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-end md:items-center justify-center bg-black/80 backdrop-blur-sm p-4 md:p-4">
+          <div className="w-full h-1/2 md:h-auto md:max-w-md bg-[#212936] rounded-t-[24px] md:rounded-[24px] p-8 border border-[#313C50] shadow-2xl animate-in slide-in-from-bottom md:zoom-in-95 duration-200">
+            {/* Mobile drag handle */}
+            <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6 md:hidden"></div>
+
             {examModalType === 'standard' ? (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-brand-blue/20 text-brand-blue dark:text-brand-cyan flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-blue-500/20 text-blue-500 flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {t('exam.modal.standard.title')}
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-[#9AA4B2]">
                     {t('exam.modal.standard.desc')}
                   </p>
                 </div>
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
                   {[10, 20, 50].map((count) => (
                     <button
                       key={count}
                       onClick={() => startStandardExam(count)}
-                      className="flex flex-col items-center justify-center py-4 rounded-2xl bg-slate-50 dark:bg-night-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:border-brand-blue hover:bg-blue-50 dark:hover:bg-brand-blue/10 hover:shadow-lg hover:shadow-brand-blue/10 transition-all group"
+                      className="flex flex-col items-center justify-center py-4 rounded-[16px] bg-[#161c24] md:bg-slate-50 md:dark:bg-night-900 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 text-white md:text-slate-900 md:dark:text-white hover:border-blue-500 md:hover:border-brand-blue hover:bg-blue-500/10 md:hover:bg-blue-50 md:dark:hover:bg-brand-blue/10 hover:shadow-lg md:hover:shadow-brand-blue/10 transition-all group active:scale-95"
                     >
-                      <span className="text-xl font-bold group-hover:text-brand-blue transition-colors">{count}</span>
-                      <span className="text-[10px] text-slate-500 uppercase font-bold mt-1">
-                        {t('exam.modal.standard.badge')}
+                      <span className="text-[20px] md:text-xl font-bold group-hover:text-blue-500 md:group-hover:text-brand-blue transition-colors">{count}</span>
+                      <span className="text-[10px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mt-1 tracking-wider">
+                        {t('exam.modal.standard.badge') || 'savol'}
                       </span>
                     </button>
                   ))}
@@ -685,13 +799,13 @@ export default function DashboardPage() {
             ) : (
               <>
                 <div className="text-center mb-6">
-                  <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 rounded-full bg-orange-500/20 text-orange-500 flex items-center justify-center mx-auto mb-4">
                     <Timer className="w-8 h-8" />
                   </div>
-                  <h3 className="text-2xl font-heading font-bold text-slate-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-bold text-white mb-2">
                     {t('exam.modal.real.title')}
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                  <p className="text-sm text-[#9AA4B2] mb-4">
                     {t('exam.modal.real.desc')}
                   </p>
                   <button
@@ -705,7 +819,7 @@ export default function DashboardPage() {
             )}
             <button
               onClick={() => { setExamModalOpen(false); setExamModalType(null); }}
-              className="w-full py-3 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors mt-2"
+              className="w-full py-3 rounded-xl text-sm font-bold text-[#9AA4B2] hover:text-white hover:bg-white/5 transition-colors mt-2"
             >
               {t('exam.modal.cancel')}
             </button>

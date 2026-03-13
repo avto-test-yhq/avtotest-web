@@ -57,7 +57,7 @@ export default function ChapterDetailPage() {
   const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title={currentChapter?.title || 'Yuklanmoqda...'} />
@@ -105,26 +105,26 @@ export default function ChapterDetailPage() {
         {/* MAIN CONTENT Area */}
         <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-4xl mx-auto">
           {loading ? (
-            <div className="text-center py-20 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-20 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : (
-            <div className="space-y-8 pb-24">
+            <div className="space-y-6 md:space-y-8 pb-24">
               {articles.map((a) => (
-                <article key={a.id} className="bg-white dark:bg-[#1e293b] rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-shadow duration-300">
-                  <span className="inline-block px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 font-bold text-sm mb-4">
+                <article key={a.id} className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] p-5 md:p-8 shadow-sm border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-md transition-shadow duration-300">
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-blue-500 md:text-sky-600 md:dark:text-sky-400 font-bold text-[12px] md:text-sm mb-4">
                     {a.number}-modda
                   </span>
-                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-lg mb-6 whitespace-pre-wrap">
+                  <p className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
                     {a.content || a.simplified || "Mazmun mavjud emas"}
                   </p>
 
                   {a.exam_tips && (
-                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-xl p-5 flex gap-4">
+                    <div className="bg-[#161c24] md:bg-amber-50 md:dark:bg-amber-900/20 border border-[#313C50] md:border-amber-100 md:dark:border-amber-900/30 rounded-[16px] p-4 md:p-5 flex gap-3 md:gap-4 mt-2">
                       <div className="flex-shrink-0">
-                        <span className="material-icons-round text-amber-500">lightbulb</span>
+                        <span className="material-icons-round text-yellow-500 md:text-amber-500 text-[20px] md:text-[24px]">lightbulb</span>
                       </div>
                       <div>
-                        <h4 className="text-amber-800 dark:text-amber-400 font-bold text-sm uppercase tracking-wide mb-1">{t('rules.examImportant')}</h4>
-                        <p className="text-amber-900/70 dark:text-amber-200/60 text-sm">
+                        <h4 className="text-yellow-500 md:text-amber-800 md:dark:text-amber-400 font-bold text-[13px] md:text-sm uppercase tracking-wide mb-1">{t('rules.examImportant')}</h4>
+                        <p className="text-[#9AA4B2] md:text-amber-900/70 md:dark:text-amber-200/60 text-[13px] md:text-sm">
                           {a.exam_tips}
                         </p>
                       </div>
@@ -134,35 +134,39 @@ export default function ChapterDetailPage() {
               ))}
 
               {articles.length === 0 && (
-                <div className="text-center py-20 bg-white dark:bg-[#1e293b] rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
-                  <p className="text-slate-500">Ushbu bobda hozircha moddalar kiritilmagan.</p>
+                <div className="text-center py-20 bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-slate-700">
+                  <p className="text-[#9AA4B2] md:text-slate-500">Ushbu bobda hozircha moddalar kiritilmagan.</p>
                 </div>
               )}
 
               {/* Visual Pagination */}
-              <div className="mt-12 flex items-center justify-between border-t border-slate-200 dark:border-slate-800 pt-8">
+              <div className="mt-8 md:mt-12 flex items-center justify-between border-t border-[#313C50] md:border-slate-200 md:dark:border-slate-800 pt-6 md:pt-8 mb-10 md:mb-0">
                 {prevChapter ? (
-                  <Link href={`/qoidalar/yol-harakati/${prevChapter.id}`} className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors group">
-                    <span className="material-icons-round group-hover:-translate-x-1 transition-transform">chevron_left</span>
+                  <Link href={`/qoidalar/yol-harakati/${prevChapter.id}`} className="flex items-center gap-2 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-blue-500 md:hover:text-sky-600 md:dark:hover:text-sky-400 transition-colors group">
+                    <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-[#212936] md:bg-transparent flex items-center justify-center">
+                      <span className="material-icons-round group-hover:-translate-x-1 transition-transform">chevron_left</span>
+                    </div>
                     <div className="text-left hidden sm:block">
-                      <div className="text-xs text-slate-400">Oldingi bob</div>
-                      <div className="font-medium line-clamp-1 max-w-[150px]">{prevChapter.title}</div>
+                      <div className="text-xs text-[#9AA4B2] md:text-slate-400">Oldingi bob</div>
+                      <div className="font-bold md:font-medium text-white md:text-inherit line-clamp-1 max-w-[120px] md:max-w-[150px]">{prevChapter.title}</div>
                     </div>
                   </Link>
                 ) : <span></span>}
 
                 {/* Pages (Simplified visual) */}
-                <div className="hidden md:flex gap-2 text-sm font-medium text-slate-400">
+                <div className="flex md:flex gap-2 text-sm font-bold md:font-medium text-[#9AA4B2] md:text-slate-400">
                   {currentIndex + 1} / {allChapters.length}
                 </div>
 
                 {nextChapter ? (
-                  <Link href={`/qoidalar/yol-harakati/${nextChapter.id}`} className="flex items-center gap-2 text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-colors font-medium group">
+                  <Link href={`/qoidalar/yol-harakati/${nextChapter.id}`} className="flex items-center gap-2 text-white md:text-slate-900 md:dark:text-white hover:text-blue-500 md:hover:text-sky-600 md:dark:hover:text-sky-400 transition-colors font-bold md:font-medium group">
                     <div className="text-right hidden sm:block">
-                      <div className="text-xs text-slate-400">Keyingi bob</div>
-                      <div className="font-medium line-clamp-1 max-w-[150px]">{nextChapter.title}</div>
+                      <div className="text-xs text-[#9AA4B2] md:text-slate-400">Keyingi bob</div>
+                      <div className="line-clamp-1 max-w-[120px] md:max-w-[150px]">{nextChapter.title}</div>
                     </div>
-                    <span className="material-icons-round group-hover:translate-x-1 transition-transform">chevron_right</span>
+                    <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-[#212936] md:bg-transparent flex items-center justify-center">
+                      <span className="material-icons-round group-hover:translate-x-1 transition-transform">chevron_right</span>
+                    </div>
                   </Link>
                 ) : <span></span>}
               </div>
@@ -172,7 +176,7 @@ export default function ChapterDetailPage() {
       </div>
 
       {/* Mobile Help FAB */}
-      <button className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-sky-500 text-white rounded-full shadow-lg shadow-sky-500/30 flex items-center justify-center hover:scale-105 transition-transform active:scale-95 z-50">
+      <button className="fixed bottom-6 right-6 lg:hidden w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-600/30 flex items-center justify-center hover:scale-105 transition-transform active:scale-95 z-50">
         <span className="material-icons-round">description</span>
       </button>
 

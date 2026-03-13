@@ -56,7 +56,7 @@ export default function YolBelgilariPage() {
   const popularSigns = signs.filter((s) => s.is_popular).slice(0, 8)
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title="Yo'l belgilari" />
@@ -87,13 +87,13 @@ export default function YolBelgilariPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto w-full">
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : (
             <>
               {/* Categories Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-12">
                 {categories.map((cat) => {
                   const count = getCategorySignCount(cat.id)
                   const sampleSign = signs.find((s) => s.category_id === cat.id)
@@ -101,28 +101,30 @@ export default function YolBelgilariPage() {
                     <Link
                       key={cat.id}
                       href={`/qoidalar/yol-belgilari/${cat.folder || cat.id}`}
-                      className="group flex items-center justify-between p-6 rounded-3xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-sky-500/30 transition-all duration-300"
+                      className="group flex items-center justify-between p-4 md:p-6 rounded-[24px] bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all duration-300 active:scale-[0.98]"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center p-2 border border-slate-100 dark:border-slate-700">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-14 h-14 md:w-16 md:h-16 rounded-[16px] md:rounded-2xl bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 flex items-center justify-center p-2 border border-[#313C50] md:border-slate-100 md:dark:border-slate-700">
                           {sampleSign?.image ? (
                             <img
                               src={getSignImageUrl(sampleSign.image)}
                               alt=""
                               width={48}
                               height={48}
-                              className="object-contain w-12 h-12"
+                              className="object-contain w-10 h-10 md:w-12 md:h-12"
                             />
                           ) : (
-                            <span className="material-icons-round text-slate-400 text-3xl">sms_failed</span>
+                            <span className="material-icons-round text-[#9AA4B2] md:text-slate-400 text-2xl md:text-3xl">sms_failed</span>
                           )}
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors mb-1">{cat.name}</h3>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">{count} ta belgi</p>
+                          <h3 className="text-base md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors mb-1 line-clamp-1">{cat.name}</h3>
+                          <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400">{count} ta belgi</p>
                         </div>
                       </div>
-                      <span className="material-icons-round text-slate-300 group-hover:text-sky-500 group-hover:translate-x-1 transition-all">arrow_forward</span>
+                      <div className="w-8 h-8 rounded-full bg-[#161c24] md:bg-transparent flex items-center justify-center group-hover:bg-blue-600 transition-colors shrink-0">
+                        <span className="material-icons-round text-[20px] text-[#9AA4B2] md:text-slate-300 md:group-hover:text-sky-500 group-hover:text-white md:group-hover:translate-x-1 transition-all">arrow_forward</span>
+                      </div>
                     </Link>
                   )
                 })}
@@ -130,17 +132,17 @@ export default function YolBelgilariPage() {
 
               {popularSigns.length > 0 && (
                 <div>
-                  <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white mb-6">
-                    <span className="text-amber-500">🔥</span> Ommabop belgilar
+                  <h2 className="flex items-center gap-2 text-[18px] md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white mb-4 md:mb-6">
+                    <span className="text-yellow-500 md:text-amber-500">🔥</span> Ommabop belgilar
                   </h2>
-                  <div className="flex gap-4 overflow-x-auto pb-6 -mx-4 px-4 custom-scrollbar">
+                  <div className="flex gap-3 md:gap-4 overflow-x-auto pb-6 -mx-4 px-4 custom-scrollbar hide-scrollbar-mobile">
                     {popularSigns.map((s) => (
                       <Link
                         key={s.id}
                         href={`/qoidalar/yol-belgilari/${categories.find((c) => c.id === s.category_id)?.folder || s.category_id}/${s.id}`}
-                        className="shrink-0 w-32 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md hover:border-sky-500/30 transition-all group"
+                        className="shrink-0 w-28 md:w-32 rounded-[20px] md:rounded-2xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 overflow-hidden hover:shadow-md hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all group active:scale-[0.98]"
                       >
-                        <div className="relative w-full h-24 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center p-4">
+                        <div className="relative w-full h-20 md:h-24 bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800/50 flex items-center justify-center p-3 md:p-4 border-b border-[#313C50] md:border-slate-100 md:dark:border-slate-800/50">
                           <img
                             src={getSignImageUrl(s.image) || '/imgage/background.jpg'}
                             alt={s.name}
@@ -148,8 +150,8 @@ export default function YolBelgilariPage() {
                           />
                         </div>
                         <div className="p-3">
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 mb-1">{s.code}</span>
-                          <p className="text-xs font-medium text-slate-700 dark:text-slate-300 line-clamp-2 leading-snug">{s.name}</p>
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-[#9AA4B2] md:text-sky-600 md:dark:text-sky-400 mb-1">{s.code}</span>
+                          <p className="text-[11px] md:text-xs font-medium text-white md:text-slate-700 md:dark:text-slate-300 line-clamp-2 leading-snug">{s.name}</p>
                         </div>
                       </Link>
                     ))}

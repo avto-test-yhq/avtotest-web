@@ -69,14 +69,20 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
     }
 
     return (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-[#1e2130] border border-white/10 rounded-2xl w-full max-w-sm shadow-2xl scale-100 animate-in zoom-in-95 duration-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between bg-[#23263a]">
-                    <h2 className="text-lg font-bold text-white">
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
+            <div className="bg-[#1e2532] sm:bg-[#1e2130] border-t sm:border border-[#2d3748] sm:border-white/10 rounded-t-[24px] sm:rounded-2xl w-full sm:max-w-sm shadow-2xl scale-100 animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 overflow-hidden pb-6 sm:pb-0 font-display sm:font-sans relative">
+                
+                {/* Mobile Drag Handle */}
+                <div className="w-full flex justify-center pt-3 pb-1 sm:hidden">
+                    <div className="w-12 h-1.5 bg-[#334155] rounded-full"></div>
+                </div>
+
+                <div className="px-6 py-3 sm:py-4 sm:border-b sm:border-white/5 flex items-center justify-between sm:bg-[#23263a]">
+                    <h2 className="text-[18px] sm:text-lg font-bold text-white flex-1 text-center sm:text-left pr-6 sm:pr-0">
                         {context ? t('feedback.questionTitle') : t('feedback.title')}
                     </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    <button onClick={onClose} className="absolute right-4 top-4 sm:static text-slate-400 hover:text-white transition-colors bg-[#2a2d3e] sm:bg-transparent p-1.5 sm:p-0 rounded-full sm:rounded-none">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
 
@@ -91,11 +97,11 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
                     ) : (
                         <>
                             {context && (
-                                <div className="bg-brand-cyan/10 border border-brand-cyan/20 rounded-xl p-3 mb-2">
-                                    <p className="text-brand-cyan text-xs font-bold mb-1">
+                                <div className="bg-[#161c24] sm:bg-brand-cyan/10 border border-[#2d3748] sm:border-brand-cyan/20 rounded-[14px] sm:rounded-xl p-4 sm:p-3 mb-2">
+                                    <p className="text-[#60a5fa] sm:text-brand-cyan text-[13px] sm:text-xs font-bold mb-1.5 sm:mb-1">
                                         Savol ID: {context.questionId} {context.ticketId ? `(Bilet: ${context.ticketId})` : ''}
                                     </p>
-                                    <p className="text-slate-300 text-sm line-clamp-2">
+                                    <p className="text-slate-300 text-[14px] sm:text-sm line-clamp-2 leading-relaxed">
                                         {context.questionText}
                                     </p>
                                 </div>
@@ -120,23 +126,23 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
                             )}
 
                             <div>
-                                <label className="block text-xs text-slate-400 mb-1.5 font-medium">{t('feedback.label.message')}</label>
+                                <label className="hidden sm:block text-xs text-slate-400 mb-1.5 font-medium">{t('feedback.label.message')}</label>
                                 <textarea
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    className="w-full bg-[#2a2d3e] border border-white/5 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-cyan/50 resize-none h-32"
+                                    className="w-full bg-[#161c24] sm:bg-[#2a2d3e] border border-[#2d3748] sm:border-white/5 rounded-[14px] sm:rounded-xl px-4 py-4 text-[15px] sm:text-white placeholder-[#94a3b8] sm:placeholder-slate-500 focus:outline-none focus:border-blue-500/50 resize-none h-[120px] sm:h-32 shadow-inner sm:shadow-none"
                                     placeholder={context ? t('feedback.placeholders.question') : t(`feedback.placeholders.${type}`)}
                                     required
                                 ></textarea>
                             </div>
 
                             <div>
-                                <label className="block text-xs text-slate-400 mb-1.5 font-medium">{t('feedback.label.contact')}</label>
+                                <label className="hidden sm:block text-xs text-slate-400 mb-1.5 font-medium">{t('feedback.label.contact')}</label>
                                 <input
                                     type="text"
                                     value={contact}
                                     onChange={(e) => setContact(e.target.value)}
-                                    className="w-full bg-[#2a2d3e] border border-white/5 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-brand-cyan/50"
+                                    className="w-full bg-[#161c24] sm:bg-[#2a2d3e] border border-[#2d3748] sm:border-white/5 rounded-[14px] sm:rounded-xl px-4 py-4 sm:py-3 text-[15px] sm:text-white placeholder-[#94a3b8] sm:placeholder-slate-500 focus:outline-none focus:border-blue-500/50"
                                     placeholder={t('feedback.contactPlaceholder')}
                                 />
                             </div>
@@ -145,13 +151,15 @@ export default function FeedbackModal({ isOpen, onClose, context = null }) {
                                 <p className="text-rose-400 text-sm text-center">{t('feedback.status.error')}</p>
                             )}
 
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-3 rounded-xl bg-brand-cyan hover:bg-cyan-400 text-white font-bold transition-all shadow-lg shadow-cyan-500/20 active:scale-[0.98] disabled:opacity-50"
-                            >
-                                {loading ? t('feedback.status.sending') : t('feedback.send')}
-                            </button>
+                            <div className="pt-2 sm:pt-0">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className="w-full py-4 sm:py-3 rounded-[14px] sm:rounded-xl bg-[#2563eb] sm:bg-brand-cyan sm:hover:bg-cyan-400 text-white font-bold text-[16px] sm:text-base transition-all shadow-lg sm:shadow-cyan-500/20 active:scale-[0.98] disabled:opacity-50"
+                                >
+                                    {loading ? t('feedback.status.sending') : t('feedback.send')}
+                                </button>
+                            </div>
                         </>
                     )}
                 </form>

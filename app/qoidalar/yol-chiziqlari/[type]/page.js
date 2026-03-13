@@ -64,7 +64,7 @@ export default function MarkingsListPage() {
   }, [fetchData])
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title={TYPE_LABELS[type] || 'Chiziqlar'} />
@@ -98,18 +98,18 @@ export default function MarkingsListPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto w-full">
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
               {markings.map((m) => (
                 <Link
                   key={m.id}
                   href={`/qoidalar/yol-chiziqlari/${type}/${m.id}`}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/30 transition-all group"
+                  className="flex items-center gap-3 md:gap-4 p-4 rounded-[20px] md:rounded-2xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all group active:scale-[0.98]"
                 >
-                  <div className="relative w-20 h-10 rounded-lg bg-slate-50 dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                  <div className="relative w-16 h-10 md:w-20 md:h-10 rounded-[8px] md:rounded-lg bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-[#313C50] md:border-slate-100 md:dark:border-slate-700">
                     <img
                       src={getMarkingImageUrl(m.image)}
                       alt={m.name}
@@ -117,16 +117,16 @@ export default function MarkingsListPage() {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-sky-500 mb-0.5">{m.code}</p>
-                    <p className="font-bold text-slate-900 dark:text-white leading-tight mb-1">{m.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{m.description}</p>
+                    <p className="text-[10px] md:text-xs font-bold text-blue-500 md:text-sky-500 mb-0.5">{m.code}</p>
+                    <p className="font-bold text-[14px] md:text-base text-white md:text-slate-900 md:dark:text-white leading-tight mb-1">{m.name}</p>
+                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{m.description}</p>
                   </div>
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 group-hover:bg-sky-500 group-hover:text-white transition-colors text-slate-400">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 group-hover:bg-blue-600 md:group-hover:bg-sky-500 group-hover:text-white transition-colors text-[#9AA4B2] md:text-slate-400 shrink-0 border border-[#313C50] md:border-none">
                     <span className="material-icons-round text-lg">arrow_forward</span>
                   </div>
                 </Link>
               ))}
-              {markings.length === 0 && <p className="col-span-full text-center py-12 text-slate-400">Chiziqlar topilmadi</p>}
+              {markings.length === 0 && <p className="col-span-full text-center py-12 text-[#9AA4B2] md:text-slate-400">Chiziqlar topilmadi</p>}
             </div>
           )}
         </main>

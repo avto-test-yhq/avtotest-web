@@ -63,7 +63,7 @@ export default function TezlikChegaralariPage() {
   }, [fetchData])
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title="Tezlik chegaralari" />
@@ -95,39 +95,39 @@ export default function TezlikChegaralariPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-4xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-4xl mx-auto w-full">
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : (
-            <div className="space-y-8 pb-24">
+            <div className="space-y-6 md:space-y-8 pb-24">
               {zones.map((zone) => (
-                <div key={zone.id} id={`zone-${zone.id}`} className="scroll-mt-24 bg-white dark:bg-[#1e293b] rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800">
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${ICON_COLORS[zone.icon_color] || 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-                      <span className="material-icons-round text-3xl">{mapIcon(zone.icon)}</span>
+                <div key={zone.id} id={`zone-${zone.id}`} className="scroll-mt-24 bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] md:rounded-3xl p-5 md:p-8 shadow-sm border border-[#313C50] md:border-slate-100 md:dark:border-slate-800">
+                  <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-8">
+                    <div className={`w-12 h-12 md:w-14 md:h-14 rounded-[16px] md:rounded-2xl flex items-center justify-center shrink-0 border border-[#313C50] md:border-none ${ICON_COLORS[zone.icon_color] || 'bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 text-[#9AA4B2] md:text-slate-500'}`}>
+                      <span className="material-icons-round text-[24px] md:text-3xl">{mapIcon(zone.icon)}</span>
                     </div>
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">{zone.name}</h2>
+                    <h2 className="text-[18px] md:text-xl font-bold text-white md:text-slate-900 md:dark:text-white leading-tight">{zone.name}</h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     {zone.limits?.map((limit, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-[#161821] border border-slate-100 dark:border-slate-800 hover:scale-[1.02] transition-transform">
+                      <div key={idx} className="flex items-center justify-between p-3 md:p-4 rounded-[16px] md:rounded-xl bg-[#161c24] md:bg-slate-50 md:dark:bg-[#161821] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:scale-[1.02] md:hover:scale-[1.02] transition-transform active:scale-[0.98] md:active:scale-100">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-white dark:bg-[#1e293b] flex items-center justify-center shadow-sm">
-                            <span className="material-icons-round text-slate-400">{mapVehicleIcon(limit.icon)}</span>
+                          <div className="w-10 h-10 md:w-10 md:h-10 rounded-full bg-[#212936] md:bg-white md:dark:bg-[#1e293b] flex items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.2)] md:shadow-sm border border-[#313C50] md:border-none">
+                            <span className="material-icons-round text-[#9AA4B2] md:text-slate-400">{mapVehicleIcon(limit.icon)}</span>
                           </div>
-                          <span className="font-medium text-slate-700 dark:text-slate-300">{limit.vehicle}</span>
+                          <span className="font-bold md:font-medium text-[13px] md:text-base text-white md:text-slate-700 md:dark:text-slate-300">{limit.vehicle}</span>
                         </div>
                         <div className="flex flex-col items-end">
-                          <span className="text-2xl font-bold text-slate-900 dark:text-white leading-none">{limit.speed}</span>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">km/s</span>
+                          <span className="text-[20px] md:text-2xl font-black md:font-bold text-white md:text-slate-900 md:dark:text-white leading-none">{limit.speed}</span>
+                          <span className="text-[9px] md:text-[10px] font-bold text-[#9AA4B2] md:text-slate-400 uppercase mt-0.5">km/s</span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               ))}
-              {zones.length === 0 && <p className="text-center py-12 text-slate-400">Ma&apos;lumot topilmadi</p>}
+              {zones.length === 0 && <p className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Ma'lumot topilmadi</p>}
             </div>
           )}
         </main>

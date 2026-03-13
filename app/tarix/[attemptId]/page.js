@@ -73,16 +73,16 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
 
     if (isSkipped) {
         statusText = t('tarix.skipped')
-        statusColor = 'text-slate-500'
-        statusBg = 'bg-slate-50 dark:bg-[#1e293b]'
-        borderClass = 'border-l-4 border-slate-400'
-        iconClass = 'border-slate-400 text-slate-400'
+        statusColor = 'text-[#9AA4B2]'
+        statusBg = 'bg-[#212936] md:bg-slate-50 md:dark:bg-[#1e293b]'
+        borderClass = 'border-l-4 border-[#313C50] md:border-slate-400'
+        iconClass = 'border-[#313C50] md:border-slate-400 text-[#9AA4B2] md:text-slate-400'
     } else if (isCorrect) {
         statusText = `✓ ${t('tarix.correct')}`
-        statusColor = 'text-emerald-500'
-        statusBg = 'bg-white dark:bg-[#1e293b]'
-        borderClass = 'border-l-4 border-emerald-500'
-        iconClass = 'border-emerald-500 text-emerald-500'
+        statusColor = 'text-green-500 md:text-emerald-500'
+        statusBg = 'bg-[#212936] md:bg-white md:dark:bg-[#1e293b]'
+        borderClass = 'border-l-4 border-green-500 md:border-emerald-500'
+        iconClass = 'border-green-500 md:border-emerald-500 text-green-500 md:text-emerald-500'
     } else {
         statusText = `✕ ${t('tarix.incorrect')}`
         statusColor = 'text-rose-500'
@@ -92,10 +92,10 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
     }
 
     return (
-        <div className={`rounded-2xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 transition-all ${statusBg} ${borderClass}`}>
+        <div className={`rounded-[20px] overflow-hidden shadow-sm border border-[#313C50] md:border-slate-200 md:dark:border-slate-800 transition-all ${statusBg} ${borderClass}`}>
             <div
                 onClick={toggleOpen}
-                className="p-4 flex items-center justify-between cursor-pointer border-b border-transparent data-[open=true]:border-slate-200 dark:data-[open=true]:border-slate-800"
+                className="p-4 flex items-center justify-between cursor-pointer border-b border-transparent data-[open=true]:border-[#313C50] md:data-[open=true]:border-slate-200 md:dark:data-[open=true]:border-slate-800"
                 data-open={isOpen}
             >
                 <div className="flex items-center gap-4">
@@ -103,19 +103,19 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
                         {index + 1}
                     </div>
                     <div>
-                        <h3 className="font-bold text-slate-900 dark:text-white">
+                        <h3 className="font-bold text-white md:text-slate-900 md:dark:text-white">
                             {t('tarix.questionLabel')} #{index + 1}
                         </h3>
-                        <p className={`text-xs font-semibold ${statusColor}`}>{statusText}</p>
+                        <p className={`text-xs font-bold md:font-semibold ${statusColor}`}>{statusText}</p>
                     </div>
                 </div>
-                <Icon name={isOpen ? 'ExpandLess' : 'ExpandMore'} className="w-6 h-6 text-slate-400" />
+                <Icon name={isOpen ? 'ExpandLess' : 'ExpandMore'} className="w-6 h-6 text-[#9AA4B2] md:text-slate-400" />
             </div>
 
             {isOpen && (
                 <div className="p-6 space-y-6 sm:space-y-8 animate-in slide-in-from-top-2 duration-300">
                     {questionData?.media && questionData.media.name && (
-                        <div className={`bg-slate-50 dark:bg-slate-800/50 p-4 sm:p-6 rounded-xl border border-slate-100 dark:border-slate-700 flex flex-wrap justify-center gap-8 items-end`}>
+                        <div className={`bg-black/40 md:bg-slate-50 md:dark:bg-slate-800/50 p-4 sm:p-6 rounded-[16px] border border-[#313C50] md:border-slate-100 md:dark:border-slate-700 flex flex-wrap justify-center gap-8 items-end`}>
                             <div className="relative w-full max-w-sm h-48 sm:h-56 mx-auto">
                                 <Image
                                     src={`${API_URL}/uploads/${questionData.media.name}`}
@@ -127,7 +127,7 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
                         </div>
                     )}
 
-                    <p className="text-base sm:text-lg font-semibold leading-relaxed text-slate-800 dark:text-slate-100">
+                    <p className="text-[15px] sm:text-lg font-medium leading-relaxed text-white md:text-slate-800 md:dark:text-slate-100">
                         {questionData?.question?.replace(/<[^>]+>/g, '') || t('tarix.questionNoText')}
                     </p>
 
@@ -136,21 +136,21 @@ function QuestionItem({ item, index, isOpen, toggleOpen, t }) {
                             const isSelected = userAnswer === optIdx
                             const isOptCorrect = correctAnswer === optIdx
 
-                            let containerClass = "flex items-center gap-3 p-4 rounded-xl transition-all border "
-                            let labelClass = "w-8 h-8 flex items-center justify-center rounded-md text-[10px] font-black uppercase shrink-0 "
-                            let textClass = "font-medium text-slate-700 dark:text-slate-300 "
+                            let containerClass = "flex items-center gap-3 p-4 rounded-[14px] transition-all border "
+                            let labelClass = "w-8 h-8 flex items-center justify-center rounded-[10px] text-[10px] font-bold uppercase shrink-0 "
+                            let textClass = "font-medium text-white md:text-slate-700 md:dark:text-slate-300 "
 
                             if (isOptCorrect) {
-                                containerClass += "bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/50"
-                                labelClass += "bg-emerald-500 text-white"
-                                textClass = "font-bold text-emerald-700 dark:text-emerald-400"
+                                containerClass += "bg-green-500/20 md:bg-emerald-500/10 border-green-500/50 md:border-emerald-500/30 md:dark:border-emerald-500/50"
+                                labelClass += "bg-green-500 md:bg-emerald-500 text-white"
+                                textClass = "font-bold text-green-400 md:text-emerald-700 md:dark:text-emerald-400"
                             } else if (isSelected && !isOptCorrect) {
-                                containerClass += "bg-rose-500/10 border-rose-500/30 dark:border-rose-500/50"
-                                labelClass += "bg-rose-500 text-white"
-                                textClass = "font-bold text-rose-700 dark:text-rose-400"
+                                containerClass += "bg-[#161c24] md:bg-rose-500/10 border-red-500/50 md:border-rose-500/30 md:dark:border-rose-500/50"
+                                labelClass += "bg-red-500 md:bg-rose-500 text-white"
+                                textClass = "font-bold text-red-500 md:text-rose-700 md:dark:text-rose-400"
                             } else {
-                                containerClass += "bg-slate-50 dark:bg-[#1e293b] border-slate-200 dark:border-slate-800"
-                                labelClass += "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400"
+                                containerClass += "bg-[#161c24] md:bg-slate-50 md:dark:bg-[#1e293b] border-[#313C50] md:border-slate-200 md:dark:border-slate-800"
+                                labelClass += "bg-[#313C50] md:bg-slate-200 md:dark:bg-slate-700 text-[#9AA4B2] md:text-slate-600 md:dark:text-slate-400"
                             }
 
                             return (
@@ -334,14 +334,14 @@ export default function ExamDetailPage() {
     const percentage = total > 0 ? Math.round((correct / total) * 100) : 0
 
     return (
-        <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300 font-display">
-            <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen transition-colors duration-300 font-display flex flex-col pt-[72px] lg:pt-0">
+            <header className="fixed lg:sticky top-0 left-0 right-0 z-50 bg-[#161c24]/90 md:bg-white/80 md:dark:bg-[#1e293b]/80 backdrop-blur-md border-b border-[#313C50] md:border-slate-200 md:dark:border-slate-800 px-4 py-3">
                 <div className="max-w-6xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => router.back()} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors text-slate-600 dark:text-slate-300">
+                        <button onClick={() => router.back()} className="p-2 -ml-2 text-white md:text-slate-600 md:dark:text-slate-300 hover:bg-[#313C50] md:hover:bg-slate-100 md:dark:hover:bg-slate-700 rounded-[12px] transition-colors">
                             <Icon name="ArrowLeft" className="w-6 h-6" />
                         </button>
-                        <h1 className="text-xl font-bold tracking-tight">{t('tarix.detailTitle')}</h1>
+                        <h1 className="text-[20px] font-bold tracking-tight text-white">{t('tarix.detailTitle')}</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold rounded uppercase tracking-wider">
@@ -363,17 +363,17 @@ export default function ExamDetailPage() {
 
                 {/* Left Column: Stats & Actions */}
                 <div className="lg:col-span-5 space-y-6">
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500">
+                    <section className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-[#313C50] md:border-slate-200 md:dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500">
                         <div className="flex justify-between items-start mb-6">
                             <StatusBadge status={status} t={t} />
                             <div className="text-right">
-                                <p className="text-xs text-slate-500 uppercase font-bold mb-1">
+                                <p className="text-[11px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mb-1">
                                     {t('tarix.ball')}
                                 </p>
-                                <p className={`text-4xl font-black ${isCanceled ? 'text-slate-400' : 'text-brand-cyan'}`}>
+                                <p className={`text-[32px] font-black ${isCanceled ? 'text-[#9AA4B2]' : 'text-blue-500'}`}>
                                     {isCanceled ? 0 : correct}
-                                    <span className="text-slate-400 text-xl font-medium mx-1">/{total}</span>
-                                    <span className="text-lg text-brand-cyan/70 ml-1">
+                                    <span className="text-[#9AA4B2] md:text-slate-400 text-xl font-medium mx-1">/{total}</span>
+                                    <span className="text-sm text-blue-500/70 ml-1">
                                         {isCanceled ? '0%' : `${percentage}%`}
                                     </span>
                                 </p>
@@ -382,47 +382,47 @@ export default function ExamDetailPage() {
 
                         <div className="grid grid-cols-4 gap-2 text-center mt-8">
                             <div className="space-y-2">
-                                <div className="w-12 h-12 mx-auto bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto bg-green-500/20 md:bg-emerald-500/10 text-green-500 md:text-emerald-500 rounded-[14px] flex items-center justify-center">
                                     <Icon name="CheckCircle" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white">{stats.correct}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-base font-bold text-white md:text-slate-900 md:dark:text-white">{stats.correct}</p>
+                                    <p className="text-[10px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mt-1">
                                         {t('tarix.correct')}
                                     </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <div className="w-12 h-12 mx-auto bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto bg-red-500/20 md:bg-rose-500/10 text-red-500 md:text-rose-500 rounded-[14px] flex items-center justify-center">
                                     <Icon name="Cancel" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white">{stats.incorrect}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-base font-bold text-white md:text-slate-900 md:dark:text-white">{stats.incorrect}</p>
+                                    <p className="text-[10px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mt-1">
                                         {t('tarix.incorrect')}
                                     </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <div className="w-12 h-12 mx-auto bg-slate-500/10 text-slate-400 rounded-full flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto bg-[#313C50] md:bg-slate-500/10 text-[#9AA4B2] md:text-slate-400 rounded-[14px] flex items-center justify-center">
                                     <Icon name="HelpOutline" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white">{stats.skipped}</p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-base font-bold text-white md:text-slate-900 md:dark:text-white">{stats.skipped}</p>
+                                    <p className="text-[10px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mt-1">
                                         {t('tarix.skipped')}
                                     </p>
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <div className="w-12 h-12 mx-auto bg-brand-cyan/10 text-brand-cyan rounded-full flex items-center justify-center">
+                                <div className="w-12 h-12 mx-auto bg-blue-500/20 md:bg-brand-cyan/10 text-blue-500 md:text-brand-cyan rounded-[14px] flex items-center justify-center">
                                     <Icon name="Schedule" className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-bold text-slate-900 dark:text-white font-mono">
+                                    <p className="text-base font-bold text-white md:text-slate-900 md:dark:text-white font-mono">
                                         {formatDuration(durationSeconds)}
                                     </p>
-                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-[10px] text-[#9AA4B2] md:text-slate-500 uppercase font-bold mt-1">
                                         {t('tarix.time')}
                                     </p>
                                 </div>
@@ -430,17 +430,17 @@ export default function ExamDetailPage() {
                         </div>
                     </section>
 
-                    <section className="bg-white dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500 delay-100">
-                        <h2 className="text-sm font-bold mb-5 uppercase tracking-wider text-slate-500">
+                    <section className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] p-6 rounded-[24px] shadow-sm border border-[#313C50] md:border-slate-200 md:dark:border-slate-800 animate-in fade-in slide-in-from-left-4 duration-500 delay-100">
+                        <h2 className="text-sm font-bold mb-5 uppercase tracking-wider text-[#9AA4B2] md:text-slate-500">
                             {t('tarix.questionsTab')}
                         </h2>
                         <div className="grid grid-cols-5 md:grid-cols-6 lg:grid-cols-5 gap-3">
                             {details.map((item, idx) => {
                                 const isSkipped = item.userAnswer === null || item.userAnswer === undefined
-                                let bgClass = "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                                let bgClass = "bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 text-[#9AA4B2] md:text-slate-500"
 
-                                if (item.isCorrect) bgClass = "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                else if (!item.isCorrect && !isSkipped) bgClass = "bg-rose-500 text-white shadow-md shadow-rose-500/20"
+                                if (item.isCorrect) bgClass = "bg-green-500 md:bg-emerald-500 text-white shadow-md shadow-green-500/20"
+                                else if (!item.isCorrect && !isSkipped) bgClass = "bg-red-500 md:bg-rose-500 text-white shadow-md shadow-red-500/20"
 
                                 return (
                                     <button
@@ -461,16 +461,16 @@ export default function ExamDetailPage() {
                     <div className="grid grid-cols-2 gap-4 pt-2">
                         <button
                             onClick={() => router.push(type === 'bilet' ? `/biletlar/${attempt.ticketId || 1}` : '/exam')}
-                            className="flex items-center justify-center gap-2 bg-brand-cyan hover:bg-brand-cyan/90 text-white font-bold py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-brand-cyan/20"
+                            className="flex flex-col md:flex-row items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-[20px] transition-all active:scale-95 shadow-lg shadow-blue-500/20"
                         >
-                            <Icon name="Refresh" className="w-5 h-5" />
+                            <Icon name="Refresh" className="w-5 h-5 mb-1 md:mb-0" />
                             {t('tarix.retry')}
                         </button>
                         <button
-                            className="flex items-center justify-center gap-2 bg-white dark:bg-[#1e293b] border-2 border-slate-200 dark:border-slate-700 hover:border-brand-cyan/50 text-slate-700 dark:text-slate-300 font-bold py-4 rounded-2xl transition-all active:scale-95"
+                            className="flex flex-col md:flex-row items-center justify-center gap-2 bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border-2 border-[#313C50] md:border-slate-200 md:dark:border-slate-700 hover:border-blue-500/50 text-[#9AA4B2] md:text-slate-700 md:dark:text-slate-300 font-bold py-4 rounded-[20px] transition-all active:scale-95 text-center text-[12px] md:text-sm"
                         >
-                            <Icon name="ErrorOutline" className="w-5 h-5 text-brand-cyan" />
-                            {t('tarix.workMistakes')} ({stats.incorrect})
+                            <Icon name="ErrorOutline" className="w-5 h-5 text-blue-500 mb-1 md:mb-0" />
+                            <span>{t('tarix.workMistakes')} ({stats.incorrect})</span>
                         </button>
                     </div>
                 </div>
@@ -478,26 +478,26 @@ export default function ExamDetailPage() {
                 {/* Right Column: Answers List */}
                 <div className="lg:col-span-7 space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 delay-200">
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-[72px] lg:top-20 z-40 bg-slate-50/95 dark:bg-[#0f172a]/95 py-4 backdrop-blur-md">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sticky top-[72px] lg:top-20 z-40 bg-[#161c24]/95 md:bg-slate-50/95 md:dark:bg-[#0f172a]/95 py-4 backdrop-blur-md border-b border-[#313C50] md:border-transparent pb-3 sm:pb-4">
+                        <h2 className="text-xl font-bold text-white md:text-slate-900 md:dark:text-white">
                             {t('tarix.viewAnswers')}
                         </h2>
                         <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
                             <button
                                 onClick={() => setActiveFilter('all')}
-                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'all' ? 'bg-brand-cyan text-white shadow-md shadow-brand-cyan/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'all' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-[#212936] md:bg-white md:dark:bg-[#1e293b] text-[#9AA4B2] md:text-slate-500 border border-[#313C50] md:border-slate-200 md:dark:border-slate-800'}`}
                             >
                                 {t('tarix.filterAllCount')} ({details.length})
                             </button>
                             <button
                                 onClick={() => setActiveFilter('correct')}
-                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'correct' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'correct' ? 'bg-green-500 text-white shadow-md shadow-green-500/20' : 'bg-[#212936] md:bg-white md:dark:bg-[#1e293b] text-[#9AA4B2] md:text-slate-500 border border-[#313C50] md:border-slate-200 md:dark:border-slate-800'}`}
                             >
                                 {t('tarix.filterCorrect')} ({stats.correct})
                             </button>
                             <button
                                 onClick={() => setActiveFilter('incorrect')}
-                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'incorrect' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20' : 'bg-white dark:bg-[#1e293b] text-slate-500 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                className={`px-5 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-colors ${activeFilter === 'incorrect' ? 'bg-red-500 text-white shadow-md shadow-red-500/20' : 'bg-[#212936] md:bg-white md:dark:bg-[#1e293b] text-[#9AA4B2] md:text-slate-500 border border-[#313C50] md:border-slate-200 md:dark:border-slate-800'}`}
                             >
                                 {t('tarix.filterIncorrect')} ({stats.incorrect})
                             </button>

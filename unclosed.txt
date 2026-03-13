@@ -1,0 +1,7 @@
+Unclosed div(s) in app/exam/page.js:
+  Line 661
+  Line 711
+Unclosed div(s) in app/biletlar/[ticketId]/page.js:
+  Line 439
+  Line 479
+  Line 691

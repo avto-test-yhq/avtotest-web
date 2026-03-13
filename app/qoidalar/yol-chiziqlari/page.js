@@ -27,7 +27,7 @@ export default function YolChiziqlariPage() {
   const router = useRouter()
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title="Yo'l chiziqlari" />
@@ -55,26 +55,26 @@ export default function YolChiziqlariPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-5xl mx-auto w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/qoidalar/yol-chiziqlari/${cat.id}`}
-                className="group flex flex-col items-center justify-center text-center p-8 rounded-3xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-sky-500/30 transition-all duration-300"
+                className="group flex flex-col items-center justify-center text-center p-6 md:p-8 rounded-[24px] md:rounded-3xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all duration-300 active:scale-[0.98]"
               >
-                <div className={`w-20 h-20 rounded-2xl mb-6 flex items-center justify-center ${cat.iconBg}`}>
+                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-[16px] md:rounded-2xl mb-4 md:mb-6 flex items-center justify-center ${cat.iconBg}`}>
                   {cat.id === 'horizontal' ? (
-                    <span className="material-icons-round text-4xl">horizontal_rule</span>
+                    <span className="material-icons-round text-3xl md:text-4xl">horizontal_rule</span>
                   ) : (
-                    <span className="material-icons-round text-4xl transform rotate-90">horizontal_rule</span>
+                    <span className="material-icons-round text-3xl md:text-4xl transform rotate-90">horizontal_rule</span>
                   )}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-sky-500 transition-colors mb-2">{cat.name}</h3>
-                <p className="text-slate-500 dark:text-slate-400">{cat.count} ta chiziq namunasi</p>
+                <h3 className="text-[18px] md:text-xl font-bold text-white md:text-slate-900 md:dark:text-white group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors mb-2">{cat.name}</h3>
+                <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400">{cat.count} ta chiziq namunasi</p>
 
-                <div className="mt-8 flex items-center text-sm font-semibold text-sky-500 gap-1 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                  Ko&apos;rish <span className="material-icons-round text-sm">arrow_forward</span>
+                <div className="mt-4 md:mt-8 flex items-center text-[13px] md:text-sm font-bold text-blue-500 md:text-sky-500 gap-1 md:opacity-0 group-hover:opacity-100 transition-all md:transform md:translate-y-2 md:group-hover:translate-y-0">
+                  Ko'rish <span className="material-icons-round text-[16px] md:text-sm relative top-[1px]">arrow_forward</span>
                 </div>
               </Link>
             ))}

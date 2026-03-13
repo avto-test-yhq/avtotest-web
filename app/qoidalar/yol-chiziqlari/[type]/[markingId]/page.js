@@ -74,7 +74,7 @@ export default function MarkingDetailPage() {
   const total = allMarkings.length
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title="Chiziq tafsilotlari" />
@@ -108,68 +108,68 @@ export default function MarkingDetailPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-4xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-4xl mx-auto w-full">
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : marking ? (
-            <div className="space-y-8 pb-24">
-              <div className="flex justify-center py-8">
-                <div className="relative w-64 h-48 md:w-80 md:h-64 rounded-3xl bg-white dark:bg-[#1e293b] flex items-center justify-center shadow-lg shadow-slate-200 dark:shadow-none border border-slate-100 dark:border-slate-800 p-6">
+            <div className="space-y-6 md:space-y-8 pb-24">
+              <div className="flex justify-center py-6 md:py-8">
+                <div className="relative w-64 h-48 md:w-80 md:h-64 rounded-[24px] md:rounded-3xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] flex items-center justify-center shadow-lg shadow-slate-200/5 md:shadow-slate-200 dark:shadow-none border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 p-6">
                   <img
                     src={getMarkingImageUrl(marking.image)}
                     alt={marking.name}
                     className="object-contain max-w-full max-h-full"
                   />
-                  <div className="absolute top-4 right-4 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md text-xs font-bold text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                  <div className="absolute top-4 right-4 bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 px-2 py-1 rounded-[8px] md:rounded-md text-[11px] md:text-xs font-bold text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 border border-[#313C50] md:border-slate-200 md:dark:border-slate-700">
                     {marking.code}
                   </div>
                 </div>
               </div>
 
-              <div className="text-center max-w-2xl mx-auto space-y-4">
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white leading-tight">{marking.name}</h2>
+              <div className="text-center max-w-2xl mx-auto space-y-3 md:space-y-4 px-2">
+                <h2 className="text-[20px] md:text-3xl font-bold text-white md:text-slate-900 md:dark:text-white leading-tight">{marking.name}</h2>
               </div>
 
-              <div className="rounded-3xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
-                <div className="flex items-center gap-3 mb-4 text-sky-500">
-                  <span className="material-icons-round">info</span>
-                  <span className="text-sm font-bold uppercase tracking-wider">Tavsif</span>
+              <div className="rounded-[24px] md:rounded-3xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 p-6 md:p-8 shadow-sm">
+                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4 text-blue-500 md:text-sky-500">
+                  <span className="material-icons-round text-[20px] md:text-[24px]">info</span>
+                  <span className="text-[13px] md:text-sm font-bold uppercase tracking-wider">Tavsif</span>
                 </div>
-                <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">{marking.description}</p>
+                <p className="text-[15px] md:text-lg text-white md:text-slate-600 md:dark:text-slate-300 leading-relaxed font-medium md:font-normal">{marking.description}</p>
               </div>
 
-              <div className="flex items-center justify-between pt-8 border-t border-slate-100 dark:border-slate-800">
+              <div className="flex items-center justify-between pt-6 md:pt-8 border-t border-[#313C50] md:border-slate-100 md:dark:border-slate-800">
                 <button
                   onClick={() => prevMarking && router.push(`/qoidalar/yol-chiziqlari/${type}/${prevMarking.id}`)}
                   disabled={!prevMarking}
-                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
+                  className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-[16px] md:rounded-xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-200 md:dark:border-slate-800 text-white md:text-slate-700 md:dark:text-slate-300 font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#313C50] md:hover:bg-slate-50 md:dark:hover:bg-slate-800 transition-colors shadow-sm active:scale-[0.96] md:active:scale-100 gap-3"
                 >
                   <span className="material-icons-round">arrow_back</span>
                   <div className="text-left hidden sm:block">
-                    <span className="block text-[10px] text-slate-400 uppercase font-bold">Oldingi</span>
-                    <span className="block text-sm">Chiziq</span>
+                    <span className="block text-[10px] text-[#9AA4B2] md:text-slate-400 uppercase font-bold">Oldingi</span>
+                    <span className="block text-[13px] md:text-sm">Chiziq</span>
                   </div>
                 </button>
 
-                <div className="text-center md:hidden">
-                  <span className="text-sm font-bold text-slate-400">{currentIndex + 1} / {total}</span>
+                <div className="text-center">
+                  <span className="text-[13px] md:text-sm font-bold text-[#9AA4B2] md:text-slate-400">{currentIndex + 1} / {total}</span>
                 </div>
 
                 <button
                   onClick={() => nextMarking && router.push(`/qoidalar/yol-chiziqlari/${type}/${nextMarking.id}`)}
                   disabled={!nextMarking}
-                  className="flex items-center gap-3 px-6 py-3 rounded-xl bg-sky-500 text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sky-600 transition-colors shadow-lg shadow-sky-500/20"
+                  className="flex items-center justify-center w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-[16px] md:rounded-xl bg-blue-600 md:bg-sky-500 text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-700 md:hover:bg-sky-600 transition-colors shadow-lg shadow-blue-600/20 md:shadow-sky-500/20 active:scale-[0.96] md:active:scale-100 gap-3"
                 >
                   <div className="text-right hidden sm:block">
-                    <span className="block text-[10px] text-sky-100 uppercase font-bold">Keyingi</span>
-                    <span className="block text-sm">Chiziq</span>
+                    <span className="block text-[10px] text-blue-100 md:text-sky-100 uppercase font-bold">Keyingi</span>
+                    <span className="block text-[13px] md:text-sm">Chiziq</span>
                   </div>
                   <span className="material-icons-round">arrow_forward</span>
                 </button>
               </div>
             </div>
           ) : (
-            <p className="text-center py-12 text-slate-400">Chiziq topilmadi</p>
+            <p className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Chiziq topilmadi</p>
           )}
         </main>
       </div>

@@ -65,7 +65,7 @@ export default function CategorySignsPage() {
   }, [fetchData])
 
   return (
-    <div className="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
+    <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
       <QoidalarHeader title={category?.name || 'Belgilar'} />
@@ -101,18 +101,18 @@ export default function CategorySignsPage() {
         </aside>
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto">
+        <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-5xl mx-auto w-full">
           {loading ? (
-            <div className="text-center py-12 text-slate-400">Yuklanmoqda...</div>
+            <div className="text-center py-12 text-[#9AA4B2] md:text-slate-400">Yuklanmoqda...</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
               {signs.map((s) => (
                 <Link
                   key={s.id}
                   href={`/qoidalar/yol-belgilari/${categorySlug}/${s.id}`}
-                  className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-[#1e293b] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-sky-500/30 transition-all group"
+                  className="flex items-center gap-4 p-4 rounded-[20px] md:rounded-2xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all group active:scale-[0.98]"
                 >
-                  <div className="relative w-16 h-16 rounded-xl bg-slate-50 dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-slate-100 dark:border-slate-700">
+                  <div className="relative w-16 h-16 rounded-[16px] md:rounded-xl bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 shrink-0 overflow-hidden flex items-center justify-center border border-[#313C50] md:border-slate-100 md:dark:border-slate-700">
                     <img
                       src={getSignImageUrl(s.image)}
                       alt={s.name}
@@ -121,17 +121,17 @@ export default function CategorySignsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400">{s.code}</span>
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-[#9AA4B2] md:text-sky-600 md:dark:text-sky-400 border border-[#313C50] md:border-none">{s.code}</span>
                     </div>
-                    <p className="font-bold text-slate-900 dark:text-white truncate mb-1 group-hover:text-sky-500 transition-colors">{s.name}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{s.description}</p>
+                    <p className="font-bold text-[15px] md:text-base text-white md:text-slate-900 md:dark:text-white truncate mb-1 group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors">{s.name}</p>
+                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{s.description}</p>
                   </div>
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 group-hover:bg-sky-500 group-hover:text-white transition-colors text-slate-400">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 group-hover:bg-blue-600 md:group-hover:bg-sky-500 group-hover:text-white transition-colors text-[#9AA4B2] md:text-slate-400 shrink-0 border border-[#313C50] md:border-none">
                     <span className="material-icons-round text-lg">arrow_forward</span>
                   </div>
                 </Link>
               ))}
-              {signs.length === 0 && <p className="col-span-full text-center py-12 text-slate-400">Belgilar topilmadi</p>}
+              {signs.length === 0 && <p className="col-span-full text-center py-12 text-[#9AA4B2] md:text-slate-400">Belgilar topilmadi</p>}
             </div>
           )}
         </main>

@@ -367,7 +367,7 @@ export default function ProfilPage() {
     }
 
     return (
-        <div className="font-display bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden flex flex-col md:flex-row relative z-0">
+        <div className="font-display bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen overflow-hidden flex flex-col md:flex-row relative z-0">
             {/* Custom Styles Injected */}
             <style dangerouslySetInnerHTML={{
                 __html: `
@@ -468,12 +468,12 @@ export default function ProfilPage() {
                     </div>
                 </aside>
 
-                <main className="flex-1 glass-panel md:rounded-3xl overflow-y-auto relative flex flex-col h-full w-full">
+                <main className="flex-1 md:glass-panel md:rounded-3xl overflow-y-auto relative flex flex-col h-full w-full">
                     {/* Header */}
-                    <header className="flex items-center justify-between p-6 sm:p-8 border-b border-slate-200 dark:border-white/5 sticky top-0 z-20 backdrop-blur-xl bg-white/40 dark:bg-slate-900/60 transition-colors">
+                    <header className="flex items-center justify-between p-6 sm:p-8 border-b border-[#313C50] md:border-slate-200 md:dark:border-white/5 sticky top-0 z-20 bg-[#161c24]/90 md:backdrop-blur-xl md:bg-white/40 md:dark:bg-slate-900/60 transition-colors">
                         <div>
-                            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Foydalanuvchi ma'lumotlari</h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">Shaxsiy ma'lumotlaringizni shu yerda boshqaring</p>
+                            <h2 className="text-xl sm:text-2xl font-bold text-white md:text-slate-900 md:dark:text-white">Foydalanuvchi ma'lumotlari</h2>
+                            <p className="text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 text-xs sm:text-sm mt-1">Shaxsiy ma'lumotlaringizni shu yerda boshqaring</p>
                         </div>
                         <div className="flex items-center gap-2 sm:gap-4">
                             <div className="hidden sm:block">
@@ -482,7 +482,7 @@ export default function ProfilPage() {
                             <div className="hidden sm:block">
                                 <ThemeToggle size="sm" />
                             </div>
-                            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center border border-white/5 text-slate-600 dark:text-slate-300">
+                            <div className="w-10 h-10 rounded-full bg-[#212936] md:bg-slate-200 md:dark:bg-white/10 flex items-center justify-center border border-[#313C50] md:border-white/5 text-white md:text-slate-600 md:dark:text-slate-300">
                                 <Bell className="w-5 h-5" />
                             </div>
                         </div>
@@ -491,13 +491,13 @@ export default function ProfilPage() {
                     <div className="p-4 sm:p-8 max-w-5xl w-full mx-auto space-y-8 flex-1">
 
                         {/* Profile Summary Card */}
-                        <div className="flex items-center gap-4 sm:gap-6 p-4 sm:p-6 glass-card rounded-3xl">
+                        <div className="flex items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-[#212936] md:glass-card rounded-[24px] border border-[#313C50] md:border-none">
                             <div className="relative group flex-shrink-0">
-                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-slate-200 dark:bg-slate-800 border-4 border-white dark:border-slate-700/50 flex items-center justify-center overflow-hidden shadow-lg">
+                                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#161c24] md:bg-slate-200 md:dark:bg-slate-800 border-4 border-[#313C50] md:border-white md:dark:border-slate-700/50 flex items-center justify-center overflow-hidden shadow-lg">
                                     {avatar ? (
                                         <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                                     ) : (
-                                        <User className="w-10 h-10 text-slate-400" />
+                                        <User className="w-10 h-10 text-[#9AA4B2] md:text-slate-400" />
                                     )}
                                 </div>
 
@@ -514,10 +514,10 @@ export default function ProfilPage() {
                                 />
                             </div>
                             <div className="min-w-0">
-                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-800 dark:text-white truncate">
+                                <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white md:text-slate-800 md:dark:text-white truncate">
                                     {fullName || 'Foydalanuvchi'}
                                 </h3>
-                                <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 truncate">
+                                <p className="text-sm sm:text-base text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 truncate">
                                     {email || phoneNumber || 'Email/Raqam kiritilmagan'}
                                 </p>
                             </div>
@@ -538,60 +538,60 @@ export default function ProfilPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <User className="w-4 h-4" />
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <User className="w-4 h-4 text-[#9AA4B2]" />
                                             To'liq ism <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
-                                            className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-primary/20 transition-all shadow-sm"
+                                            className="w-full bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-5 py-3 text-white md:text-slate-900 md:dark:text-slate-100 placeholder:text-[#9AA4B2] md:placeholder:text-slate-400 md:dark:placeholder:text-slate-600 focus:ring-blue-500/20 transition-all shadow-sm"
                                             placeholder="Ism va Familya"
                                             type="text"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <Mail className="w-4 h-4" />
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <Mail className="w-4 h-4 text-[#9AA4B2]" />
                                             Email
                                         </label>
                                         <input
                                             value={email}
                                             disabled
-                                            className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-primary/20 transition-all cursor-not-allowed shadow-sm"
+                                            className="w-full bg-[#161c24] md:bg-slate-100 md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-5 py-3 text-[#9AA4B2] md:text-slate-500 placeholder:text-[#9AA4B2] md:placeholder:text-slate-400 md:dark:placeholder:text-slate-600 focus:ring-blue-500/20 transition-all cursor-not-allowed shadow-sm"
                                             placeholder="email@example.com"
                                             type="email"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <Phone className="w-4 h-4" />
-                                            Telefon raqami <span className="text-xs opacity-60 ml-1">(ixtiyoriy)</span>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <Phone className="w-4 h-4 text-[#9AA4B2]" />
+                                            Telefon raqami <span className="text-xs opacity-60 ml-1 text-[#9AA4B2]">(ixtiyoriy)</span>
                                         </label>
                                         <div className="flex gap-2">
-                                            <div className="w-20 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 text-slate-500 dark:text-slate-100 text-center flex items-center justify-center font-medium shadow-sm">
+                                            <div className="w-20 bg-[#212936] md:bg-slate-100 md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-4 py-3 text-white md:text-slate-500 md:dark:text-slate-100 text-center flex items-center justify-center font-medium shadow-sm">
                                                 +998
                                             </div>
                                             <input
                                                 value={(phoneNumber || '').replace('+998', '')}
                                                 onChange={(e) => setPhoneNumber(e.target.value)}
                                                 disabled={hasPhoneFromDB}
-                                                className={`flex-1 w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-primary/20 transition-all shadow-sm ${hasPhoneFromDB ? 'cursor-not-allowed' : ''}`}
+                                                className={`flex-1 w-full bg-[#212936] md:bg-slate-100 md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-5 py-3 text-white md:text-slate-500 placeholder:text-[#9AA4B2] md:placeholder:text-slate-400 md:dark:placeholder:text-slate-600 focus:ring-blue-500/20 transition-all shadow-sm ${hasPhoneFromDB ? 'cursor-not-allowed' : ''}`}
                                                 placeholder="901234567"
                                                 type="tel"
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <Calendar className="w-4 h-4" />
-                                            Tug'ilgan sana <span className="text-xs opacity-60 ml-1">(ixtiyoriy)</span>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <Calendar className="w-4 h-4 text-[#9AA4B2]" />
+                                            Tug'ilgan sana <span className="text-xs opacity-60 ml-1 text-[#9AA4B2]">(ixtiyoriy)</span>
                                         </label>
                                         <div className="grid grid-cols-3 gap-2 sm:gap-3">
                                             <select
                                                 value={dobDay}
                                                 onChange={(e) => setDobDay(e.target.value)}
-                                                className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-3 sm:px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-primary/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
+                                                className="bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-3 sm:px-4 py-3 text-white md:text-slate-900 md:dark:text-slate-100 focus:ring-blue-500/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
                                             >
                                                 <option disabled value="">Kun</option>
                                                 {days.map(d => <option key={d} value={d < 10 ? `0${d}` : d}>{d}</option>)}
@@ -599,7 +599,7 @@ export default function ProfilPage() {
                                             <select
                                                 value={dobMonth}
                                                 onChange={(e) => setDobMonth(e.target.value)}
-                                                className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-3 sm:px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-primary/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
+                                                className="bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-3 sm:px-4 py-3 text-white md:text-slate-900 md:dark:text-slate-100 focus:ring-blue-500/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
                                             >
                                                 <option disabled value="">Oy</option>
                                                 {months.map((m, i) => {
@@ -610,7 +610,7 @@ export default function ProfilPage() {
                                             <select
                                                 value={dobYear}
                                                 onChange={(e) => setDobYear(e.target.value)}
-                                                className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-3 sm:px-4 py-3 text-slate-900 dark:text-slate-100 focus:ring-primary/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
+                                                className="bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-3 sm:px-4 py-3 text-white md:text-slate-900 md:dark:text-slate-100 focus:ring-blue-500/20 transition-all appearance-none shadow-sm text-sm sm:text-base text-center"
                                             >
                                                 <option disabled value="">Yil</option>
                                                 {years.map(y => <option key={y} value={y}>{y}</option>)}
@@ -628,9 +628,9 @@ export default function ProfilPage() {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <Map className="w-4 h-4" />
-                                            Viloyat <span className="text-xs opacity-60 ml-1">(ixtiyoriy)</span>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <Map className="w-4 h-4 text-[#9AA4B2]" />
+                                            Viloyat <span className="text-xs opacity-60 ml-1 text-[#9AA4B2]">(ixtiyoriy)</span>
                                         </label>
                                         <div className="relative">
                                             <select
@@ -639,39 +639,39 @@ export default function ProfilPage() {
                                                     setRegion(e.target.value)
                                                     setDistrict('')
                                                 }}
-                                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 text-slate-900 dark:text-slate-100 focus:ring-primary/20 transition-all appearance-none shadow-sm"
+                                                className="w-full bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-5 py-3 text-white md:text-slate-900 md:dark:text-slate-100 focus:ring-blue-500/20 transition-all appearance-none shadow-sm"
                                             >
                                                 <option value="">Viloyatni tanlang</option>
                                                 {VILOYATLAR.map(v => <option key={v} value={v}>{v}</option>)}
                                             </select>
-                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 w-5 h-5" />
+                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9AA4B2] md:text-slate-400 w-5 h-5" />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-400">
-                                            <Building2 className="w-4 h-4" />
-                                            Tuman <span className="text-xs opacity-60 ml-1">(ixtiyoriy)</span>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-white md:text-slate-600 md:dark:text-slate-400">
+                                            <Building2 className="w-4 h-4 text-[#9AA4B2]" />
+                                            Tuman <span className="text-xs opacity-60 ml-1 text-[#9AA4B2]">(ixtiyoriy)</span>
                                         </label>
                                         <div className="relative">
                                             <select
                                                 value={district}
                                                 onChange={(e) => setDistrict(e.target.value)}
                                                 disabled={!region}
-                                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 text-slate-900 dark:text-slate-100 focus:ring-primary/20 transition-all appearance-none shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full bg-[#212936] md:bg-white md:dark:bg-white/5 border border-[#313C50] md:border-slate-200 md:dark:border-white/10 rounded-[16px] px-5 py-3 text-white md:text-slate-900 md:dark:text-slate-100 focus:ring-blue-500/20 transition-all appearance-none shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 <option value="">Tumanni tanlang</option>
                                                 {availableDistricts.map(d => <option key={d} value={d}>{d}</option>)}
                                             </select>
-                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 w-5 h-5" />
+                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9AA4B2] md:text-slate-400 w-5 h-5" />
                                         </div>
                                     </div>
                                 </div>
                             </section>
 
-                            <div className="flex justify-end pt-8 border-t border-slate-200 dark:border-white/5">
+                            <div className="flex justify-end pt-8 border-t border-[#313C50] md:border-slate-200 md:dark:border-white/5">
                                 <button
                                     disabled={saving || uploading}
-                                    className="bg-primary hover:bg-blue-700 text-white font-semibold py-4 px-10 rounded-2xl shadow-lg shadow-primary/30 flex items-center gap-3 transition-all active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
+                                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-[20px] shadow-lg shadow-blue-500/30 flex items-center gap-3 transition-all active:scale-95 group disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
                                     type="submit"
                                 >
                                     {saving ? (
@@ -751,17 +751,17 @@ export default function ProfilPage() {
             )}
 
             {/* Mobile Navigation */}
-            <nav className="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200 dark:border-white/5 z-[60] flex items-center justify-around py-3 pb-safe md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
-                <Link href="/dashboard" className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
+            <nav className="fixed bottom-0 left-0 w-full bg-[#212936]/90 md:bg-white/80 md:dark:bg-slate-900/80 backdrop-blur-lg border-t border-[#313C50] md:border-slate-200 md:dark:border-white/5 z-[60] flex items-center justify-around py-3 pb-safe md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.2)]">
+                <Link href="/dashboard" className="p-2 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-blue-500 md:hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
                     <Home className="w-6 h-6" />
                 </Link>
-                <Link href="/biletlar" className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
+                <Link href="/biletlar" className="p-2 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-blue-500 md:hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
                     <ClipboardCheck className="w-6 h-6" />
                 </Link>
-                <Link href="/savollar" className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
+                <Link href="/savollar" className="p-2 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 hover:text-blue-500 md:hover:text-primary dark:hover:text-white transition-colors flex flex-col items-center gap-1">
                     <Search className="w-6 h-6" />
                 </Link>
-                <Link href="/profil" className="p-2 text-primary flex flex-col items-center gap-1 scale-110 pb-1 border-b-2 border-primary">
+                <Link href="/profil" className="p-2 text-blue-500 flex flex-col items-center gap-1 scale-110 pb-1 border-b-2 border-blue-500">
                     <Settings className="w-6 h-6" />
                 </Link>
             </nav>
