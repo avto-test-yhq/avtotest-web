@@ -40,8 +40,8 @@ export default function YolHarakatiPage() {
   const filtered = chapters.filter(
     (c) =>
       !search.trim() ||
-      c.title?.toLowerCase().includes(search.toLowerCase()) ||
-      c.number?.includes(search)
+      c.name?.toLowerCase().includes(search.toLowerCase()) ||
+      c.code?.toString().includes(search)
   )
 
   const getRandomColor = (index) => {
@@ -153,12 +153,14 @@ export default function YolHarakatiPage() {
                       <div className={`w-12 h-12 rounded-[16px] ${style.bg} flex items-center justify-center ${style.text}`}>
                         <span className="material-icons-round text-2xl">{icon}</span>
                       </div>
-                      <span className="text-[11px] font-bold px-3 py-1 bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 rounded-full">{ch.number}-BOB</span>
+                      <span className="text-[11px] font-bold px-3 py-1 bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-800 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 rounded-full">{ch.code}-BOB</span>
                     </div>
-                    <h3 className="text-[18px] md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors mb-2 leading-tight">{ch.title}</h3>
-                    <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{t('rules.traffic.chapterDesc').replace('{topic}', ch.title.toLowerCase())}</p>
+                    <h3 className="text-[18px] md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors mb-2 leading-tight">{ch.name}</h3>
+                    <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      {t('rules.traffic.chapterDesc').replace('{topic}', ch.name?.toLowerCase() || '')}
+                    </p>
                     <div className="mt-6 flex items-center justify-between">
-                      <span className="text-[13px] md:text-sm font-bold text-[#9AA4B2] md:text-slate-400">{ch.article_count} {t('rules.traffic.articlesCount')}</span>
+                      <span className="text-[13px] md:text-sm font-bold text-[#9AA4B2] md:text-slate-400">{ch.item_count} {t('rules.traffic.articlesCount')}</span>
                       <div className="w-8 h-8 rounded-full bg-[#161c24] md:bg-transparent flex items-center justify-center group-hover:bg-blue-600 transition-colors">
                         <span className="material-icons-round text-[20px] text-[#9AA4B2] md:text-slate-300 md:group-hover:text-sky-500 group-hover:text-white md:group-hover:translate-x-1 transition-all">arrow_forward</span>
                       </div>

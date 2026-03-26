@@ -49,8 +49,10 @@ export default function MarkingDetailPage() {
       const res = await fetch(`${API_URL}/api/rules/markings?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
-      const list = (data.markings || [])
-        .filter((m) => m.marking_type === type && m.code && !['1', '2'].includes(m.code) && m.name !== 'Eslatma')
+      const chapters = data.chapters || []
+      const chapter = chapters.find(c => c.code === type || c.image_folder === type)
+      const list = (data.items || [])
+        .filter((m) => m.chapter_id === chapter?.id && m.code && !['1', '2'].includes(m.code) && m.name !== 'Eslatma')
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
       const m = list.find((x) => x.id === markingId)
       setMarking(m || null)
@@ -135,7 +137,7 @@ export default function MarkingDetailPage() {
                   <span className="material-icons-round text-[20px] md:text-[24px]">info</span>
                   <span className="text-[13px] md:text-sm font-bold uppercase tracking-wider">Tavsif</span>
                 </div>
-                <p className="text-[15px] md:text-lg text-white md:text-slate-600 md:dark:text-slate-300 leading-relaxed font-medium md:font-normal">{marking.description}</p>
+                <p className="text-[15px] md:text-lg text-white md:text-slate-600 md:dark:text-slate-300 leading-relaxed font-medium md:font-normal">{marking.content || marking.description}</p>
               </div>
 
               <div className="flex items-center justify-between pt-6 md:pt-8 border-t border-[#313C50] md:border-slate-100 md:dark:border-slate-800">

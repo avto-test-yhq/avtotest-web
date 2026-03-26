@@ -47,8 +47,10 @@ export default function MarkingsListPage() {
       const res = await fetch(`${API_URL}/api/rules/markings?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
-      const list = (data.markings || [])
-        .filter((m) => m.marking_type === type && m.code && !['1', '2'].includes(m.code) && m.name !== 'Eslatma')
+      const chapters = data.chapters || []
+      const chapter = chapters.find(c => c.code === type || c.image_folder === type)
+      const list = (data.items || [])
+        .filter((m) => m.chapter_id === chapter?.id && m.code && !['1', '2'].includes(m.code) && m.name !== 'Eslatma')
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
       setMarkings(list)
     } catch (e) {
@@ -119,7 +121,7 @@ export default function MarkingsListPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] md:text-xs font-bold text-blue-500 md:text-sky-500 mb-0.5">{m.code}</p>
                     <p className="font-bold text-[14px] md:text-base text-white md:text-slate-900 md:dark:text-white leading-tight mb-1">{m.name}</p>
-                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{m.description}</p>
+                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{m.content || m.description}</p>
                   </div>
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 group-hover:bg-blue-600 md:group-hover:bg-sky-500 group-hover:text-white transition-colors text-[#9AA4B2] md:text-slate-400 shrink-0 border border-[#313C50] md:border-none">
                     <span className="material-icons-round text-lg">arrow_forward</span>

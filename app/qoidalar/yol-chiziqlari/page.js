@@ -10,14 +10,14 @@ const categories = [
   {
     id: 'horizontal',
     name: 'Yotiq chiziqlar',
-    count: 40,
+    count: 42,
     icon: 'horizontal',
     iconBg: 'bg-orange-500/10 text-orange-500',
   },
   {
     id: 'vertical',
     name: 'Tik chiziqlar',
-    count: 9,
+    count: 10,
     icon: 'vertical',
     iconBg: 'bg-purple-500/10 text-purple-500',
   },

@@ -41,11 +41,11 @@ export default function CategorySignsPage() {
       const res = await fetch(`${API_URL}/api/rules/signs?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
-      const cats = data.categories || []
-      const allSigns = data.signs || []
+      const cats = data.chapters || []
+      const allSigns = data.items || []
 
-      const cat = cats.find((c) => (c.folder || String(c.id)) === categorySlug)
-      const list = allSigns.filter((s) => s.category_id === cat?.id).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+      const cat = cats.find((c) => (c.image_folder || String(c.id)) === categorySlug)
+      const list = allSigns.filter((s) => s.chapter_id === cat?.id).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
       setCategories(cats)
       setCategory(cat || { name: 'Kategoriya' })
@@ -81,11 +81,11 @@ export default function CategorySignsPage() {
               <div className="px-3 text-sm text-slate-400">Yuklanmoqda...</div>
             ) : (
               categories.map(cat => {
-                const isActive = (cat.folder || String(cat.id)) === categorySlug
+                const isActive = (cat.image_folder || String(cat.id)) === categorySlug
                 return (
                   <Link
                     key={cat.id}
-                    href={`/qoidalar/yol-belgilari/${cat.folder || cat.id}`}
+                    href={`/qoidalar/yol-belgilari/${cat.image_folder || cat.id}`}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'

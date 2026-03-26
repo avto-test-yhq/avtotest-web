@@ -37,8 +37,8 @@ export default function YolBelgilariPage() {
       const res = await fetch(`${API_URL}/api/rules/signs?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
-      setCategories(data.categories || [])
-      setSigns(data.signs || [])
+      setCategories(data.chapters || [])
+      setSigns(data.items || [])
     } catch (e) {
       console.error('Belgilarni yuklashda xatolik:', e)
       setCategories([])
@@ -52,7 +52,7 @@ export default function YolBelgilariPage() {
     fetchData()
   }, [fetchData])
 
-  const getCategorySignCount = (catId) => signs.filter((s) => s.category_id === catId).length
+  const getCategorySignCount = (catId) => signs.filter((s) => s.chapter_id === catId).length
   const popularSigns = signs.filter((s) => s.is_popular).slice(0, 8)
 
   return (
@@ -75,7 +75,7 @@ export default function YolBelgilariPage() {
               categories.map(cat => (
                 <Link
                   key={cat.id}
-                  href={`/qoidalar/yol-belgilari/${cat.folder || cat.id}`}
+                  href={`/qoidalar/yol-belgilari/${cat.image_folder || cat.id}`}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all group"
                 >
                   <span className="material-icons-round text-[20px] text-slate-400 group-hover:text-slate-500">folder</span>
@@ -96,11 +96,11 @@ export default function YolBelgilariPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-12">
                 {categories.map((cat) => {
                   const count = getCategorySignCount(cat.id)
-                  const sampleSign = signs.find((s) => s.category_id === cat.id)
+                  const sampleSign = signs.find((s) => s.chapter_id === cat.id)
                   return (
                     <Link
                       key={cat.id}
-                      href={`/qoidalar/yol-belgilari/${cat.folder || cat.id}`}
+                      href={`/qoidalar/yol-belgilari/${cat.image_folder || cat.id}`}
                       className="group flex items-center justify-between p-4 md:p-6 rounded-[24px] bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-lg dark:hover:shadow-none hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all duration-300 active:scale-[0.98]"
                     >
                       <div className="flex items-center gap-3 md:gap-4">
@@ -139,7 +139,7 @@ export default function YolBelgilariPage() {
                     {popularSigns.map((s) => (
                       <Link
                         key={s.id}
-                        href={`/qoidalar/yol-belgilari/${categories.find((c) => c.id === s.category_id)?.folder || s.category_id}/${s.id}`}
+                        href={`/qoidalar/yol-belgilari/${categories.find((c) => c.id === s.chapter_id)?.image_folder || s.chapter_id}/${s.id}`}
                         className="shrink-0 w-28 md:w-32 rounded-[20px] md:rounded-2xl bg-[#212936] md:bg-white md:dark:bg-[#1e293b] border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 overflow-hidden hover:shadow-md hover:border-blue-500/30 md:hover:border-sky-500/30 transition-all group active:scale-[0.98]"
                       >
                         <div className="relative w-full h-20 md:h-24 bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800/50 flex items-center justify-center p-3 md:p-4 border-b border-[#313C50] md:border-slate-100 md:dark:border-slate-800/50">

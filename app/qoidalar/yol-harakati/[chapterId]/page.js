@@ -32,12 +32,12 @@ export default function ChapterDetailPage() {
 
       const chapters = data.chapters || []
       const current = chapters.find((c) => c.id === chapterId)
-      const arts = (data.articles || [])
+      const arts = (data.items || [])
         .filter((a) => a.chapter_id === chapterId)
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
 
       setAllChapters(chapters)
-      setCurrentChapter(current || { title: `Bob ${chapterId}`, number: chapterId })
+      setCurrentChapter(current || { name: `Bob ${chapterId}`, code: chapterId })
       setArticles(arts)
     } catch (e) {
       console.error('Ma\'lumot yuklashda xatolik:', e)
@@ -60,7 +60,7 @@ export default function ChapterDetailPage() {
     <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
-      <QoidalarHeader title={currentChapter?.title || 'Yuklanmoqda...'} />
+      <QoidalarHeader title={currentChapter?.name || 'Yuklanmoqda...'} />
 
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
 
@@ -87,7 +87,7 @@ export default function ChapterDetailPage() {
                     }`}>
                     {ch.id === 1 ? 'menu_book' : 'description'}
                   </span>
-                  <span className="line-clamp-1">{ch.title}</span>
+                  <span className="line-clamp-1">{ch.name}</span>
                 </Link>
               ))
             )}
@@ -111,13 +111,13 @@ export default function ChapterDetailPage() {
               {articles.map((a) => (
                 <article key={a.id} className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] p-5 md:p-8 shadow-sm border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-md transition-shadow duration-300">
                   <span className="inline-block px-3 py-1 rounded-full bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-blue-500 md:text-sky-600 md:dark:text-sky-400 font-bold text-[12px] md:text-sm mb-4">
-                    {a.number}-modda
+                    {a.code}-modda
                   </span>
                   <p className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
-                    {a.content || a.simplified || "Mazmun mavjud emas"}
+                    {a.content || a.metadata?.simplified || "Mazmun mavjud emas"}
                   </p>
 
-                  {a.exam_tips && (
+                  {a.metadata?.exam_tips && (
                     <div className="bg-[#161c24] md:bg-amber-50 md:dark:bg-amber-900/20 border border-[#313C50] md:border-amber-100 md:dark:border-amber-900/30 rounded-[16px] p-4 md:p-5 flex gap-3 md:gap-4 mt-2">
                       <div className="flex-shrink-0">
                         <span className="material-icons-round text-yellow-500 md:text-amber-500 text-[20px] md:text-[24px]">lightbulb</span>
@@ -125,7 +125,7 @@ export default function ChapterDetailPage() {
                       <div>
                         <h4 className="text-yellow-500 md:text-amber-800 md:dark:text-amber-400 font-bold text-[13px] md:text-sm uppercase tracking-wide mb-1">{t('rules.examImportant')}</h4>
                         <p className="text-[#9AA4B2] md:text-amber-900/70 md:dark:text-amber-200/60 text-[13px] md:text-sm">
-                          {a.exam_tips}
+                          {a.metadata.exam_tips}
                         </p>
                       </div>
                     </div>
@@ -148,7 +148,7 @@ export default function ChapterDetailPage() {
                     </div>
                     <div className="text-left hidden sm:block">
                       <div className="text-xs text-[#9AA4B2] md:text-slate-400">Oldingi bob</div>
-                      <div className="font-bold md:font-medium text-white md:text-inherit line-clamp-1 max-w-[120px] md:max-w-[150px]">{prevChapter.title}</div>
+                      <div className="font-bold md:font-medium text-white md:text-inherit line-clamp-1 max-w-[120px] md:max-w-[150px]">{prevChapter.name}</div>
                     </div>
                   </Link>
                 ) : <span></span>}
@@ -162,7 +162,7 @@ export default function ChapterDetailPage() {
                   <Link href={`/qoidalar/yol-harakati/${nextChapter.id}`} className="flex items-center gap-2 text-white md:text-slate-900 md:dark:text-white hover:text-blue-500 md:hover:text-sky-600 md:dark:hover:text-sky-400 transition-colors font-bold md:font-medium group">
                     <div className="text-right hidden sm:block">
                       <div className="text-xs text-[#9AA4B2] md:text-slate-400">Keyingi bob</div>
-                      <div className="line-clamp-1 max-w-[120px] md:max-w-[150px]">{nextChapter.title}</div>
+                      <div className="line-clamp-1 max-w-[120px] md:max-w-[150px]">{nextChapter.name}</div>
                     </div>
                     <div className="w-10 h-10 md:w-auto md:h-auto rounded-full bg-[#212936] md:bg-transparent flex items-center justify-center">
                       <span className="material-icons-round group-hover:translate-x-1 transition-transform">chevron_right</span>
