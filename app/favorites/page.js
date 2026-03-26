@@ -93,7 +93,8 @@ export default function FavoritesPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (currentUser || loginMethod === 'phone') {
         setUser(currentUser)
         await fetchFavorites()
       } else {

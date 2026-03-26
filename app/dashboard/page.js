@@ -86,21 +86,28 @@ export default function DashboardPage() {
   useEffect(() => {
     // Firebase auth state ni tekshiramiz
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        // Agar foydalanuvchi authenticated bo'lmasa, login pagega o'tkazamiz
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('loginMethod');
-        localStorage.removeItem('phoneNumber');
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (loginMethod !== 'phone') {
+        if (!user) {
+          // Agar foydalanuvchi authenticated bo'lmasa, login pagega o'tkazamiz
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userToken');
+          localStorage.removeItem('userData');
+          localStorage.removeItem('loginMethod');
+          localStorage.removeItem('phoneNumber');
+          router.push('/login');
+          return;
+        }
+      }
+
+      // Check current custom token
+      const currentToken = localStorage.getItem('userToken');
+      if (!currentToken) {
         router.push('/login');
         return;
       }
 
-      // Agar authenticated bo'lsa, tokenni yangilaymiz
       try {
-        const token = await user.getIdToken();
-        localStorage.setItem('userToken', token);
         localStorage.setItem('isLoggedIn', 'true');
 
         // User ma'lumotlarini o'rnatamiz

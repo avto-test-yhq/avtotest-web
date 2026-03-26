@@ -175,7 +175,8 @@ export default function ProfilPage() {
         }
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (!user) {
+            const loginMethod = localStorage.getItem('loginMethod');
+      if (loginMethod !== 'phone' && !user) {
                 router.push('/login')
                 return
             }

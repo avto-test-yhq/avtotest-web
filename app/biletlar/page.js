@@ -67,7 +67,8 @@ export default function BiletlarPage() {
     if (settingsLoading) return
 
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (loginMethod !== 'phone' && !user) {
         router.push('/login')
         return
       }
@@ -82,7 +83,8 @@ export default function BiletlarPage() {
   useEffect(() => {
     if (!showSettings && !settingsLoading) {
       const currentUser = auth.currentUser;
-      if (currentUser) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (currentUser || loginMethod === 'phone') {
         const qCount = settings?.questionCount || 10
         fetchStatsAndProgress(qCount)
       }

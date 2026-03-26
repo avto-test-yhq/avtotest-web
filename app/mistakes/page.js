@@ -103,7 +103,8 @@ export default function MistakesPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (currentUser || loginMethod === 'phone') {
         setUser(currentUser)
         await fetchMistakes()
       } else {

@@ -107,7 +107,8 @@ export default function TarixPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (user || loginMethod === 'phone') {
         fetchHistory()
       } else {
         router.push('/login')

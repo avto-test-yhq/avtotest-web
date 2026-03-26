@@ -63,7 +63,8 @@ export default function TashriflarPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (user || loginMethod === 'phone') {
         fetchActivity()
       } else {
         router.push('/login')

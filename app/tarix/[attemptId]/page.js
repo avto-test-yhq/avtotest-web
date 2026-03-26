@@ -185,7 +185,8 @@ export default function ExamDetailPage() {
         if (!attemptId) return
 
         const unsub = onAuthStateChanged(auth, async (user) => {
-            if (user) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (user || loginMethod === 'phone') {
                 try {
                     const res = await apiFetch(`/exam-history/attempt/${attemptId}`)
                     if (res.ok) {

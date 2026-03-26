@@ -238,8 +238,9 @@ export default function BiletTicketPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user || null)
-      if (user) {
-        loadSavedIds(user.uid)
+      const loginMethod = localStorage.getItem('loginMethod')
+      if (user || loginMethod === 'phone') {
+        if (user) loadSavedIds(user.uid)
       } else {
         setSavedIds([])
         router.push('/login')
@@ -495,7 +496,7 @@ export default function BiletTicketPage() {
             <button onClick={() => router.back()} className="text-white hover:opacity-70 transition-opacity">
               <Icon name="ArrowLeft" className="w-5 h-5" />
             </button>
-            <h1 className="text-[17px] font-bold text-white leading-tight">Ticket {ticketId}</h1>
+            <h1 className="text-[17px] font-bold text-white leading-tight">Tickets {ticketId}</h1>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowFeedbackModal(true)} className="text-slate-400 hover:text-white transition-colors">

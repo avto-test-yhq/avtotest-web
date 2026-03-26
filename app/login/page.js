@@ -35,12 +35,9 @@ export default function LoginPage() {
       if (user) {
         try {
           // Tokenni yangilaymiz
-          const token = await user.getIdToken();
-          localStorage.setItem('userToken', token);
-
           // Agar foydalanuvchi allaqachon kirgan bo'lsa, dashboardga o'tkazamiz
           const isLoggedIn = localStorage.getItem('isLoggedIn');
-          if (isLoggedIn === 'true') {
+          if (isLoggedIn === 'true' && localStorage.getItem('userToken')) {
             router.push('/dashboard');
           }
         } catch (error) {
@@ -100,10 +97,8 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (data.success && data.token) {
-        const userCredential = await signInWithCustomToken(auth, data.token)
-        const firebaseToken = await userCredential.user.getIdToken()
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('userToken', firebaseToken)
+        localStorage.setItem('userToken', data.token)
         localStorage.setItem('loginMethod', 'phone')
         localStorage.setItem('phoneNumber', phoneNumber)
         if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
@@ -137,10 +132,8 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (data.success && data.token) {
-        const userCredential = await signInWithCustomToken(auth, data.token)
-        const firebaseToken = await userCredential.user.getIdToken()
         localStorage.setItem('isLoggedIn', 'true')
-        localStorage.setItem('userToken', firebaseToken)
+        localStorage.setItem('userToken', data.token)
         localStorage.setItem('loginMethod', 'phone')
         if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
         router.push('/dashboard')
@@ -208,10 +201,8 @@ export default function LoginPage() {
           setViewMode('complete-profile')
         } else {
           if (data.token) {
-            const userCredential = await signInWithCustomToken(auth, data.token)
-            const firebaseToken = await userCredential.user.getIdToken()
             localStorage.setItem('isLoggedIn', 'true')
-            localStorage.setItem('userToken', firebaseToken)
+            localStorage.setItem('userToken', data.token)
             localStorage.setItem('loginMethod', 'phone')
             localStorage.setItem('phoneNumber', phoneNumber)
             if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
@@ -258,10 +249,8 @@ export default function LoginPage() {
       const data = await res.json()
       if (data.success) {
         if (data.token) {
-          const userCredential = await signInWithCustomToken(auth, data.token)
-          const firebaseToken = await userCredential.user.getIdToken()
           localStorage.setItem('isLoggedIn', 'true')
-          localStorage.setItem('userToken', firebaseToken)
+          localStorage.setItem('userToken', data.token)
           localStorage.setItem('loginMethod', 'phone')
           localStorage.setItem('phoneNumber', phoneNumber)
           if (data.user) localStorage.setItem('userData', JSON.stringify(data.user))
@@ -293,7 +282,7 @@ export default function LoginPage() {
       if (res.ok) {
         // Muvaffaqiyatli saqlash
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userToken', idToken);
+        localStorage.setItem('userToken', data.token || idToken);
         localStorage.setItem('loginMethod', 'google');
 
         if (data.user) {

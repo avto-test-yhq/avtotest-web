@@ -38,7 +38,8 @@ export default function UserProfileHeader() {
 
             // Then fetch from backend if authenticated
             const unsubscribe = auth.onAuthStateChanged(async (user) => {
-                if (user) {
+      const loginMethod = localStorage.getItem('loginMethod');
+      if (user || loginMethod === 'phone') {
                     try {
                         const res = await apiFetch(`/users/profile/`)
                         if (res.ok) {
