@@ -22,6 +22,7 @@ export default function ChapterDetailPage() {
   const [currentChapter, setCurrentChapter] = useState(null)
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
+  const [ruleTests, setRuleTests] = useState([])
 
   const fetchData = useCallback(async () => {
     try {
@@ -50,6 +51,15 @@ export default function ChapterDetailPage() {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Fetch linked rule tests
+  useEffect(() => {
+    if (!chapterId) return
+    fetch(`${API_URL}/api/rules/tests?topicType=traffic&itemType=chapter&itemId=${chapterId}`)
+      .then(r => r.json())
+      .then(d => setRuleTests(d.data || []))
+      .catch(() => {})
+  }, [chapterId])
 
   // Pagination Logic
   const currentIndex = allChapters.findIndex(c => c.id === chapterId)
@@ -111,7 +121,7 @@ export default function ChapterDetailPage() {
               {articles.map((a) => (
                 <article key={a.id} className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] p-5 md:p-8 shadow-sm border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-md transition-shadow duration-300">
                   <span className="inline-block px-3 py-1 rounded-full bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-blue-500 md:text-sky-600 md:dark:text-sky-400 font-bold text-[12px] md:text-sm mb-4">
-                    {a.code}-modda
+                    {a.code}-band
                   </span>
                   <p className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
                     {a.content || a.metadata?.simplified || "Mazmun mavjud emas"}
@@ -135,7 +145,35 @@ export default function ChapterDetailPage() {
 
               {articles.length === 0 && (
                 <div className="text-center py-20 bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-slate-700">
-                  <p className="text-[#9AA4B2] md:text-slate-500">Ushbu bobda hozircha moddalar kiritilmagan.</p>
+                  <p className="text-[#9AA4B2] md:text-slate-500">Ushbu bobda hozircha bandlar kiritilmagan.</p>
+                </div>
+              )}
+
+              {/* Rule Tests Section */}
+              {ruleTests.length > 0 && (
+                <div className="mt-8 p-5 md:p-6 rounded-[24px] bg-gradient-to-br from-blue-600 to-blue-700 text-white relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-10" style={{backgroundImage:'radial-gradient(circle at 70% 50%, white 1px, transparent 1px)', backgroundSize:'20px 20px'}} />
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        <span className="material-icons-round text-white text-[20px]">quiz</span>
+                      </div>
+                      <div>
+                        <div className="font-bold text-base">Bu bob bo'yicha test</div>
+                        <div className="text-blue-100 text-xs">{ruleTests.length} ta savol tayyorlangan</div>
+                      </div>
+                    </div>
+                    <p className="text-blue-100 text-sm mb-4">
+                      Bobni o'qib bitirdingizmi? Bilimingizni sinab ko'ring!
+                    </p>
+                    <button
+                      onClick={() => router.push(`/exam?mode=rule&topicType=traffic&itemType=chapter&itemId=${chapterId}&count=${ruleTests.length}`)}
+                      className="w-full flex items-center justify-center gap-2 bg-white text-blue-600 font-bold py-3 rounded-xl hover:bg-blue-50 transition active:scale-[0.98]"
+                    >
+                      <span className="material-icons-round text-[18px]">play_arrow</span>
+                      Testni Boshlash
+                    </button>
+                  </div>
                 </div>
               )}
 

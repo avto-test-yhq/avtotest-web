@@ -36,6 +36,7 @@ export default function SignDetailPage() {
   const [sign, setSign] = useState(null)
   const [allSigns, setAllSigns] = useState([])
   const [loading, setLoading] = useState(true)
+  const [ruleTests, setRuleTests] = useState([])
 
   const fetchData = useCallback(async () => {
     try {
@@ -68,6 +69,15 @@ export default function SignDetailPage() {
   useEffect(() => {
     fetchData()
   }, [fetchData])
+
+  // Fetch linked rule tests
+  useEffect(() => {
+    if (!signId) return
+    fetch(`${API_URL}/api/rules/tests?topicType=signs&itemType=item&itemId=${signId}`)
+      .then(r => r.json())
+      .then(d => setRuleTests(d.data || []))
+      .catch(() => {})
+  }, [signId])
 
   const currentIndex = allSigns.findIndex((s) => s.id === signId)
   const prevSign = currentIndex > 0 ? allSigns[currentIndex - 1] : null
@@ -140,6 +150,26 @@ export default function SignDetailPage() {
                 </div>
                 <p className="text-[15px] md:text-lg text-white md:text-slate-600 md:dark:text-slate-300 leading-relaxed font-medium md:font-normal">{sign.description}</p>
               </div>
+
+              {/* Rule Tests Button */}
+              {ruleTests.length > 0 && (
+                <div className="p-4 md:p-5 rounded-[20px] md:rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                    <span className="material-icons-round text-white text-[20px]">quiz</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-sm">Bu belgi bo'yicha test</div>
+                    <div className="text-blue-100 text-xs">{ruleTests.length} ta savol</div>
+                  </div>
+                  <button
+                    onClick={() => router.push(`/exam?mode=rule&topicType=signs&itemType=item&itemId=${signId}&count=${ruleTests.length}`)}
+                    className="flex items-center gap-1.5 bg-white text-blue-600 font-bold text-sm px-4 py-2 rounded-xl hover:bg-blue-50 transition active:scale-95 shrink-0"
+                  >
+                    <span className="material-icons-round text-[16px]">play_arrow</span>
+                    Boshlash
+                  </button>
+                </div>
+              )}
 
               <div className="flex items-center justify-between pt-6 md:pt-8 border-t border-[#313C50] md:border-slate-100 md:dark:border-slate-800">
                 <button

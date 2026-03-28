@@ -45,7 +45,10 @@ function ExamContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const countParam = searchParams.get('count') || '20'
-  const mode = searchParams.get('mode') || 'standard' // 'standard', 'real' yoki 'favorites'
+  const mode = searchParams.get('mode') || 'standard' // 'standard', 'real', 'favorites', 'mistakes', 'rule'
+  const ruleTopicType = searchParams.get('topicType') || ''
+  const ruleItemType = searchParams.get('itemType') || 'item'
+  const ruleItemId = searchParams.get('itemId') || ''
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 
@@ -248,6 +251,21 @@ function ExamContent() {
           return
         }
         data = [...rawData].sort(() => Math.random() - 0.5)
+      } else if (mode === 'rule') {
+        // Rule mode: specific rule linked tests
+        if (!ruleTopicType || !ruleItemId) {
+          setFavoritesEmpty(true)
+          return
+        }
+        const ruleRes = await fetch(`${API_URL}/api/rules/tests?topicType=${ruleTopicType}&itemType=${ruleItemType}&itemId=${ruleItemId}`)
+        if (!ruleRes.ok) throw new Error('API xatolik')
+        const ruleData = await ruleRes.json()
+        const ruleItems = ruleData.data || []
+        if (ruleItems.length === 0) {
+          setFavoritesEmpty(true)
+          return
+        }
+        data = ruleItems
       } else {
         // Oddiy rejimlar: count bo'yicha yoki avvalgi IDlar bo'yicha
         let url = `/tests?lang=${langCode}`
@@ -294,7 +312,7 @@ function ExamContent() {
         setQuestions(transformedData)
         if (!skipReset) startTimeRef.current = Date.now()
         setLoadError(null)
-      } else if (mode !== 'favorites' && mode !== 'mistakes') {
+      } else if (mode !== 'favorites' && mode !== 'mistakes' && mode !== 'rule') {
         console.log('API validatsiyadan o\'tmadi:', data)
         setLoadError('Savollar topilmadi. Serverdan noto\'g\'ri format keldi.')
       }
@@ -304,7 +322,7 @@ function ExamContent() {
     } finally {
       setIsLoading(false)
     }
-  }, [API_URL, getLangCode, transformQuestion, questionCount, reloadTrigger, mode, currentUser, settings.shuffleOptions])
+  }, [API_URL, getLangCode, transformQuestion, questionCount, reloadTrigger, mode, currentUser, settings.shuffleOptions, ruleTopicType, ruleItemType, ruleItemId])
 
   useEffect(() => {
     langRef.current = lang
@@ -612,7 +630,7 @@ function ExamContent() {
     } catch (e) {
       console.error('Tarix saqlashda xatolik:', e)
     }
-  }, [API_URL, currentUser, mode, questions.length, stats.correct])
+  }, [currentUser, mode, questions, answers, stats.correct])
 
   // Qayta boshlash funksiyasi
   const restartExam = () => {
@@ -711,7 +729,7 @@ function ExamContent() {
         mode={mode}
         onRetry={restartExam}
         title={t('exam.resultTitle') || 'Natijalar'}
-        subtitle={mode === 'favorites' ? 'Saqlanganlar' : mode === 'mistakes' ? 'Xatolar' : mode === 'real' ? 'Haqiqiy Imtihon' : 'Tasodifiy'}
+        subtitle={mode === 'favorites' ? 'Saqlanganlar' : mode === 'mistakes' ? 'Xatolar' : mode === 'real' ? 'Haqiqiy Imtihon' : mode === 'rule' ? 'Qoida Testi' : 'Tasodifiy'}
         ticketNumber={mode !== 'favorites' && mode !== 'mistakes' && mode !== 'real' ? countParam : null}
       />
     )
@@ -772,7 +790,7 @@ function ExamContent() {
 
             <div className="flex flex-col">
                <h1 className="text-[17px] font-bold text-white leading-tight">Testlar</h1>
-               <p className="text-[12px] text-slate-400 mt-0.5">{currentIndex + 1}/{questions.length} • {mode === 'real' ? 'Haqiqiy' : mode === 'favorites' ? 'Saqlanganlar' : mode === 'mistakes' ? 'Xatolar' : 'Standart'}</p>
+               <p className="text-[12px] text-slate-400 mt-0.5">{currentIndex + 1}/{questions.length} • {mode === 'real' ? 'Haqiqiy' : mode === 'favorites' ? 'Saqlanganlar' : mode === 'mistakes' ? 'Xatolar' : mode === 'rule' ? 'Qoida Testi' : 'Standart'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
