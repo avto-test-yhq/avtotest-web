@@ -310,6 +310,13 @@ export default function DashboardPage() {
             <BookOpen className="w-5 h-5" />
             <span>{t('nav.rules')}</span>
           </Link>
+          <Link href="/qoidalar/mavzu-testi" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400 group">
+            <div className="w-5 h-5 flex items-center justify-center">
+              <span className="material-icons-round text-[20px]">auto_stories</span>
+            </div>
+            <span>Mavzu Testi</span>
+            <span className="ml-auto text-[9px] font-black bg-emerald-500/20 text-emerald-500 px-1.5 py-0.5 rounded-full uppercase">Yangi</span>
+          </Link>
           <Link href="/biletlar" className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-all text-slate-500 dark:text-slate-400">
             <ClipboardCheck className="w-5 h-5" />
             <span>{t('nav.tickets')}</span>
@@ -441,11 +448,20 @@ export default function DashboardPage() {
                   <span className="text-[13px] font-bold text-white z-10">Sevimlilar</span>
                 </Link>
 
-                <Link href="/mistakes" className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group col-span-2">
+                <Link href="/mistakes" className="bg-[#212936] rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-[#313C50] shadow-sm relative overflow-hidden group">
                   <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center mb-2 z-10">
                     <Lightbulb className="w-5 h-5 text-red-500 stroke-[2]" />
                   </div>
-                  <span className="text-[13px] font-bold text-white z-10">Xatolarim ustida ishlash</span>
+                  <span className="text-[13px] font-bold text-white z-10">Xatolarim</span>
+                </Link>
+
+                <Link href="/qoidalar/mavzu-testi" className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[20px] p-4 flex flex-col items-center justify-center h-[110px] border border-emerald-500/30 shadow-lg shadow-emerald-900/30 relative overflow-hidden group col-span-2">
+                  <div className="absolute inset-0 opacity-10" style={{backgroundImage:'radial-gradient(circle at 80% 20%, white 1px, transparent 1px)', backgroundSize:'16px 16px'}} />
+                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center mb-2 z-10">
+                    <span className="material-icons-round text-white text-[20px]">auto_stories</span>
+                  </div>
+                  <span className="text-[13px] font-bold text-white z-10">Mavzu bo'yicha Test</span>
+                  <span className="text-[10px] text-emerald-100 z-10 mt-0.5">Yangi!</span>
                 </Link>
               </div>
             </div>
@@ -649,6 +665,29 @@ export default function DashboardPage() {
                 <span className="flex items-center justify-center gap-2 text-amber-500 font-bold text-sm group-hover:translate-x-1 transition-transform">
                   {t('dashboard.activity.favorites.cta')} <ChevronRight className="w-4 h-4" />
                 </span>
+              </Link>
+
+              {/* Mavzu bo'yicha Test — Yangi funksiya */}
+              <Link href="/qoidalar/mavzu-testi" className="relative overflow-hidden rounded-2xl p-6 group col-span-1 md:col-span-2 block text-white bg-gradient-to-br from-emerald-600 to-teal-700 shadow-xl shadow-emerald-600/20 hover:shadow-2xl hover:shadow-emerald-600/30 transition-all duration-300 hover:scale-[1.01]">
+                <div className="absolute inset-0 opacity-10" style={{backgroundImage:'radial-gradient(circle at 70% 30%, white 1px, transparent 1px), radial-gradient(circle at 30% 70%, white 1px, transparent 1px)', backgroundSize:'24px 24px'}} />
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
+                  <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                    <span className="material-icons-round text-white text-3xl">auto_stories</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-xl font-bold text-white">Mavzu bo'yicha Test</h4>
+                      <span className="bg-white/30 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Yangi!</span>
+                    </div>
+                    <p className="text-emerald-100 text-sm max-w-sm">
+                      Qoidalarni mavzu bo'yicha o'rganib, har bir bob uchun maxsus testlarni ishlang
+                    </p>
+                  </div>
+                  <span className="flex items-center gap-2 bg-white text-emerald-700 font-bold text-sm px-5 py-3 rounded-xl shadow-lg whitespace-nowrap hover:bg-emerald-50 transition-colors w-fit">
+                    <span className="material-icons-round text-[18px]">play_circle</span>
+                    Boshlash
+                  </span>
+                </div>
               </Link>
             </div>
           </div>

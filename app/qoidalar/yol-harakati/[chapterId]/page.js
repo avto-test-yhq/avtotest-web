@@ -70,7 +70,23 @@ export default function ChapterDetailPage() {
     <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
-      <QoidalarHeader title={currentChapter?.name || 'Yuklanmoqda...'} />
+      <QoidalarHeader
+        title={currentChapter?.name || 'Yuklanmoqda...'}
+        backUrl="/qoidalar/yol-harakati"
+        beforeDashboard={
+          ruleTests.length > 0 ? (
+            <button
+              onClick={() => router.push(`/exam?mode=rule&topicType=traffic&itemType=chapter&itemId=${chapterId}&count=${ruleTests.length}`)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.97] text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-blue-600/30"
+            >
+              <span className="material-icons-round text-[16px]">play_arrow</span>
+              <span className="hidden sm:inline">Test Ishlash</span>
+              <span className="sm:hidden">Test</span>
+              <span className="bg-white/20 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md">{ruleTests.length}</span>
+            </button>
+          ) : null
+        }
+      />
 
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
 

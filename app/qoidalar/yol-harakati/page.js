@@ -108,7 +108,7 @@ export default function YolHarakatiPage() {
         <header className="sticky top-0 bg-[#161c24]/90 md:bg-white/80 md:dark:bg-[#1e293b]/80 backdrop-blur-md border-b border-[#313C50] md:border-slate-200 md:dark:border-slate-800 z-40">
           <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4 md:gap-6">
             <div className="flex-1 max-w-2xl relative flex items-center gap-2">
-              <button onClick={() => router.back()} className="lg:hidden p-2 text-white md:text-slate-500 hover:bg-[#313C50] md:hover:bg-transparent rounded-xl transition-colors">
+              <button onClick={() => router.push('/qoidalar')} className="lg:hidden p-2 text-white md:text-slate-500 hover:bg-[#313C50] md:hover:bg-transparent rounded-xl transition-colors">
                 <span className="material-icons-round">arrow_back</span>
               </button>
               <div className="relative flex-1">
