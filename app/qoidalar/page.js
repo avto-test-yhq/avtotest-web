@@ -6,7 +6,8 @@ import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
-import { useI18n, getCurrentLocale } from '@/lib/i18n'
+import { useI18n } from '@/lib/i18n'
+import { useLanguage } from '@/context/LanguageContext'
 import { useState, useEffect } from 'react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz/api/v1';
@@ -15,14 +16,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz/api/
 export default function QoidalarPage() {
   const router = useRouter()
   const t = useI18n()
+  const { lang } = useLanguage()
   const [topics, setTopics] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const lang = getCurrentLocale()
-        const res = await fetch(`${API_URL}/rules/topics?lang=${lang}`)
+        const currentLang = lang || 'uzl'
+        const res = await fetch(`${API_URL}/rules/topics?lang=${currentLang}`)
         if (res.ok) {
           const data = await res.json()
           setTopics(data.topics || [])
@@ -34,7 +36,7 @@ export default function QoidalarPage() {
       }
     }
     fetchTopics()
-  }, [])
+  }, [lang])
 
   return (
     <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen transition-colors duration-200 font-sans">

@@ -7,7 +7,7 @@ import ThemeToggle from '@/components/ThemeToggle'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
-import { useI18n, getCurrentLocale } from '@/lib/i18n'
+import { useI18n } from '@/lib/i18n'
 import { useLanguage } from '@/context/LanguageContext'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz/api/v1';
