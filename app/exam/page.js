@@ -120,11 +120,29 @@ function ExamContent() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user || null)
       if (user) {
+        // Firebase orqali kirgan (Google)
+        setCurrentUser(user)
         loadSavedIds(user.uid)
       } else {
-        setSavedIds([])
+        // Firebase'da yo'q - telefon/parol bilan kirgan bo'lishi mumkin
+        const userToken = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null
+        const userData = typeof window !== 'undefined' ? localStorage.getItem('userData') : null
+        if (userToken && userData) {
+          try {
+            const parsed = JSON.parse(userData)
+            // uid ni turli field nomlardan olamiz
+            const uid = parsed.uid || parsed._id || parsed.id
+            setCurrentUser({ uid, ...parsed })
+            loadSavedIds(uid)
+          } catch {
+            setCurrentUser(null)
+            setSavedIds([])
+          }
+        } else {
+          setCurrentUser(null)
+          setSavedIds([])
+        }
       }
     })
     return () => unsubscribe()
@@ -577,37 +595,36 @@ function ExamContent() {
     setIsFinished(true)
   }
 
-  // Imtihon natijasini Tarix uchun saqlash (dashboard davomiylik grafigi uchun)
+  // Imtihon natijasini Tarix uchun saqlash
   const saveExamAttempt = useCallback(async (status) => {
-    const uid = currentUser?.uid || auth.currentUser?.uid
-    if (!uid || examAttemptSavedRef.current) return
+    // Token bor bo'lsa yetarli (Firebase yoki telefon login)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null
+    if (!token || examAttemptSavedRef.current) return
     const answeredCount = Object.keys(answers).length
     if (answeredCount === 0) return
     const elapsed = (endTimeRef.current && startTimeRef.current)
       ? Math.floor((endTimeRef.current - startTimeRef.current) / 1000) : 0
     const typeMap = { standard: 'standart', real: 'haqiqiy', favorites: 'favorites', mistakes: 'mistakes' }
 
-    // Shunchaki o'tkazib yuborilgan (javobsiz) testlarni details ro'yxatidan olib tashlaymiz
     const details = questions
       .filter(q => answers[q.id] !== undefined)
       .map(q => {
-        const qId = q.numeric_id || q.id;
-        const userAnswer = answers[q.id]; // answers uses original ID (string/number mixed from API)
-        const isCorrect = q.options[userAnswer]?.is_correct;
-        const correctAnswer = q.options.findIndex(o => o.is_correct);
-
+        const qId = q.numeric_id || q.id
+        const userAnswer = answers[q.id]
+        const isCorrect = q.options[userAnswer]?.is_correct
+        const correctAnswer = q.options.findIndex(o => o.is_correct)
         return {
           questionId: qId,
-          userAnswer: userAnswer,
-          correctAnswer: correctAnswer,
-          isCorrect: isCorrect,
+          userAnswer,
+          correctAnswer,
+          isCorrect,
           questionData: {
             question: q.question,
             options: q.options,
-            media: { name: q.image ? q.image.split('/').pop() : null } // simplified media
+            media: { name: q.image ? q.image.split('/').pop() : null }
           }
-        };
-      });
+        }
+      })
 
     try {
       const res = await apiFetch('/exam-history/save', {
@@ -618,19 +635,20 @@ function ExamContent() {
           total: answeredCount,
           durationSeconds: elapsed,
           status,
-          details: details
+          details
         }),
       })
       if (res.ok) {
         examAttemptSavedRef.current = true
+        console.log('✅ Imtihon tarixi saqlandi:', status)
       } else {
         const err = await res.json().catch(() => ({}))
-        console.error('Tarix saqlashda xatolik:', res.status, err)
+        console.error('❌ Tarix saqlashda xatolik:', res.status, err)
       }
     } catch (e) {
-      console.error('Tarix saqlashda xatolik:', e)
+      console.error('❌ Tarix saqlashda tarmoq xatoligi:', e)
     }
-  }, [currentUser, mode, questions, answers, stats.correct])
+  }, [mode, questions, answers, stats.correct])
 
   // Qayta boshlash funksiyasi
   const restartExam = () => {
@@ -641,7 +659,9 @@ function ExamContent() {
   }
 
   useEffect(() => {
-    if (!currentUser?.uid || examAttemptSavedRef.current) return
+    // Token mavjudligini tekshiramiz (Firebase yoki telefon login uchun)
+    const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null
+    if (!token || examAttemptSavedRef.current) return
     if (showFailModal) {
       saveExamAttempt('otmadi')
     } else if (showTimeUp) {
@@ -649,7 +669,7 @@ function ExamContent() {
     } else if (isFinished && questions.length > 0) {
       saveExamAttempt('tugallangan')
     }
-  }, [showFailModal, showTimeUp, isFinished, questions.length, currentUser?.uid, saveExamAttempt])
+  }, [showFailModal, showTimeUp, isFinished, questions.length, saveExamAttempt])
 
   if (!questions.length) {
     if (mode === 'favorites' && favoritesEmpty) {
