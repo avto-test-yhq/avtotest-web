@@ -4,8 +4,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { auth } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
@@ -92,15 +90,13 @@ export default function FavoritesPage() {
   }, [lang])
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      const userToken = localStorage.getItem('userToken');
-      if (userToken) {
-        fetchFavorites()
-      } else {
-        router.push('/login')
-      }
-    })
-    return () => unsubscribe()
+    const userToken = localStorage.getItem('userToken')
+    const isLoggedIn = localStorage.getItem('isLoggedIn')
+    if (!userToken || isLoggedIn !== 'true') {
+      router.push('/login')
+      return
+    }
+    fetchFavorites()
   }, [router, fetchFavorites])
 
   const count = questions.length

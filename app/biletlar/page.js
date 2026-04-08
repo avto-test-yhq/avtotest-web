@@ -4,8 +4,6 @@ import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { auth } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import QoidalarSidebar from '@/components/QoidalarSidebar'
 import QoidalarHeader from '@/components/QoidalarHeader'
@@ -65,26 +63,22 @@ export default function BiletlarPage() {
 
   useEffect(() => {
     if (settingsLoading) return
-
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      const userToken = localStorage.getItem('userToken');
-      if (!userToken) {
-        router.push('/login')
-        return
-      }
-      setLoading(true)
-      const qCount = settings?.questionCount || 10
-      await fetchStatsAndProgress(qCount)
-    })
-    return () => unsub()
+    const userToken = localStorage.getItem('userToken')
+    const isLoggedIn = localStorage.getItem('isLoggedIn')
+    if (!userToken || isLoggedIn !== 'true') {
+      router.push('/login')
+      return
+    }
+    setLoading(true)
+    const qCount = settings?.questionCount || 10
+    fetchStatsAndProgress(qCount)
   }, [router, settingsLoading, settings?.questionCount])
 
   // Refetch when settings modal closes
   useEffect(() => {
     if (!showSettings && !settingsLoading) {
-      const currentUser = auth.currentUser;
-      const loginMethod = localStorage.getItem('loginMethod');
-      if (currentUser || loginMethod === 'phone') {
+      const userToken = localStorage.getItem('userToken')
+      if (userToken) {
         const qCount = settings?.questionCount || 10
         fetchStatsAndProgress(qCount)
       }

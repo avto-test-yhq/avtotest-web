@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useI18n } from '@/lib/i18n'
 import { apiFetch } from '@/lib/apiClient'
@@ -34,15 +32,13 @@ export default function StatistikaPage() {
     }
 
     useEffect(() => {
-        const unsub = onAuthStateChanged(auth, (user) => {
-            const userToken = localStorage.getItem('userToken');
-            if (userToken) {
-                fetchStats()
-            } else {
-                router.push('/login')
-            }
-        })
-        return () => unsub()
+        const userToken = localStorage.getItem('userToken')
+        const isLoggedIn = localStorage.getItem('isLoggedIn')
+        if (!userToken || isLoggedIn !== 'true') {
+            router.push('/login')
+            return
+        }
+        fetchStats()
     }, [sort, order])
 
     const handleSort = (key) => {

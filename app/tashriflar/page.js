@@ -4,8 +4,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { auth } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
 import ThemeToggle from '@/components/ThemeToggle'
 import { apiFetch } from '@/lib/apiClient'
 
@@ -62,15 +60,13 @@ export default function TashriflarPage() {
   )
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      const userToken = localStorage.getItem('userToken');
-      if (userToken) {
-        fetchActivity()
-      } else {
-        router.push('/login')
-      }
-    })
-    return () => unsubscribe()
+    const userToken = localStorage.getItem('userToken')
+    const isLoggedIn = localStorage.getItem('isLoggedIn')
+    if (!userToken || isLoggedIn !== 'true') {
+      router.push('/login')
+      return
+    }
+    fetchActivity()
   }, [router, fetchActivity])
 
   return (
