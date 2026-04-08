@@ -24,7 +24,7 @@ export default function QoidalarPage() {
     const fetchTopics = async () => {
       try {
         const currentLang = lang || 'uzl'
-        const res = await fetch(`${API_URL}/rules/topics?lang=${currentLang}`)
+        const res = await fetch(`${API_URL}/api/v1/rules/topics?lang=${currentLang}`)
         if (res.ok) {
           const data = await res.json()
           setTopics(data.topics || [])

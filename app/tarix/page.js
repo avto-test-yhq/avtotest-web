@@ -91,8 +91,8 @@ export default function TarixPage() {
     async () => {
       try {
         setLoading(true)
-        const res = await apiFetch(`/exam-history/history/`)
-        if (!res.ok) throw new Error('API xatolik')
+        const res = await apiFetch(`/exam-history/history`)
+        if (!res.ok) throw new Error(`API xatolik: ${res.status}`)
         const data = await res.json()
         setAttempts(data.attempts || [])
       } catch (e) {
@@ -107,8 +107,8 @@ export default function TarixPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      const loginMethod = localStorage.getItem('loginMethod');
-      if (user || loginMethod === 'phone') {
+      const userToken = localStorage.getItem('userToken');
+      if (userToken) {
         fetchHistory()
       } else {
         router.push('/login')

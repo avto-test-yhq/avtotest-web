@@ -31,12 +31,19 @@ export default function LoginPage() {
   // 0. AUTH STATE TEKSHIRISH (Avtomatik kirish)
   // ==========================================
   useEffect(() => {
+    // Oflayn tekshiruv: Lokal token mavjud bo'lsa, Firebase'ni kutmasdan kirgizamiz.
+    // Bu telefon orqali kirganlar uchun majburiy (chunki ular Firebase'ga kirmaydi)
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userToken = localStorage.getItem('userToken');
+    
+    if (isLoggedIn === 'true' && userToken) {
+      router.push('/dashboard');
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
-          // Tokenni yangilaymiz
-          // Agar foydalanuvchi allaqachon kirgan bo'lsa, dashboardga o'tkazamiz
-          const isLoggedIn = localStorage.getItem('isLoggedIn');
           if (isLoggedIn === 'true' && localStorage.getItem('userToken')) {
             router.push('/dashboard');
           }

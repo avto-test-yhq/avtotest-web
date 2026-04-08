@@ -30,7 +30,7 @@ export default function GenericTopicPage() {
       const currentLang = lang || 'uzl'
       
       // 1. Fetch Topic Metadata (to get the real name/color/icon)
-      const resMeta = await fetch(`${API_URL}/rules/topics?lang=${currentLang}`)
+      const resMeta = await fetch(`${API_URL}/api/v1/rules/topics?lang=${currentLang}`)
       if (resMeta.ok) {
          const metaData = await resMeta.json()
          const currentMeta = metaData.topics?.find(t => t.id === topicId)

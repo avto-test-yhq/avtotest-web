@@ -38,15 +38,15 @@ export default function UserProfileHeader() {
 
             // Then fetch from backend if authenticated
             const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      const loginMethod = localStorage.getItem('loginMethod');
-      if (user || loginMethod === 'phone') {
+                const userToken = localStorage.getItem('userToken');
+                if (userToken) {
                     try {
                         const res = await apiFetch(`/users/profile/`)
                         if (res.ok) {
                             const data = await res.json()
                             setUserData({
-                                name: data.fullName || user.displayName || localName || '',
-                                email: data.email || user.email || '',
+                                name: data.fullName || user?.displayName || localName || '',
+                                email: data.email || user?.email || '',
                                 picture: data.picture ? (data.picture.startsWith('http') ? data.picture : `${API_URL}${data.picture}`) : ''
                             })
                         }

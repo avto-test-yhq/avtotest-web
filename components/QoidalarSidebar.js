@@ -18,7 +18,7 @@ export default function QoidalarSidebar() {
     useEffect(() => {
         const fetchTopics = async () => {
             try {
-                const res = await fetch(`${API_URL}/rules/topics?lang=${lang || 'uzl'}`)
+                const res = await fetch(`${API_URL}/api/v1/rules/topics?lang=${lang || 'uzl'}`)
                 if (res.ok) {
                     const data = await res.json()
                     setTopics(data.topics || [])

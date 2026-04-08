@@ -47,8 +47,8 @@ export function ExamSettingsProvider({ children }) {
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser)
-            const loginMethod = localStorage.getItem('loginMethod');
-      if (currentUser || loginMethod === 'phone') {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
                 try {
                     const res = await apiFetch(`/users/settings`)
                     if (res.ok) {

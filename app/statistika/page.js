@@ -35,8 +35,8 @@ export default function StatistikaPage() {
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (user) => {
-            const loginMethod = localStorage.getItem('loginMethod');
-            if (user || loginMethod === 'phone') {
+            const userToken = localStorage.getItem('userToken');
+            if (userToken) {
                 fetchStats()
             } else {
                 router.push('/login')

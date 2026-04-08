@@ -238,8 +238,8 @@ export default function BiletTicketPage() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user || null)
-      const loginMethod = localStorage.getItem('loginMethod')
-      if (user || loginMethod === 'phone') {
+      const userToken = localStorage.getItem('userToken')
+      if (userToken) {
         if (user) loadSavedIds(user.uid)
       } else {
         setSavedIds([])

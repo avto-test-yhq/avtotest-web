@@ -67,8 +67,8 @@ export default function BiletlarPage() {
     if (settingsLoading) return
 
     const unsub = onAuthStateChanged(auth, async (user) => {
-      const loginMethod = localStorage.getItem('loginMethod');
-      if (loginMethod !== 'phone' && !user) {
+      const userToken = localStorage.getItem('userToken');
+      if (!userToken) {
         router.push('/login')
         return
       }
