@@ -9,8 +9,7 @@ import QoidalarSidebar from '@/components/QoidalarSidebar'
 import { useI18n } from '@/lib/i18n'
 import { useLanguage } from '@/context/LanguageContext'
 import { useState, useEffect } from 'react'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz/api/v1';
+import { apiFetch } from '@/lib/apiClient'
 
 
 export default function QoidalarPage() {
@@ -24,7 +23,7 @@ export default function QoidalarPage() {
     const fetchTopics = async () => {
       try {
         const currentLang = lang || 'uzl'
-        const res = await fetch(`${API_URL}/api/v1/rules/topics?lang=${currentLang}`)
+        const res = await apiFetch(`/rules/topics?lang=${currentLang}`)
         if (res.ok) {
           const data = await res.json()
           setTopics(data.topics || [])
@@ -94,7 +93,6 @@ export default function QoidalarPage() {
                       <div className={`w-12 h-12 rounded-[16px] ${item.bg || 'bg-blue-50 dark:bg-blue-900/20'} flex items-center justify-center ${item.color || 'text-blue-500'}`}>
                         <span className="material-icons-round text-2xl">{item.icon || 'menu_book'}</span>
                       </div>
-                      <span className="text-[11px] font-bold px-3 py-1 bg-[#161c24] md:bg-slate-100 md:dark:bg-slate-700 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 rounded-full">{item.badge}</span>
                     </div>
                     <h3 className="text-[18px] md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors mb-2">{item.name}</h3>
                     <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{item.description}</p>

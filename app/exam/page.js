@@ -77,7 +77,23 @@ function ExamContent() {
   const [timerTick, setTimerTick] = useState(0) // Har soniya yangilash uchun
   const [savedIds, setSavedIds] = useState([]) // API dan kelgan saqlangan savol IDlari
   const [favoritesEmpty, setFavoritesEmpty] = useState(false)
-  const [currentUser, setCurrentUser] = useState(null)
+
+  // currentUser ni darhol (sinxron) localStorage'dan o'qiymiz.
+  // Telefon login uchun FireBase onAuthStateChanged kutilmaydi — race condition yo'q qilinadi.
+  const [currentUser, setCurrentUser] = useState(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const userToken = localStorage.getItem('userToken')
+      const userData = localStorage.getItem('userData')
+      if (userToken && userData) {
+        const parsed = JSON.parse(userData)
+        const uid = parsed.uid || parsed._id || parsed.id
+        if (uid) return { uid, ...parsed }
+      }
+    } catch {}
+    return null
+  })
+
   const [loadError, setLoadError] = useState(null) // Yuklash xatosi
   const [isLoading, setIsLoading] = useState(true)
 
@@ -285,21 +301,15 @@ function ExamContent() {
         }
         data = ruleItems
       } else {
-        // Oddiy rejimlar: count bo'yicha yoki avvalgi IDlar bo'yicha
+        // Oddiy rejimlar: backend'dan random savollar (count orqali)
         let url = `/tests?lang=${langCode}`
         if (reloadTrigger === 0 && currentIdsRef.current.length > 0) {
+          // Til o'zgarganda yoki qayta yuklaganda avvalgi IDlar bilan
           const idsString = currentIdsRef.current.join(',')
           url += `&ids=${idsString}`
         } else {
-          // Generate random IDs between 1 and 1228
-          const TOTAL_QUESTIONS_DB = 1228
-          const randomIds = new Set()
-          while (randomIds.size < questionCount) {
-            const r = Math.floor(Math.random() * TOTAL_QUESTIONS_DB) + 1
-            randomIds.add(r)
-          }
-          const idsString = Array.from(randomIds).join(',')
-          url += `&ids=${idsString}`
+          // Birinchi yuklashda backend o'zi random tanlaydi
+          url += `&count=${questionCount}`
         }
         const res = await apiFetch(url, { cache: 'no-store' })
         if (!res.ok) throw new Error('API xatolik')

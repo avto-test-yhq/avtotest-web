@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useLanguage } from '@/context/LanguageContext'
+import { apiFetch } from '@/lib/apiClient'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
@@ -87,7 +88,7 @@ export default function MavzuTestiPage() {
   const fetchTopics = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch(`${API_URL}/api/rules/topics?lang=${lang || 'uzl'}`)
+      const res = await apiFetch(`/rules/topics?lang=${lang || 'uzl'}`)
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       setTopics(data.topics || [])

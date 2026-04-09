@@ -6,8 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
 import { useLanguage } from '@/context/LanguageContext'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
+import { apiFetch } from '@/lib/apiClient'
 
 // topicId → test parametrlari (exam page uchun)
 const topicExamMap = {
@@ -47,8 +46,8 @@ export default function TopicChaptersPage() {
 
       // Parallel: topics va chapters
       const [topicsRes, chaptersRes] = await Promise.all([
-        fetch(`${API_URL}/api/rules/topics?lang=${lang || 'uzl'}`),
-        fetch(`${API_URL}/api/rules/chapters-by-topic?topic=${topicId}&lang=${lang || 'uzl'}`),
+        apiFetch(`/rules/topics?lang=${lang || 'uzl'}`),
+        apiFetch(`/rules/chapters-by-topic?topic=${topicId}&lang=${lang || 'uzl'}`),
       ])
 
       if (topicsRes.ok) {
@@ -77,7 +76,7 @@ export default function TopicChaptersPage() {
     if (chapters.length === 0) return
     const fetchCounts = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/v1/rules/stats/${examInfo.topicType}`)
+        const res = await apiFetch(`/rules/stats/${examInfo.topicType}`)
         if (res.ok) {
           const data = await res.json()
           setTestCounts(data.stats || {})
