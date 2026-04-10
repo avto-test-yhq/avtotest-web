@@ -9,7 +9,7 @@ export default function AosInit() {
             strategy="afterInteractive"
             onLoad={() => {
                 if (typeof window !== 'undefined' && window.AOS) {
-                    window.AOS.init({ duration: 800, once: true, offset: 50 });
+                    window.AOS.init({ duration: 650, once: true, offset: 60, easing: 'ease-out-cubic' });
                 }
             }}
         />

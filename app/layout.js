@@ -24,8 +24,34 @@ const plusJakarta = Plus_Jakarta_Sans({
 })
 
 export const metadata = {
-  title: 'PravachiUZ - Premium Haydovchilik',
-  description: 'Haydovchilikni kelajakda o\'rganing',
+  title: 'PravachiUZ – Haydovchilik Guvohnomasi №1 Platforma',
+  description: "Sun'iy intellekt (AI) yordamida haydovchilik guvohnomasini birinchi urinishda oling. 1200+ YHQ test savollari, simulyatsiya imtihonlari, xatolar banki va bepul boshlash imkoniyati.",
+  keywords: [
+    'haydovchilik guvohnomasi', 'avtotest', 'YHQ test', 'yo\'l harakati qoidalari',
+    'haydovchilik imtihoni', 'PravachiUZ', 'pravachi', 'avtotest o\'zbekiston',
+    'haydovchilik kursi', 'AI mentor', 'online test', 'yo\'l qoidalari',
+  ],
+  authors: [{ name: 'PravachiUZ' }],
+  creator: 'PravachiUZ',
+  metadataBase: new URL('https://pravachi.uz'),
+  openGraph: {
+    title: 'PravachiUZ – Haydovchilik Guvohnomasi №1 Platforma',
+    description: "Sun'iy intellekt yordamida haydovchilik guvohnomasini birinchi urinishda oling. 1200+ test savoli va bepul boshlash.",
+    url: 'https://pravachi.uz',
+    siteName: 'PravachiUZ',
+    locale: 'uz_UZ',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PravachiUZ – Haydovchilik №1 Platforma',
+    description: "1200+ YHQ test savollari, AI Mentor va simulyatsiya imtihoni bilan guvohnomani birinchi urinishda oling.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
 }
 
 // Tema flash oldini olish: sahifa yuklanishidan oldin localStorage dan temani o'qib body ga qo'llash

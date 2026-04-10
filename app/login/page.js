@@ -15,7 +15,13 @@ export default function LoginPage() {
   const router = useRouter()
 
   // Rejimlar: 'login-pass' | 'login-email' | 'register' | 'phone-sms' | 'verify-sms' | 'complete-profile' | 'reset-password' | 'reset-password-code'
-  const [viewMode, setViewMode] = useState('login-pass')
+  const [viewMode, setViewMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const mode = new URLSearchParams(window.location.search).get('mode')
+      if (mode === 'register') return 'phone-sms'
+    }
+    return 'login-pass'
+  })
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
