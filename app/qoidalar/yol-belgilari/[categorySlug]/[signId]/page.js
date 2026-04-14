@@ -75,7 +75,7 @@ export default function SignDetailPage() {
     fetch(`${API_URL}/api/rules/tests?topicType=signs&itemType=item&itemId=${signId}`)
       .then(r => r.json())
       .then(d => setRuleTests(d.data || []))
-      .catch(() => {})
+      .catch(() => { })
   }, [signId])
 
   const currentIndex = allSigns.findIndex((s) => s.id === signId)
@@ -123,7 +123,7 @@ export default function SignDetailPage() {
 
         {/* MAIN CONTENT */}
         <main className="flex-1 p-4 md:p-8 lg:p-16 overflow-y-auto max-w-5xl mx-auto w-full relative">
-          
+
           {/* Subtle Background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-lg h-96 bg-blue-600/5 blur-[120px] pointer-events-none rounded-full" />
 
@@ -134,15 +134,15 @@ export default function SignDetailPage() {
             </div>
           ) : sign ? (
             <div className="space-y-10 md:space-y-12 pb-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              
+
               {/* IMAGE SECTION */}
               <div className="flex justify-center group">
                 <div className="relative w-56 h-56 md:w-80 md:h-80">
                   {/* Decorative backgrounds */}
                   <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500/10 to-purple-500/5 rounded-[40px] blur-2xl group-hover:scale-105 transition-transform duration-700 opacity-50 dark:opacity-100" />
-                  
+
                   <div className="relative w-full h-full rounded-[32px] md:rounded-[48px] bg-white dark:bg-[#121926] border border-white/50 dark:border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center justify-center p-8 md:p-12 transition-all duration-500 group-hover:shadow-[0_30px_60px_rgba(59,130,246,0.15)] overflow-hidden">
-                    
+
                     {/* Background Pattern */}
                     <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
                       <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
@@ -153,10 +153,10 @@ export default function SignDetailPage() {
                       alt={sign.name}
                       className="object-contain max-w-full max-h-full drop-shadow-2xl translate-y-1 group-hover:-translate-y-2 transition-transform duration-500 ease-out"
                     />
-                    
+
                     {/* Category/Code badge */}
                     <div className="absolute top-6 right-6 flex items-center gap-2">
-                       <span className="bg-blue-600 text-white px-2.5 py-1 rounded-lg text-[10px] md:text-[11px] font-black tracking-wider uppercase shadow-md shadow-blue-500/20">
+                      <span className="bg-blue-600 text-white px-2.5 py-1 rounded-lg text-[10px] md:text-[11px] font-black tracking-wider uppercase shadow-md shadow-blue-500/20">
                         {sign.code}
                       </span>
                     </div>
@@ -173,23 +173,23 @@ export default function SignDetailPage() {
 
                 {/* Content Card */}
                 <div className="relative group/card">
-                   <div className="absolute -inset-px bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-[28px] md:rounded-[36px] blur-sm opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
-                   
-                   <div className="relative rounded-[28px] md:rounded-[36px] bg-white/70 dark:bg-[#0f172a]/60 backdrop-blur-xl border border-white dark:border-white/5 p-8 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                  <div className="absolute -inset-px bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-[28px] md:rounded-[36px] blur-sm opacity-0 group-hover/card:opacity-100 transition-opacity duration-500" />
+
+                  <div className="relative rounded-[28px] md:rounded-[36px] bg-white/70 dark:bg-[#0f172a]/60 backdrop-blur-xl border border-white dark:border-white/5 p-8 md:p-12 shadow-xl shadow-slate-200/50 dark:shadow-none">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-10 h-10 rounded-xl bg-blue-600/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                         <span className="material-icons-round text-[22px]">auto_stories</span>
                       </div>
                       <span className="text-[12px] md:text-sm font-black uppercase tracking-[0.15em] text-blue-600 dark:text-blue-400">{t('rules.signs.explanation')}</span>
                     </div>
-                    
+
                     <p className="text-[16px] md:text-[19px] text-white md:text-slate-700 md:dark:text-slate-200 leading-[1.7] md:leading-[1.8] font-medium md:font-normal text-justify md:text-left">
                       {sign.content || sign.description}
                     </p>
 
                     {/* Decorative quote icon */}
                     <div className="absolute bottom-6 right-8 opacity-[0.05] dark:opacity-[0.1] select-none pointer-events-none">
-                       <span className="material-icons-round text-[80px]">format_quote</span>
+                      <span className="material-icons-round text-[80px]">format_quote</span>
                     </div>
                   </div>
                 </div>

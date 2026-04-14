@@ -77,7 +77,7 @@ export default function MarkingDetailPage() {
     fetch(`${API_URL}/api/rules/tests?topicType=markings&itemType=item&itemId=${markingId}`)
       .then(r => r.json())
       .then(d => setRuleTests(d.data || []))
-      .catch(() => {})
+      .catch(() => { })
   }, [markingId])
 
   const currentIndex = allMarkings.findIndex((m) => m.id === markingId)

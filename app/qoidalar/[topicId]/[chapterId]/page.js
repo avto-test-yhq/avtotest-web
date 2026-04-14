@@ -70,7 +70,14 @@ export default function GenericChapterDetailPage() {
 
       {/* HEADER */}
       <QoidalarHeader
-        title={currentChapter?.name || 'Yuklanmoqda...'}
+        title={(function() {
+          const name = currentChapter?.name
+          if (typeof name === 'string') return name
+          if (typeof name === 'object' && name !== null) {
+            return name[lang || 'uzl'] || name['uzl'] || name[Object.keys(name)[0]] || ''
+          }
+          return name || 'Yuklanmoqda...'
+        })()}
         backUrl={`/qoidalar/${topicId}`}
         beforeDashboard={
           ruleTests.length > 0 ? (
@@ -105,7 +112,9 @@ export default function GenericChapterDetailPage() {
                 <span className={`material-icons-round text-[20px] ${ch.id === chapterId ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-500'}`}>
                   description
                 </span>
-                <span className="line-clamp-1">{ch.name}</span>
+                <span className="line-clamp-1">
+                  {typeof ch.name === 'object' ? (ch.name[lang || 'uzl'] || ch.name['uzl']) : ch.name}
+                </span>
               </Link>
             ))}
           </nav>
@@ -126,18 +135,33 @@ export default function GenericChapterDetailPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
-                    {a.content || a.description || "Mazmun mavjud emas"}
-                  </p>
+                  <div className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
+                    {(function() {
+                      const val = a.content || a.description || "Mazmun mavjud emas"
+                      if (typeof val === 'string') return val
+                      if (typeof val === 'object' && val !== null) {
+                        return val[lang || 'uzl'] || val['uzl'] || val[Object.keys(val)[0]] || ''
+                      }
+                      return String(val)
+                    })()}
+                  </div>
 
-                  {/* Image Support */}
+                  {/* Image/Icon Support */}
                   {a.image && (
                     <div className="mb-6 rounded-2xl overflow-hidden border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 bg-black/20 p-4">
-                      <img
-                        src={`${(process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz').replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '')}/uploads/rules/${topicId}/${a.image}`}
-                        alt={a.name}
-                        className="max-h-[400px] mx-auto object-contain"
-                      />
+                      {a.image.includes('.') ? (
+                        <img
+                          src={`${(process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz').replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '')}/uploads/rules/${topicId}/${a.image}`}
+                          alt={typeof a.name === 'object' ? (a.name[lang || 'uzl'] || a.name['uzl']) : a.name}
+                          className="max-h-[400px] mx-auto object-contain"
+                        />
+                      ) : (
+                        <div className="flex justify-center py-6">
+                          <span className="material-icons-round text-6xl text-blue-500">
+                            {a.image}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -166,7 +190,9 @@ export default function GenericChapterDetailPage() {
                     <span className="material-icons-round group-hover:-translate-x-1 transition-transform">chevron_left</span>
                     <div className="hidden sm:block">
                       <div className="text-[10px] uppercase">Oldingi</div>
-                      <div className="text-sm font-bold truncate max-w-[150px]">{prevChapter.name}</div>
+                      <div className="text-sm font-bold truncate max-w-[150px]">
+                        {typeof prevChapter.name === 'object' ? (prevChapter.name[lang || 'uzl'] || prevChapter.name['uzl']) : prevChapter.name}
+                      </div>
                     </div>
                   </Link>
                 ) : <span />}
@@ -179,7 +205,9 @@ export default function GenericChapterDetailPage() {
                   <Link href={`/qoidalar/${topicId}/${nextChapter.id}`} className="flex items-center gap-2 text-white md:text-slate-900 md:dark:text-white hover:text-blue-500 transition-colors group">
                     <div className="text-right hidden sm:block">
                       <div className="text-[10px] uppercase">Keyingi</div>
-                      <div className="text-sm font-bold truncate max-w-[150px]">{nextChapter.name}</div>
+                      <div className="text-sm font-bold truncate max-w-[150px]">
+                        {typeof nextChapter.name === 'object' ? (nextChapter.name[lang || 'uzl'] || nextChapter.name['uzl']) : nextChapter.name}
+                      </div>
                     </div>
                     <span className="material-icons-round group-hover:translate-x-1 transition-transform">chevron_right</span>
                   </Link>
