@@ -58,7 +58,7 @@ export default function ChapterDetailPage() {
     fetch(`${API_URL}/api/rules/tests?topicType=traffic&itemType=chapter&itemId=${chapterId}`)
       .then(r => r.json())
       .then(d => setRuleTests(d.data || []))
-      .catch(() => {})
+      .catch(() => { })
   }, [chapterId])
 
   // Pagination Logic
@@ -80,7 +80,7 @@ export default function ChapterDetailPage() {
               className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.97] text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-blue-600/30"
             >
               <span className="material-icons-round text-[16px]">play_arrow</span>
-              <span className="hidden sm:inline">Test Ishlash</span>
+              <span className="hidden sm:inline ">Test Ishlash</span>
               <span className="sm:hidden">Test</span>
               <span className="bg-white/20 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md">{ruleTests.length}</span>
             </button>
@@ -168,7 +168,7 @@ export default function ChapterDetailPage() {
               {/* Rule Tests Section */}
               {ruleTests.length > 0 && (
                 <div className="mt-8 p-5 md:p-6 rounded-[24px] bg-gradient-to-br from-blue-600 to-blue-700 text-white relative overflow-hidden">
-                  <div className="absolute inset-0 opacity-10" style={{backgroundImage:'radial-gradient(circle at 70% 50%, white 1px, transparent 1px)', backgroundSize:'20px 20px'}} />
+                  <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 70% 50%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">

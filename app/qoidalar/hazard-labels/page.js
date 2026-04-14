@@ -9,7 +9,8 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'
 
 function getImageUrl(topic, imagePath) {
   if (!imagePath) return null
-  return `${API_URL}/uploads/rules/${topic}/${imagePath}`
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz').replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '')
+  return `${base}/uploads/rules/${topic}/${imagePath}`
 }
 
 export default function HazardLabelsPage() {

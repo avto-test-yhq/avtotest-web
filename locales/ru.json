@@ -210,5 +210,6 @@
     "feedback.type.other": "Другое",
     "feedback.label.type": "Тип сообщения",
     "feedback.label.contact": "Контакт (Необязательно)",
-    "feedback.label.message": "Сообщение"
+    "feedback.label.message": "Сообщение",
+    "rules.signs.explanation": "Описание знака"
 }

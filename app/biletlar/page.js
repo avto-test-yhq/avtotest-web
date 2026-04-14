@@ -102,7 +102,8 @@ export default function BiletlarPage() {
     const attempts = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' && !Array.isArray(raw) ? [raw] : [])
     if (attempts.length === 0) return null
     const last = attempts[attempts.length - 1]
-    return { attempts, last, count: attempts.length }
+    const best = attempts.reduce((prev, current) => (prev.percent > current.percent) ? prev : current, attempts[0])
+    return { attempts, last, best, count: attempts.length }
   }
 
   if (loading) {
@@ -193,18 +194,20 @@ export default function BiletlarPage() {
                     </div>
                     <div className="relative z-10 flex-1 pt-1 pb-2">
                       <div className="text-white font-bold text-[16px] mb-1">Bilet {num}</div>
-                      <div className="flex flex-wrap items-center gap-2 md:gap-3 text-xs">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
                         <span className="text-[#9AA4B2] font-semibold">{qCount} ta savol</span>
                         {isCompleted && (
                           <>
-                            <span className="text-green-500 font-bold flex items-center gap-0.5 bg-green-500/10 px-1.5 py-0.5 rounded-[6px]">
-                              <span className="text-[10px]">✓</span>{correctStr}
-                            </span>
-                            <span className="text-red-500 font-bold flex items-center gap-0.5 bg-red-500/10 px-1.5 py-0.5 rounded-[6px]">
-                              <span className="text-[10px]">✗</span>{wrongStr}
-                            </span>
-                            <span className="bg-blue-500/10 text-blue-500 px-2.5 py-1 rounded-[6px] text-[10px] font-bold">
-                              {percent}%
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-green-500 font-bold flex items-center gap-0.5 bg-green-500/10 px-1.5 py-0.5 rounded-[6px]">
+                                <span className="text-[10px]">✓</span>{result.best.correct}
+                              </span>
+                              <span className="bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded-[6px] text-[10px] font-bold">
+                                {result.best.percent}%
+                              </span>
+                            </div>
+                            <span className="text-[#9AA4B2] bg-white/5 px-2 py-0.5 rounded-[6px] text-[10px] font-medium border border-[#313C50]">
+                              {result.count} {t('bilet.progress.attempts')}
                             </span>
                           </>
                         )}
@@ -341,14 +344,19 @@ export default function BiletlarPage() {
                       </span>
                       {result && (
                         <div className="flex-1 ml-4 text-right">
-                          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-1">
+                          <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden mb-1.5">
                             <div
-                              className="h-full bg-cyan-500 rounded-full"
-                              style={{ width: `${Math.max(5, Math.min(100, percent))}%` }}
+                              className={`h-full rounded-full transition-all duration-700 ${result.best.percent >= 90 ? 'bg-emerald-500' : result.best.percent >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`}
+                              style={{ width: `${Math.max(5, Math.min(100, result.best.percent))}%` }}
                             />
                           </div>
-                          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                            {percent}% • {result.count} {t('bilet.progress.attempts')}
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">
+                              {result.count} {t('bilet.progress.attempts')}
+                            </span>
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${result.best.percent >= 90 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-blue-500/10 text-blue-500'}`}>
+                              BEST: {result.best.percent}%
+                            </span>
                           </div>
                         </div>
                       )}

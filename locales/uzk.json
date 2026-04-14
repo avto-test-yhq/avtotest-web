@@ -200,5 +200,6 @@
     "feedback.type.other": "Бошқа",
     "feedback.label.type": "Хабар тури",
     "feedback.label.contact": "Алоқа учун (Ихтиёрий)",
-    "feedback.label.message": "Хабар"
+    "feedback.label.message": "Хабар",
+    "rules.signs.explanation": "Белги тавсифи"
 }

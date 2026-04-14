@@ -57,7 +57,7 @@ export default function GenericChapterDetailPage() {
     fetch(`${API_URL}/rules/tests?topicType=${topicId}&itemType=chapter&itemId=${chapterId}`)
       .then(r => r.json())
       .then(d => setRuleTests(d.data || []))
-      .catch(() => {})
+      .catch(() => { })
   }, [topicId, chapterId])
 
   // Pagination Logic
@@ -90,41 +90,41 @@ export default function GenericChapterDetailPage() {
         {/* SIDEBAR (TOC) - Desktop */}
         <aside className="hidden lg:block w-80 border-r border-slate-200 dark:border-slate-800 p-6 overflow-y-auto h-[calc(100vh-64px)] sticky top-16 custom-scrollbar bg-white dark:bg-[#1e293b]/50">
           <nav className="space-y-1">
-             <div className="pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
-               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3">Boblar</span>
-             </div>
-             {allChapters.map(ch => (
-                <Link
-                  key={ch.id}
-                  href={`/qoidalar/${topicId}/${ch.id}`}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all group ${ch.id === chapterId
-                    ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                >
-                  <span className={`material-icons-round text-[20px] ${ch.id === chapterId ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-500'}`}>
-                    description
-                  </span>
-                  <span className="line-clamp-1">{ch.name}</span>
-                </Link>
-             ))}
+            <div className="pb-4 mb-4 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-3">Boblar</span>
+            </div>
+            {allChapters.map(ch => (
+              <Link
+                key={ch.id}
+                href={`/qoidalar/${topicId}/${ch.id}`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all group ${ch.id === chapterId
+                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+              >
+                <span className={`material-icons-round text-[20px] ${ch.id === chapterId ? 'text-blue-500' : 'text-slate-400 group-hover:text-slate-500'}`}>
+                  description
+                </span>
+                <span className="line-clamp-1">{ch.name}</span>
+              </Link>
+            ))}
           </nav>
         </aside>
 
         {/* MAIN CONTENT */}
         <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto max-w-4xl mx-auto">
           {loading ? (
-             <div className="text-center py-20 text-[#9AA4B2] md:text-slate-400 animate-pulse">Yuklanmoqda...</div>
+            <div className="text-center py-20 text-[#9AA4B2] md:text-slate-400 animate-pulse">Yuklanmoqda...</div>
           ) : (
             <div className="space-y-6 md:space-y-8 pb-24">
               {articles.map((a) => (
                 <article key={a.id} className="bg-[#212936] md:bg-white md:dark:bg-[#1e293b] rounded-[24px] p-5 md:p-8 shadow-sm border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 hover:shadow-md transition-shadow duration-300">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
-                     {a.code && (
-                       <span className="px-3 py-1 rounded-full bg-[#161c24] md:bg-blue-50 md:dark:bg-blue-900/30 text-blue-500 md:text-blue-600 md:dark:text-blue-400 font-bold text-[12px] md:text-sm">
-                         {a.code}-band
-                       </span>
-                     )}
+                    {a.code && (
+                      <span className="px-3 py-1 rounded-full bg-[#161c24] md:bg-blue-50 md:dark:bg-blue-900/30 text-blue-500 md:text-blue-600 md:dark:text-blue-400 font-bold text-[12px] md:text-sm">
+                        {a.code}-band
+                      </span>
+                    )}
                   </div>
                   <p className="text-white md:text-slate-700 md:dark:text-slate-300 leading-relaxed text-[15px] md:text-lg mb-6 whitespace-pre-wrap font-medium md:font-normal">
                     {a.content || a.description || "Mazmun mavjud emas"}
@@ -132,13 +132,13 @@ export default function GenericChapterDetailPage() {
 
                   {/* Image Support */}
                   {a.image && (
-                     <div className="mb-6 rounded-2xl overflow-hidden border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 bg-black/20 p-4">
-                        <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz'}/uploads/rules/${topicId}/${a.image}`}
-                          alt={a.name}
-                          className="max-h-[400px] mx-auto object-contain"
-                        />
-                     </div>
+                    <div className="mb-6 rounded-2xl overflow-hidden border border-[#313C50] md:border-slate-100 md:dark:border-slate-800 bg-black/20 p-4">
+                      <img
+                        src={`${(process.env.NEXT_PUBLIC_API_URL || 'https://api.pravachi.uz').replace(/\/api\/v1\/?$/, '').replace(/\/api\/?$/, '')}/uploads/rules/${topicId}/${a.image}`}
+                        alt={a.name}
+                        className="max-h-[400px] mx-auto object-contain"
+                      />
+                    </div>
                   )}
 
                   {a.metadata?.exam_tips && (
@@ -165,21 +165,21 @@ export default function GenericChapterDetailPage() {
                   <Link href={`/qoidalar/${topicId}/${prevChapter.id}`} className="flex items-center gap-2 text-slate-400 hover:text-blue-500 transition-colors group">
                     <span className="material-icons-round group-hover:-translate-x-1 transition-transform">chevron_left</span>
                     <div className="hidden sm:block">
-                       <div className="text-[10px] uppercase">Oldingi</div>
-                       <div className="text-sm font-bold truncate max-w-[150px]">{prevChapter.name}</div>
+                      <div className="text-[10px] uppercase">Oldingi</div>
+                      <div className="text-sm font-bold truncate max-w-[150px]">{prevChapter.name}</div>
                     </div>
                   </Link>
                 ) : <span />}
 
                 <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                   {currentIndex + 1} / {allChapters.length}
+                  {currentIndex + 1} / {allChapters.length}
                 </div>
 
                 {nextChapter ? (
                   <Link href={`/qoidalar/${topicId}/${nextChapter.id}`} className="flex items-center gap-2 text-white md:text-slate-900 md:dark:text-white hover:text-blue-500 transition-colors group">
                     <div className="text-right hidden sm:block">
-                       <div className="text-[10px] uppercase">Keyingi</div>
-                       <div className="text-sm font-bold truncate max-w-[150px]">{nextChapter.name}</div>
+                      <div className="text-[10px] uppercase">Keyingi</div>
+                      <div className="text-sm font-bold truncate max-w-[150px]">{nextChapter.name}</div>
                     </div>
                     <span className="material-icons-round group-hover:translate-x-1 transition-transform">chevron_right</span>
                   </Link>

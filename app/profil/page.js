@@ -68,7 +68,19 @@ export default function ProfilPage() {
     const router = useRouter()
     const t = useI18n()
 
-    const [currentUser, setCurrentUser] = useState(null)
+    const [currentUser, setCurrentUser] = useState(() => {
+        if (typeof window === 'undefined') return null
+        try {
+            const userToken = localStorage.getItem('userToken')
+            const userData = localStorage.getItem('userData')
+            if (userToken && userData) {
+                const parsed = JSON.parse(userData)
+                const uid = parsed.uid || parsed._id || parsed.id
+                if (uid) return { uid, ...parsed }
+            }
+        } catch { }
+        return null
+    })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [uploading, setUploading] = useState(false)
@@ -175,13 +187,28 @@ export default function ProfilPage() {
         }
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            const userToken = localStorage.getItem('userToken');
-            if (!userToken) {
-                router.push('/login')
-                return
+            if (user) {
+                setCurrentUser(user)
+                await fetchUserData(user)
+            } else {
+                const userToken = localStorage.getItem('userToken')
+                const userData = localStorage.getItem('userData')
+                if (userToken && userData) {
+                    try {
+                        const parsed = JSON.parse(userData)
+                        const uid = parsed.uid || parsed._id || parsed.id
+                        const u = { uid, ...parsed }
+                        setCurrentUser(u)
+                        await fetchUserData(u)
+                    } catch {
+                        setCurrentUser(null)
+                        router.push('/login')
+                    }
+                } else {
+                    setCurrentUser(null)
+                    router.push('/login')
+                }
             }
-            setCurrentUser(user)
-            await fetchUserData(user)
         })
 
         return () => unsubscribe()
@@ -272,10 +299,7 @@ export default function ProfilPage() {
             // apiFetch ni rasm uchun ishlatsak (multipart/form-data): Headerlarni avto qoldirish uchun content-type berilmaydi
             const res = await apiFetch(`/users/upload-avatar`, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'Content-Type': undefined
-                }
+                body: formData
             })
 
             const data = await res.json()

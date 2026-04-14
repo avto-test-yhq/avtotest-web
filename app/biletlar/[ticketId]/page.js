@@ -36,7 +36,7 @@ const Icon = ({ name, className = "w-5 h-5" }) => (
   </svg>
 )
 
-async function saveBiletResultToApi(uid, ticketId, correct, total, qCount) {
+async function saveBiletResultToApi(ticketId, correct, total, qCount) {
   try {
     const res = await apiFetch(`/bilet-progress/save`, {
       method: 'POST',
@@ -69,7 +69,19 @@ export default function BiletTicketPage() {
   const [resultSaved, setResultSaved] = useState(false)
   const [timerTick, setTimerTick] = useState(0)
   const [savedIds, setSavedIds] = useState([])
-  const [currentUser, setCurrentUser] = useState(null)
+  const [currentUser, setCurrentUser] = useState(() => {
+    if (typeof window === 'undefined') return null
+    try {
+      const userToken = localStorage.getItem('userToken')
+      const userData = localStorage.getItem('userData')
+      if (userToken && userData) {
+        const parsed = JSON.parse(userData)
+        const uid = parsed.uid || parsed._id || parsed.id
+        if (uid) return { uid, ...parsed }
+      }
+    } catch { }
+    return null
+  })
   const scrollRef = useRef(null)
   const startTimeRef = useRef(null)
   const endTimeRef = useRef(null)
@@ -121,6 +133,7 @@ export default function BiletTicketPage() {
 
     const fetchTests = async () => {
       setAnswers({})
+      setCurrentIndex(0)
       setResultSaved(false)
       try {
         const qCount = settings?.questionCount || 10
@@ -237,13 +250,28 @@ export default function BiletTicketPage() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user || null)
-      const userToken = localStorage.getItem('userToken')
-      if (userToken) {
-        if (user) loadSavedIds(user.uid)
+      if (user) {
+        setCurrentUser(user)
+        loadSavedIds(user.uid)
       } else {
-        setSavedIds([])
-        router.push('/login')
+        const userToken = localStorage.getItem('userToken')
+        const userData = localStorage.getItem('userData')
+        if (userToken && userData) {
+          try {
+            const parsed = JSON.parse(userData)
+            const uid = parsed.uid || parsed._id || parsed.id
+            setCurrentUser({ uid, ...parsed })
+            loadSavedIds(uid)
+          } catch {
+            setCurrentUser(null)
+            setSavedIds([])
+            router.push('/login')
+          }
+        } else {
+          setCurrentUser(null)
+          setSavedIds([])
+          router.push('/login')
+        }
       }
     })
     return () => unsubscribe()
@@ -267,7 +295,7 @@ export default function BiletTicketPage() {
     }
   }, [currentIndex, settings.showExplanation])
 
-  const currentQuestion = questions[currentIndex]
+  const currentQuestion = questions[currentIndex] || questions[0] || null
   const isCurrentFavorite = useMemo(() => {
     if (!currentQuestion) return false
     const qId = currentQuestion.numeric_id ?? currentQuestion.id
@@ -580,9 +608,9 @@ export default function BiletTicketPage() {
           {/* Options */}
           <div className="px-4 mt-4 flex flex-col gap-3">
             {currentQuestion.options.map((opt, idx) => {
-              const selected = answers[currentQuestion.id] === idx;
+              const selected = currentQuestion ? answers[currentQuestion.id] === idx : false;
               const isCorrect = opt.is_correct;
-              const hasAnswer = typeof answers[currentQuestion.id] === 'number';
+              const hasAnswer = currentQuestion ? typeof answers[currentQuestion.id] === 'number' : false;
 
               let containerClass = "w-full bg-[#1e2532] border border-[#2d3748] rounded-[14px] flex items-stretch overflow-hidden transition-all ";
               let prefixClass = "w-[46px] flex items-center justify-center shrink-0 border-r border-[#2d3748] font-bold text-[14px] ";

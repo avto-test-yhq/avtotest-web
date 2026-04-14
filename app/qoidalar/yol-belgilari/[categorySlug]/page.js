@@ -124,7 +124,7 @@ export default function CategorySignsPage() {
                       <span className="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#161c24] md:bg-sky-50 md:dark:bg-sky-900/30 text-[#9AA4B2] md:text-sky-600 md:dark:text-sky-400 border border-[#313C50] md:border-none">{s.code}</span>
                     </div>
                     <p className="font-bold text-[15px] md:text-base text-white md:text-slate-900 md:dark:text-white truncate mb-1 group-hover:text-blue-500 md:group-hover:text-sky-500 transition-colors">{s.name}</p>
-                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{s.description}</p>
+                    <p className="text-[12px] md:text-xs text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 line-clamp-2 leading-relaxed">{s.content || s.description}</p>
                   </div>
                   <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[#161c24] md:bg-slate-50 md:dark:bg-slate-800 group-hover:bg-blue-600 md:group-hover:bg-sky-500 group-hover:text-white transition-colors text-[#9AA4B2] md:text-slate-400 shrink-0 border border-[#313C50] md:border-none">
                     <span className="material-icons-round text-lg">arrow_forward</span>

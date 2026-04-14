@@ -210,5 +210,6 @@
     "feedback.type.other": "Boshqa",
     "feedback.label.type": "Xabar turi",
     "feedback.label.contact": "Aloqa uchun (Ixtiyoriy)",
-    "feedback.label.message": "Xabar"
+    "feedback.label.message": "Xabar",
+    "rules.signs.explanation": "Belgi tavsifi"
 }

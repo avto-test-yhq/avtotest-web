@@ -431,7 +431,7 @@ function ExamContent() {
     }
   }, [currentIndex, settings.showExplanation])
 
-  const currentQuestion = questions[currentIndex]
+  const currentQuestion = questions[currentIndex] || questions[0] || null
 
   const isCurrentFavorite = useMemo(() => {
     if (!currentQuestion) return false
@@ -1176,9 +1176,9 @@ function ExamContent() {
         <aside className="options-panel w-full md:w-[400px] lg:w-[450px] bg-white dark:bg-[#1a1d2d] flex flex-col border-r border-slate-200 dark:border-white/5 overflow-y-auto p-5 shrink-0 z-30">
           <div className="space-y-3 flex-1">
             {currentQuestion.options.map((opt, idx) => {
-              const selected = answers[currentQuestion.id] === idx
-              const isCorrect = opt.is_correct
-              const hasAnswer = typeof answers[currentQuestion.id] === 'number'
+              const selected = currentQuestion ? answers[currentQuestion.id] === idx : false;
+              const isCorrect = opt.is_correct;
+              const hasAnswer = currentQuestion ? typeof answers[currentQuestion.id] === 'number' : false;
 
               let containerClass = "group relative w-full text-left p-0 rounded-xl border transition-all duration-200 overflow-hidden flex items-stretch min-h-[56px] "
               let labelClass = "w-14 flex items-center justify-center text-base font-bold border-r "
