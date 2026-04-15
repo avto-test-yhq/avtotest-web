@@ -96,12 +96,16 @@ export default function WeeklyChart({ data: propData }) {
             return (
               <div key={index} className="flex flex-col items-center flex-1 h-full group">
                 {/* Count Label - Always visible at top */}
-                <div className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 transition-all">
+                <div className={`text-xs font-bold mb-2 transition-all ${day.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300'}`}>
                   {count > 0 ? count : ''}
                 </div>
 
                 {/* Bar Track */}
-                <div className="relative w-full flex-1 bg-slate-100 dark:bg-slate-700/40 rounded-2xl overflow-hidden flex items-end group-hover:bg-slate-200 dark:group-hover:bg-slate-600/40 transition-colors duration-300">
+                <div className={`relative w-full flex-1 rounded-2xl overflow-hidden flex items-end transition-colors duration-300 ${
+                  day.isToday
+                    ? 'bg-blue-100 dark:bg-blue-900/30 ring-2 ring-blue-400 dark:ring-blue-500 ring-inset'
+                    : 'bg-slate-100 dark:bg-slate-700/40 group-hover:bg-slate-200 dark:group-hover:bg-slate-600/40'
+                }`}>
                   <div
                     className={`w-full ${barColor} rounded-2xl transition-all duration-700 ease-out relative`}
                     style={{ height: `${heightPercent}%` }}
