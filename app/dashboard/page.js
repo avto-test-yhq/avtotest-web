@@ -388,7 +388,7 @@ export default function DashboardPage() {
                   <Target className="w-5 h-5" />
                 </div>
                 <div className="text-lg font-bold text-white leading-none mb-1">
-                  {mastery.percent}%
+                  {Number(mastery.percent).toFixed(1)}%
                 </div>
                 <div className="text-[10px] text-[#9AA4B2] font-semibold uppercase tracking-wider">Samaradorlik</div>
               </div>
@@ -502,7 +502,7 @@ export default function DashboardPage() {
                     {t('dashboard.stats.efficiency')}
                   </p>
                   <h2 className="text-3xl font-bold tracking-tight text-slate-800 dark:text-white mt-1">
-                    {mastery.percent}%
+                    {Number(mastery.percent).toFixed(1)}%
                   </h2>
                   <div className="w-full h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-4 overflow-hidden">
                     <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${Math.min(100, mastery.percent)}%` }} />
