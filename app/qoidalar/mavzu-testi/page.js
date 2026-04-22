@@ -78,11 +78,20 @@ const defaultStyle = {
   border: 'border-slate-200 dark:border-slate-700',
   badge: 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300',
 }
+const topicTypeMap = {
+  rules: 'traffic',
+  road_signs: 'signs',
+  road_markings: 'markings',
+  hazard_labels: 'hazard_labels',
+  vehicle_signs: 'vehicle_signs',
+  speed_limits: 'speed_limits',
+}
 
 export default function MavzuTestiPage() {
   const router = useRouter()
   const { lang } = useLanguage()
   const [topics, setTopics] = useState([])
+  const [testCounts, setTestCounts] = useState({})
   const [loading, setLoading] = useState(true)
 
   const fetchTopics = useCallback(async () => {
@@ -92,6 +101,13 @@ export default function MavzuTestiPage() {
       if (!res.ok) throw new Error('API xatolik')
       const data = await res.json()
       setTopics(data.topics || [])
+
+      // Umumiy test sonlarini ham yuklash
+      const statsRes = await apiFetch('/rules/stats-all')
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setTestCounts(statsData.stats || {})
+      }
     } catch (e) {
       console.error('Mavzularni yuklashda xatolik:', e)
       setTopics([])
@@ -232,9 +248,18 @@ export default function MavzuTestiPage() {
                       <h3 className="text-[17px] md:text-lg font-bold text-white md:text-slate-900 md:dark:text-white mb-2 leading-tight">
                         {topic.name}
                       </h3>
-                      <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 leading-relaxed mb-5 line-clamp-2">
+                      <p className="text-[13px] md:text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 leading-relaxed mb-4 line-clamp-2">
                         {topic.description}
                       </p>
+
+                      <div className="flex items-center gap-2 mb-5 text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                        <span className="material-icons-round text-[16px]">quiz</span>
+                        <span>
+                          {testCounts[topicTypeMap[topic.id] || topic.id] > 0
+                            ? `${testCounts[topicTypeMap[topic.id] || topic.id]} ta test biriktirilgan`
+                            : 'Test qo\'shilmagan'}
+                        </span>
+                      </div>
 
                       {/* Action buttons */}
                       <div className="flex flex-col gap-2">

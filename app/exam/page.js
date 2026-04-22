@@ -684,15 +684,51 @@ function ExamContent() {
   if (!questions.length) {
     if (mode === 'favorites' && favoritesEmpty) {
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-600 dark:text-slate-300 flex items-center justify-center px-4 text-center">
-          Sevimli savollar topilmadi. Avval testlarda savollarni saqlab oling.
+        <div className="min-h-screen bg-slate-50 dark:bg-[#161c24] text-slate-900 dark:text-white flex flex-col font-sans">
+          <header className="flex items-center justify-between p-4 bg-white dark:bg-[#212936] border-b border-slate-200 dark:border-[#313C50]">
+            <button onClick={() => router.back()} className="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <Icon name="ArrowLeft" className="w-6 h-6 text-slate-700 dark:text-white" />
+            </button>
+            <h1 className="text-lg font-bold">Saqlanganlar</h1>
+            <div className="w-10"></div>
+          </header>
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+            <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <Icon name="Bookmark" className="w-12 h-12 text-amber-500" />
+            </div>
+            <h2 className="text-2xl font-bold mb-3 text-slate-800 dark:text-white">Saqlanganlar yo&apos;q</h2>
+            <p className="text-slate-500 dark:text-[#9AA4B2] mb-8 max-w-sm leading-relaxed">
+              Sevimli savollar topilmadi. Avval testlarda savollarni saqlab oling.
+            </p>
+            <Link href="/dashboard" className="w-full max-w-xs py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-95">
+              Bosh sahifaga qaytish
+            </Link>
+          </div>
         </div>
       )
     }
     if (mode === 'mistakes' && favoritesEmpty) {
       return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#1e2130] text-slate-600 dark:text-slate-300 flex items-center justify-center px-4 text-center">
-          Xatolar topilmadi. Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda savollar shu yerga qo&apos;shiladi.
+        <div className="min-h-screen bg-slate-50 dark:bg-[#161c24] text-slate-900 dark:text-white flex flex-col font-sans">
+          <header className="flex items-center justify-between p-4 bg-white dark:bg-[#212936] border-b border-slate-200 dark:border-[#313C50]">
+            <button onClick={() => router.back()} className="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              <Icon name="ArrowLeft" className="w-6 h-6 text-slate-700 dark:text-white" />
+            </button>
+            <h1 className="text-lg font-bold">Xatolarim</h1>
+            <div className="w-10"></div>
+          </header>
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-300">
+            <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <Icon name="Check" className="w-12 h-12 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-bold mb-3 text-slate-800 dark:text-white">Ajoyib, xatolar yo&apos;q! 🎉</h2>
+            <p className="text-slate-500 dark:text-[#9AA4B2] mb-8 max-w-md leading-relaxed">
+              Sizda tasdiqlangan xatolar topilmadi. Imtihon yoki biletlarda noto&apos;g&apos;ri javob berganingizda, savollar yodlash uchun shu yerga qo&apos;shiladi.
+            </p>
+            <Link href="/dashboard" className="w-full max-w-xs py-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-95">
+              Bosh sahifaga qaytish
+            </Link>
+          </div>
         </div>
       )
     }
