@@ -60,10 +60,27 @@ export default function WeeklyChart({ data: propData }) {
   const hasPropData = Array.isArray(propData) && propData.length >= 7
   const hasFetchedData = Array.isArray(fetchedData) && fetchedData.length >= 7
   const chartSource = hasPropData ? propData : hasFetchedData ? fetchedData : defaultDays
-  const chartData = chartSource.map((d, idx) => ({
-    ...d,
-    label: labels[idx % labels.length],
-  }))
+  const chartData = chartSource.map((d, idx) => {
+    // Agar backenddan 'dow' kelmasa (eski API yoki remote API), 
+    // oxirgi elementni 'bugun' deb hisoblab dow ni o'zimiz hisoblaymiz.
+    let labelIdx = idx % labels.length;
+    
+    if (d.dow !== undefined) {
+      labelIdx = (d.dow + 6) % 7; // 0(Ya) -> 6, 1(Du) -> 0, etc.
+    } else if (hasPropData || hasFetchedData) {
+      // Rolling 7-day: idx 6 - bugun, idx 5 - kecha...
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - idx));
+      const dow = date.getDay(); // 0-6 (Ya-Sha)
+      labelIdx = (dow + 6) % 7;
+    }
+
+    return {
+      ...d,
+      label: labels[labelIdx],
+      isToday: d.isToday !== undefined ? d.isToday : (idx === 6 && (hasPropData || hasFetchedData))
+    };
+  })
 
   if (loading && !hasPropData && !hasFetchedData) {
     return (
