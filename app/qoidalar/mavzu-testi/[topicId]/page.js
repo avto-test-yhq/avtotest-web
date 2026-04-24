@@ -11,8 +11,11 @@ import { apiFetch } from '@/lib/apiClient'
 // topicId → test parametrlari (exam page uchun)
 const topicExamMap = {
   rules: { topicType: 'traffic', baseHref: '/qoidalar/yol-harakati' },
+  traffic: { topicType: 'traffic', baseHref: '/qoidalar/yol-harakati' },
   road_signs: { topicType: 'signs', baseHref: '/qoidalar/yol-belgilari' },
+  signs: { topicType: 'signs', baseHref: '/qoidalar/yol-belgilari' },
   road_markings: { topicType: 'markings', baseHref: '/qoidalar/yol-chiziqlari' },
+  markings: { topicType: 'markings', baseHref: '/qoidalar/yol-chiziqlari' },
   hazard_labels: { topicType: 'hazard_labels', baseHref: '/qoidalar/hazard-labels' },
   vehicle_signs: { topicType: 'vehicle_signs', baseHref: '/qoidalar/vehicle-signs' },
   speed_limits: { topicType: 'speed_limits', baseHref: '/qoidalar/tezlik-chegaralari' },
