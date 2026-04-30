@@ -117,7 +117,7 @@ export default function MistakesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#161c24] md:bg-slate-50 md:dark:bg-[#161821] page-bg text-white md:text-slate-900 md:dark:text-white flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#161c24] md:dark:bg-[#161821] page-bg text-slate-900 dark:text-white flex flex-col font-sans transition-colors duration-200">
       <QoidalarSidebar />
 
       <div className="lg:ml-72 min-h-screen flex flex-col">
@@ -135,7 +135,7 @@ export default function MistakesPage() {
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-white md:text-slate-900 md:dark:text-white">{t('mistakes.pageTitle')}</h2>
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">{t('mistakes.pageTitle')}</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
@@ -152,8 +152,8 @@ export default function MistakesPage() {
               </div>
             ) : !count ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-16 h-16 rounded-[20px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-white/10 flex items-center justify-center mb-5">
-                  <Icon name="Wrong" className="w-8 h-8 text-[#9AA4B2] md:text-slate-400 md:dark:text-slate-500" />
+                <div className="w-16 h-16 rounded-[20px] bg-slate-100 dark:bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-dashed border-slate-300 dark:border-[#313C50] md:dark:border-white/10 flex items-center justify-center mb-5">
+                  <Icon name="Wrong" className="w-8 h-8 text-slate-400 dark:text-[#9AA4B2] md:dark:text-slate-500" />
                 </div>
                 <h3 className="text-lg font-bold mb-2 text-white md:text-slate-900 md:dark:text-white">{t('mistakes.emptyTitle')}</h3>
                 <p className="text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 mb-6 max-w-sm">
@@ -161,7 +161,7 @@ export default function MistakesPage() {
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-[#313C50] md:bg-slate-200 md:dark:bg-[#313C50] hover:bg-[#3b475c] md:hover:bg-slate-300 md:dark:hover:bg-[#3b475c] text-white md:text-slate-700 md:dark:text-white text-sm font-bold transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-slate-200 dark:bg-[#313C50] hover:bg-slate-300 dark:hover:bg-[#3b475c] text-slate-700 dark:text-white text-sm font-bold transition-colors"
                 >
                   {t('mistakes.gotoDashboard')}
                 </Link>
@@ -172,9 +172,9 @@ export default function MistakesPage() {
                   <div
                     key={q.id || idx}
                     onClick={() => setSelectedQuestion(q)}
-                    className="group rounded-[24px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-[#313C50] md:border-slate-200 md:dark:border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col"
+                    className="group rounded-[24px] bg-white dark:bg-[#212936] md:dark:bg-[#1e2130] border border-slate-200 dark:border-[#313C50] md:dark:border-rose-500/20 hover:border-rose-500/50 hover:shadow-lg transition-all cursor-pointer overflow-hidden flex flex-col"
                   >
-                    <div className="relative w-full h-32 md:h-36 bg-[#161c24] md:bg-slate-100 md:dark:bg-black/40">
+                    <div className="relative w-full h-32 md:h-36 bg-slate-100 dark:bg-[#161c24] md:dark:bg-black/40">
                       <Image
                         src={q.image || '/imgage/background.jpg'}
                         alt="Savol rasmi"
@@ -188,10 +188,10 @@ export default function MistakesPage() {
                       </div>
                     </div>
                     <div className="p-5 flex flex-col gap-3 flex-1">
-                      <p className="text-[15px] text-white md:text-slate-700 md:dark:text-slate-100 leading-relaxed font-medium">
+                      <p className="text-[15px] text-slate-700 dark:text-white md:dark:text-slate-100 leading-relaxed font-medium">
                         {q.question.length > 80 ? q.question.substring(0, 80) + '...' : q.question}
                       </p>
-                      <div className="mt-auto pt-4 flex items-center justify-end text-[13px] font-bold text-[#9AA4B2] group-hover:text-rose-500 transition-colors">
+                      <div className="mt-auto pt-4 flex items-center justify-end text-[13px] font-bold text-slate-500 dark:text-[#9AA4B2] group-hover:text-rose-500 transition-colors">
                         <span>{t('mistakes.viewFull')}</span>
                       </div>
                     </div>
