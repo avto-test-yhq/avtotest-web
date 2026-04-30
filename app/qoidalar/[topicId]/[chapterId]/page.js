@@ -78,7 +78,7 @@ export default function GenericChapterDetailPage() {
           }
           return name || 'Yuklanmoqda...'
         })()}
-        backUrl={`/qoidalar/${topicId}`}
+        backUrl={null}
         beforeDashboard={
           ruleTests.length > 0 ? (
             <button

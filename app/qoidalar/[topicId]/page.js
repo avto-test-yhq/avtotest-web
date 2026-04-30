@@ -70,7 +70,7 @@ export default function GenericTopicPage() {
       <QoidalarSidebar />
 
       <main className="lg:ml-72 min-h-screen pb-10">
-        <QoidalarHeader title={pageTitle} backUrl="/qoidalar" />
+        <QoidalarHeader title={pageTitle} />
 
         <div className="p-4 md:p-6 lg:p-10 max-w-7xl mx-auto">
           {loading ? (

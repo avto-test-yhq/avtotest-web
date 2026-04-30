@@ -72,7 +72,7 @@ export default function ChapterDetailPage() {
       {/* HEADER */}
       <QoidalarHeader
         title={currentChapter?.name || 'Yuklanmoqda...'}
-        backUrl="/qoidalar/yol-harakati"
+        backUrl={null}
         beforeDashboard={
           ruleTests.length > 0 ? (
             <button

@@ -39,7 +39,7 @@ export default function HazardLabelsPage() {
 
   return (
     <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
-      <QoidalarHeader title="Xavfli yuklar belgilari" backUrl="/qoidalar" />
+      <QoidalarHeader title="Xavfli yuklar belgilari" />
 
       <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-6xl mx-auto w-full">
         {loading ? (

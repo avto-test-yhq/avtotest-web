@@ -152,7 +152,7 @@ export default function TopicChaptersPage() {
         <header className="sticky top-0 bg-[#161c24]/90 md:bg-white/80 md:dark:bg-[#1e293b]/80 backdrop-blur-md border-b border-[#313C50] md:border-slate-200 md:dark:border-slate-800 z-40">
           <div className="max-w-5xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <button onClick={() => router.push('/qoidalar/mavzu-testi')} className="p-2 text-white md:text-slate-500 hover:bg-[#313C50] md:hover:bg-slate-100 rounded-xl transition-colors shrink-0">
+              <button onClick={() => router.back()} className="p-2 text-white md:text-slate-500 hover:bg-[#313C50] md:hover:bg-slate-100 rounded-xl transition-colors shrink-0">
                 <span className="material-icons-round">arrow_back</span>
               </button>
               <div className="min-w-0">
@@ -209,7 +209,12 @@ export default function TopicChaptersPage() {
               {filtered.map((ch, idx) => {
                 const priority = examPriorityColors[ch.exam_priority] || examPriorityColors.LOW
                 const testCount = testCounts[ch.id]
-                const chapterReadHref = `${examInfo.baseHref}/${ch.id}`
+                let chapterReadHref = examInfo.baseHref;
+                if (examInfo.topicType === 'traffic') {
+                  chapterReadHref = `${examInfo.baseHref}/${ch.id}`;
+                } else if (examInfo.topicType === 'signs' || examInfo.topicType === 'markings') {
+                  chapterReadHref = `${examInfo.baseHref}/${ch.image_folder || ch.code}`;
+                }
                 const examHref = `/exam?mode=rule&topicType=${examInfo.topicType}&itemType=chapter&itemId=${ch.id}&count=${testCount || 20}`
 
                 return (

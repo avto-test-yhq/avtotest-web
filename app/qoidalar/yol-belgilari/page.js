@@ -59,7 +59,7 @@ export default function YolBelgilariPage() {
     <div className="bg-[#161c24] md:bg-slate-50 md:dark:bg-[#0f172a] text-white md:text-slate-900 md:dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
       {/* HEADER */}
-      <QoidalarHeader title="Yo'l belgilari" backUrl="/qoidalar" />
+      <QoidalarHeader title="Yo'l belgilari" />
 
       <div className="flex flex-1 max-w-[1400px] mx-auto w-full">
         {/* SIDEBAR */}

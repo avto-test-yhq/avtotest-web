@@ -135,7 +135,7 @@ export default function MistakesPage() {
         <main className="flex-1 px-4 lg:px-8 py-6">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg md:text-xl font-bold text-white">{t('mistakes.pageTitle')}</h2>
+              <h2 className="text-lg md:text-xl font-bold text-white md:text-slate-900 md:dark:text-white">{t('mistakes.pageTitle')}</h2>
               <button
                 onClick={handleStartPractice}
                 disabled={!count}
@@ -147,7 +147,7 @@ export default function MistakesPage() {
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16 text-[#9AA4B2]">
+              <div className="flex items-center justify-center py-16 text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400">
                 {t('common.loading')}
               </div>
             ) : !count ? (
@@ -155,13 +155,13 @@ export default function MistakesPage() {
                 <div className="w-16 h-16 rounded-[20px] bg-[#212936] md:bg-white md:dark:bg-[#1e2130] border border-dashed border-[#313C50] md:border-slate-300 md:dark:border-white/10 flex items-center justify-center mb-5">
                   <Icon name="Wrong" className="w-8 h-8 text-[#9AA4B2] md:text-slate-400 md:dark:text-slate-500" />
                 </div>
-                <h3 className="text-lg font-bold mb-2 text-white">{t('mistakes.emptyTitle')}</h3>
-                <p className="text-sm text-[#9AA4B2] mb-6 max-w-sm">
+                <h3 className="text-lg font-bold mb-2 text-white md:text-slate-900 md:dark:text-white">{t('mistakes.emptyTitle')}</h3>
+                <p className="text-sm text-[#9AA4B2] md:text-slate-500 md:dark:text-slate-400 mb-6 max-w-sm">
                   {t('mistakes.emptyDesc')}
                 </p>
                 <Link
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-[#313C50] hover:bg-[#3b475c] text-white text-sm font-bold transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-[16px] bg-[#313C50] md:bg-slate-200 md:dark:bg-[#313C50] hover:bg-[#3b475c] md:hover:bg-slate-300 md:dark:hover:bg-[#3b475c] text-white md:text-slate-700 md:dark:text-white text-sm font-bold transition-colors"
                 >
                   {t('mistakes.gotoDashboard')}
                 </Link>
