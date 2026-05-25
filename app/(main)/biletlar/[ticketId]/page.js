@@ -256,16 +256,15 @@ export default function BiletTicketPage() {
       } else {
         const userToken = localStorage.getItem('userToken')
         const userData = localStorage.getItem('userData')
-        if (userToken && userData) {
+        if (userToken) {
           try {
-            const parsed = JSON.parse(userData)
-            const uid = parsed.uid || parsed._id || parsed.id
+            const parsed = userData ? JSON.parse(userData) : {}
+            const uid = parsed.uid || parsed._id || parsed.id || 'temp_user'
             setCurrentUser({ uid, ...parsed })
             loadSavedIds(uid)
-          } catch {
-            setCurrentUser(null)
-            setSavedIds([])
-            router.push('/login')
+          } catch (e) {
+            console.error("userData parsed error:", e)
+            setCurrentUser({ uid: 'temp_user' })
           }
         } else {
           setCurrentUser(null)

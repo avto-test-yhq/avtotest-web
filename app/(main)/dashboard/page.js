@@ -107,7 +107,7 @@ export default function DashboardPage() {
             else if (parsed.email) setUserName(parsed.email);
             else if (parsed.phone) setUserName(parsed.phone);
           } catch (e) { }
-        } else {
+        } else if (user) {
           // Agar userData bo'lmasa, Firebase user ma'lumotlaridan olamiz
           if (user.displayName) setUserName(user.displayName);
           else if (user.email) setUserName(user.email);

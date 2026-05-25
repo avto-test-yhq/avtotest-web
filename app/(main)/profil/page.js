@@ -193,16 +193,18 @@ export default function ProfilPage() {
             } else {
                 const userToken = localStorage.getItem('userToken')
                 const userData = localStorage.getItem('userData')
-                if (userToken && userData) {
+                if (userToken) {
                     try {
-                        const parsed = JSON.parse(userData)
-                        const uid = parsed.uid || parsed._id || parsed.id
+                        const parsed = userData ? JSON.parse(userData) : {}
+                        const uid = parsed.uid || parsed._id || parsed.id || 'temp_user'
                         const u = { uid, ...parsed }
                         setCurrentUser(u)
                         await fetchUserData(u)
-                    } catch {
-                        setCurrentUser(null)
-                        router.push('/login')
+                    } catch (e) {
+                        console.error("userData parsed error:", e)
+                        const u = { uid: 'temp_user' }
+                        setCurrentUser(u)
+                        await fetchUserData(u)
                     }
                 } else {
                     setCurrentUser(null)
